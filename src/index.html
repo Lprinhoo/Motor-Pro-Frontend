@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor Pro Gerenciamento - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
+    </header>
+
+    <main>
+        <div class="card login-card" id="auth-card">
+            <h2 id="auth-title">LOGIN</h2>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">USUÁRIO</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário" required>
+                </div>
+
+                <div class="input-group" id="password-group">
+                    <label for="password">SENHA</label>
+                    <input type="password" id="password" placeholder="Digite sua senha" required>
+                </div>
+
+                <div class="input-group hidden" id="confirm-password-group">
+                    <label for="confirm-password">CONFIRMAR SENHA</label>
+                    <input type="password" id="confirm-password" placeholder="Confirme sua senha">
+                </div>
+
+                <button type="submit" id="btn-auth">ACESSAR SISTEMA</button>
+            </form>
+
+            <div class="auth-footer">
+                <p id="toggle-text">Não tem uma conta? <span id="toggle-auth">Cadastre-se</span></p>
+                <p class="forgot-password" id="forgot-pass">Esqueceu sua senha?</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
