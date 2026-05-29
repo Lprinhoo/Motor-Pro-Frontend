@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor Pro Gerenciamento - Cadastro de Oficina</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
+    </header>
+
+    <main>
+        <div class="card login-card" id="oficina-card">
+            <h2 id="oficina-title">CADASTRAR OFICINA</h2>
+
+            <form id="oficina-form">
+                <div class="input-group">
+                    <label for="nomeOficina">NOME DA OFICINA</label>
+                    <input type="text" id="nomeOficina" placeholder="Digite o nome da oficina" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="endereco">ENDEREÇO</label>
+                    <input type="text" id="endereco" placeholder="Digite o endereço da oficina" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="telefone">TELEFONE</label>
+                    <input type="tel" id="telefone" placeholder="Digite o telefone de contato" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="emailOficina">EMAIL DE CONTATO</label>
+                    <input type="email" id="emailOficina" placeholder="Digite o email de contato da oficina">
+                </div>
+
+                <button type="submit" id="btn-cadastrar-oficina">CADASTRAR OFICINA</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Estrutura do Pop-up (reutilizada do index.html) -->
+    <div id="popup-overlay" class="hidden">
+        <div id="popup-card">
+            <h3 id="popup-title"></h3>
+            <p id="popup-message"></p>
+            <button id="popup-close-btn">OK</button>
+        </div>
+    </div>
+
+    <script src="register-oficina.js"></script>
+</body>
+</html>

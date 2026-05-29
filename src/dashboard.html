@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor Pro Gerenciamento - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
+    </header>
+
+    <main>
+        <div class="card login-card" id="dashboard-card">
+            <h2>BEM-VINDO AO DASHBOARD!</h2>
+            <p>Você está logado e sua oficina está registrada.</p>
+            <p>Token JWT: <span id="jwtTokenDisplay"></span></p>
+            <p>ID da Oficina: <span id="oficinaIdDisplay"></span></p>
+            <button id="logoutBtn">Sair</button>
+        </div>
+    </main>
+
+    <!-- Estrutura do Pop-up (reutilizada) -->
+    <div id="popup-overlay" class="hidden">
+        <div id="popup-card">
+            <h3 id="popup-title"></h3>
+            <p id="popup-message"></p>
+            <button id="popup-close-btn">OK</button>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
