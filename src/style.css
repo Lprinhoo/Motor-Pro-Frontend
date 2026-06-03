@@ -58,7 +58,7 @@ main {
 
 .scene {
     width: 100%;
-    max-width: 900px; /* Increased from 800px to 900px */
+    max-width: 620px;
     margin: auto;
 }
 
@@ -138,7 +138,7 @@ main {
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 }
 
 .card h2 {
@@ -319,4 +319,70 @@ button:hover {
 #popup-close-btn:hover {
     background-color: #1bd65a;
     transform: translateY(-1px);
+}
+
+/* Dashboard */
+.dashboard-card {
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.dashboard-subtitle {
+    font-size: 0.9rem;
+    color: rgba(245, 246, 252, 0.5);
+    margin-bottom: 2rem;
+    margin-top: -0.5rem;
+}
+
+.dashboard-info {
+    width: 100%;
+    border: 1px solid rgba(22, 188, 78, 0.15);
+    border-radius: 6px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+    background: rgba(22, 188, 78, 0.03);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    color: rgba(245, 246, 252, 0.4);
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 0.95rem;
+    color: #F5F6FC;
+    font-weight: 600;
+}
+
+.btn-logout {
+    background-color: transparent;
+    border: 1px solid rgba(255, 77, 77, 0.4);
+    color: #FF4D4D;
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: rgba(255, 77, 77, 0.08);
+    border-color: #FF4D4D;
+    transform: none;
+}
+
+/* Label opcional */
+.optional {
+    font-size: 0.65rem;
+    color: rgba(245, 246, 252, 0.25);
+    letter-spacing: 1px;
+    text-transform: none;
+    font-weight: 400;
 }

@@ -3,33 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor Pro Gerenciamento - Dashboard</title>
+    <title>Motor Pro CRM - Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
 </head>
-<body>
-    <header>
-        <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
-    </header>
+<body class="dashboard-body">
 
-    <main>
-        <div class="card login-card" id="dashboard-card">
-            <h2>BEM-VINDO AO DASHBOARD!</h2>
-            <p>Você está logado e sua oficina está registrada.</p>
-            <p>Token JWT: <span id="jwtTokenDisplay"></span></p>
-            <p>ID da Oficina: <span id="oficinaIdDisplay"></span></p>
-            <button id="logoutBtn">Sair</button>
+<div class="db-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sb-logo">
+            <h1>MOTOR PRO <span>CRM</span></h1>
+        </div>
+        <div class="sb-oficina">
+            <div class="sb-oficina-label">OFICINA</div>
+            <div class="sb-oficina-name" id="sbOficinaName">Carregando...</div>
+        </div>
+        <nav class="sb-nav">
+            <div class="nav-section">PRINCIPAL</div>
+            <div class="nav-item active" data-page="dashboard">
+                <i class="ti ti-layout-dashboard"></i> Dashboard
+            </div>
+            <div class="nav-item" data-page="clientes">
+                <i class="ti ti-users"></i> Clientes
+            </div>
+            <div class="nav-item" data-page="ordens">
+                <i class="ti ti-clipboard-list"></i> Ordens de Serviço
+            </div>
+            <div class="nav-section">GESTÃO</div>
+            <div class="nav-item" data-page="veiculos">
+                <i class="ti ti-car"></i> Veículos
+            </div>
+            <div class="nav-item" data-page="relatorios">
+                <i class="ti ti-chart-bar"></i> Relatórios
+            </div>
+            <div class="nav-section">SISTEMA</div>
+            <div class="nav-item" data-page="configuracoes">
+                <i class="ti ti-settings"></i> Configurações
+            </div>
+        </nav>
+        <div class="sb-bottom">
+            <button class="btn-logout" id="logoutBtn">SAIR DO SISTEMA</button>
+        </div>
+    </aside>
+
+    <!-- Conteúdo principal -->
+    <main class="db-content">
+        <div class="top-bar">
+            <div>
+                <div class="page-title">DASHBOARD</div>
+                <div class="page-subtitle">Visão geral da oficina</div>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">CLIENTES</div>
+                <div class="metric-value" id="metricClientes">—</div>
+                <div class="metric-change up">Total cadastrados</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">OS ABERTAS</div>
+                <div class="metric-value" id="metricOS">—</div>
+                <div class="metric-change up">Em andamento</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">FATURAMENTO</div>
+                <div class="metric-value" id="metricFaturamento">—</div>
+                <div class="metric-change up">Este mês</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">VEÍCULOS</div>
+                <div class="metric-value" id="metricVeiculos">—</div>
+                <div class="metric-change">Cadastrados</div>
+            </div>
+        </div>
+
+        <!-- Clientes recentes + OS -->
+        <div class="grid2">
+            <div class="panel">
+                <div class="panel-title">CLIENTES RECENTES</div>
+                <div id="clientesRecentes">
+                    <div class="empty-state">Nenhum cliente cadastrado ainda.</div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">ORDENS DE SERVIÇO</div>
+                <div id="ordensRecentes">
+                    <div class="empty-state">Nenhuma ordem de serviço ainda.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Serviços -->
+        <div class="panel">
+            <div class="panel-title">SERVIÇOS MAIS REALIZADOS</div>
+            <div id="servicosChart">
+                <div class="empty-state">Dados indisponíveis.</div>
+            </div>
         </div>
     </main>
+</div>
 
-    <!-- Estrutura do Pop-up (reutilizada) -->
-    <div id="popup-overlay" class="hidden">
-        <div id="popup-card">
-            <h3 id="popup-title"></h3>
-            <p id="popup-message"></p>
-            <button id="popup-close-btn">OK</button>
-        </div>
+<!-- Pop-up -->
+<div id="popup-overlay" class="hidden">
+    <div id="popup-card">
+        <h3 id="popup-title"></h3>
+        <p id="popup-message"></p>
+        <button id="popup-close-btn">OK</button>
     </div>
+</div>
 
-    <script src="dashboard.js"></script>
+<script src="dashboard.js"></script>
 </body>
 </html>

@@ -3,87 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor Pro Gerenciamento - Login/Cadastro</title>
+    <title>Motor Pro Gerenciamento - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
-    </header>
+<header>
+    <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
+</header>
 
-    <main>
-        <div class="scene">
-            <div class="card-flip-container">
-                <!-- Frente do Card: Formulário de Login -->
-                <div class="card front-face">
-                    <h2 id="auth-title-login">LOGIN</h2>
+<main>
+    <div class="scene">
+        <div class="card-flip-container">
 
-                    <form id="login-form">
-                        <div class="input-group">
-                            <label for="username-login">USUÁRIO</label>
-                            <input type="text" id="username-login" placeholder="Digite seu usuário" required>
-                        </div>
-
-                        <div class="input-group" id="password-group-login">
-                            <label for="password-login">SENHA</label>
-                            <input type="password" id="password-login" placeholder="Digite sua senha" required>
-                        </div>
-
-                        <button type="submit" id="btn-auth-login">ACESSAR SISTEMA</button>
-                    </form>
-
-                    <div class="auth-footer">
-                        <p id="toggle-text-login">Não tem uma conta? <span id="toggle-auth-login">Cadastre-se</span></p>
-                        <p class="forgot-password" id="forgot-pass">Esqueceu sua senha?</p>
+            <!-- Frente: Login -->
+            <div class="card front-face">
+                <h2>LOGIN</h2>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="username-login">USUÁRIO</label>
+                        <input type="text" id="username-login" placeholder="Digite seu usuário" required>
                     </div>
-                </div>
-
-                <!-- Trás do Card: Formulário de Cadastro -->
-                <div class="card back-face">
-                    <h2 id="auth-title-register">CADASTRO</h2>
-
-                    <form id="register-form">
-                        <div class="input-group">
-                            <label for="username-register">USUÁRIO</label>
-                            <input type="text" id="username-register" placeholder="Escolha um nome de usuário" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="email-register">EMAIL</label>
-                            <input type="email" id="email-register" placeholder="Digite seu email" required>
-                        </div>
-
-                        <div class="input-group" id="password-group-register">
-                            <label for="password-register">SENHA</label>
-                            <input type="password" id="password-register" placeholder="Crie sua senha" required>
-                        </div>
-
-                        <div class="input-group" id="confirm-password-group-register">
-                            <label for="confirm-password-register">CONFIRMAR SENHA</label>
-                            <input type="password" id="confirm-password-register" placeholder="Confirme sua senha" required>
-                        </div>
-
-                        <button type="submit" id="btn-auth-register">CRIAR CONTA</button>
-                    </form>
-
-                    <div class="auth-footer">
-                        <p id="toggle-text-register">Já possui uma conta? <span id="toggle-auth-register">Faça Login</span></p>
-                        <!-- O link de "Esqueceu sua senha?" não faz sentido no cadastro, então não o duplicamos aqui -->
+                    <div class="input-group">
+                        <label for="password-login">SENHA</label>
+                        <input type="password" id="password-login" placeholder="Digite sua senha" required>
                     </div>
+                    <button type="submit">ACESSAR SISTEMA</button>
+                </form>
+                <div class="auth-footer">
+                    <p>Não tem uma conta? <span id="toggle-auth-login">Cadastre-se</span></p>
+                    <p class="forgot-password" id="forgot-pass">Esqueceu sua senha?</p>
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Pop-up de Mensagens (já existente) -->
-    <div id="popup-overlay" class="hidden">
-        <div id="popup-card">
-            <h3 id="popup-title"></h3>
-            <p id="popup-message"></p>
-            <button id="popup-close-btn">OK</button>
+            <!-- Verso: Cadastro -->
+            <div class="card back-face">
+                <h2>CADASTRO</h2>
+                <form id="register-form">
+                    <div class="input-group">
+                        <label for="username-register">USUÁRIO</label>
+                        <input type="text" id="username-register" placeholder="Escolha um nome de usuário" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="email-register">EMAIL</label>
+                        <input type="email" id="email-register" placeholder="Digite seu email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password-register">SENHA</label>
+                        <input type="password" id="password-register" placeholder="Crie sua senha" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirm-password-register">CONFIRMAR SENHA</label>
+                        <input type="password" id="confirm-password-register" placeholder="Confirme sua senha" required>
+                    </div>
+                    <button type="submit">CRIAR CONTA</button>
+                </form>
+                <div class="auth-footer">
+                    <p>Já possui uma conta? <span id="toggle-auth-register">Faça Login</span></p>
+                </div>
+            </div>
+
         </div>
     </div>
+</main>
 
-    <script src="script.js"></script>
+<div id="popup-overlay" class="hidden">
+    <div id="popup-card">
+        <h3 id="popup-title"></h3>
+        <p id="popup-message"></p>
+        <button id="popup-close-btn">OK</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
