@@ -17,11 +17,11 @@
             <h1>MOTOR PRO <span>CRM</span></h1>
         </div>
         <div class="sb-oficina">
-            <div class="sb-oficina-label">OFICINA</div>
+            <div class="sb-oficina-label">Oficina</div>
             <div class="sb-oficina-name" id="sbOficinaName">Carregando...</div>
         </div>
         <nav class="sb-nav">
-            <div class="nav-section">PRINCIPAL</div>
+            <div class="nav-section">Principal</div>
             <div class="nav-item active" data-page="dashboard">
                 <i class="ti ti-layout-dashboard"></i> Dashboard
             </div>
@@ -31,20 +31,20 @@
             <div class="nav-item" data-page="ordens">
                 <i class="ti ti-clipboard-list"></i> Ordens de Serviço
             </div>
-            <div class="nav-section">GESTÃO</div>
+            <div class="nav-section">Gestão</div>
             <div class="nav-item" data-page="veiculos">
                 <i class="ti ti-car"></i> Veículos
             </div>
             <div class="nav-item" data-page="relatorios">
                 <i class="ti ti-chart-bar"></i> Relatórios
             </div>
-            <div class="nav-section">SISTEMA</div>
+            <div class="nav-section">Sistema</div>
             <div class="nav-item" data-page="configuracoes">
                 <i class="ti ti-settings"></i> Configurações
             </div>
         </nav>
         <div class="sb-bottom">
-            <button class="btn-logout" id="logoutBtn">SAIR DO SISTEMA</button>
+            <button class="btn-logout" id="logoutBtn">Sair do Sistema</button>
         </div>
     </aside>
 
@@ -52,7 +52,7 @@
     <main class="db-content">
         <div class="top-bar">
             <div>
-                <div class="page-title">DASHBOARD</div>
+                <div class="page-title">Dashboard</div>
                 <div class="page-subtitle">Visão geral da oficina</div>
             </div>
         </div>
@@ -60,22 +60,26 @@
         <!-- Métricas -->
         <div class="metrics">
             <div class="metric-card">
-                <div class="metric-label">CLIENTES</div>
+                <div class="metric-icon"><i class="ti ti-users"></i></div>
+                <div class="metric-label">Clientes</div>
                 <div class="metric-value" id="metricClientes">—</div>
                 <div class="metric-change up">Total cadastrados</div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">OS ABERTAS</div>
+                <div class="metric-icon" style="background:rgba(77,158,255,0.12);color:#4D9EFF"><i class="ti ti-clipboard-list"></i></div>
+                <div class="metric-label">OS Abertas</div>
                 <div class="metric-value" id="metricOS">—</div>
-                <div class="metric-change up">Em andamento</div>
+                <div class="metric-change">Em andamento</div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">FATURAMENTO</div>
+                <div class="metric-icon" style="background:rgba(255,181,71,0.12);color:#FFB547"><i class="ti ti-currency-dollar"></i></div>
+                <div class="metric-label">Faturamento</div>
                 <div class="metric-value" id="metricFaturamento">—</div>
                 <div class="metric-change up">Este mês</div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">VEÍCULOS</div>
+                <div class="metric-icon" style="background:rgba(255,92,92,0.12);color:#FF5C5C"><i class="ti ti-car"></i></div>
+                <div class="metric-label">Veículos</div>
                 <div class="metric-value" id="metricVeiculos">—</div>
                 <div class="metric-change">Cadastrados</div>
             </div>
@@ -84,13 +88,13 @@
         <!-- Clientes recentes + OS -->
         <div class="grid2">
             <div class="panel">
-                <div class="panel-title">CLIENTES RECENTES</div>
+                <div class="panel-title">Clientes Recentes</div>
                 <div id="clientesRecentes">
                     <div class="empty-state">Nenhum cliente cadastrado ainda.</div>
                 </div>
             </div>
             <div class="panel">
-                <div class="panel-title">ORDENS DE SERVIÇO</div>
+                <div class="panel-title">Ordens de Serviço</div>
                 <div id="ordensRecentes">
                     <div class="empty-state">Nenhuma ordem de serviço ainda.</div>
                 </div>
@@ -98,8 +102,8 @@
         </div>
 
         <!-- Serviços -->
-        <div class="panel">
-            <div class="panel-title">SERVIÇOS MAIS REALIZADOS</div>
+        <div class="panel full">
+            <div class="panel-title">Serviços Mais Realizados</div>
             <div id="servicosChart">
                 <div class="empty-state">Dados indisponíveis.</div>
             </div>
