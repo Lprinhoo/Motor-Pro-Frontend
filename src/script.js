@@ -126,11 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Busca a oficina do usuário na API
                 const temOficina = await buscarOficinaDoUsuario(text);
 
-                showPopup('Sucesso', 'Login realizado! Redirecionando...');
+                // showPopup('Sucesso', 'Login realizado! Redirecionando...'); // Removido popup
                 setTimeout(() => {
-                    hidePopup();
+                    // hidePopup(); // Removido popup
                     window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                }, 1500);
+                }, 500); // Reduzido o tempo para redirecionar mais rápido
             } else {
                 showPopup('Erro', text || 'Usuário ou senha incorretos.', true);
             }
@@ -179,11 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loginResponse.ok) {
                 const token = await loginResponse.text();
                 localStorage.setItem('jwtToken', token);
-                showPopup('Sucesso', 'Conta criada! Agora cadastre sua oficina.');
-                setTimeout(() => { hidePopup(); window.location.href = 'register-oficina.html'; }, 1500);
+                // showPopup('Sucesso', 'Conta criada! Agora cadastre sua oficina.'); // Removido popup
+                setTimeout(() => { /* hidePopup(); */ window.location.href = 'register-oficina.html'; }, 500); // Reduzido o tempo para redirecionar mais rápido
             } else {
-                showPopup('Conta criada!', 'Faça login para continuar.');
-                setTimeout(() => { hidePopup(); flipTo(false); }, 1500);
+                // showPopup('Conta criada!', 'Faça login para continuar.'); // Removido popup
+                setTimeout(() => { /* hidePopup(); */ flipTo(false); }, 500); // Reduzido o tempo
             }
         } catch {
             showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);

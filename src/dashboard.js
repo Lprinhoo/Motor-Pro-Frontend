@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
-        showPopup('Acesso Negado', 'Você não está logado. Redirecionando...', true);
+        // showPopup('Acesso Negado', 'Você não está logado. Redirecionando...', true); // Removed popup
         setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
     }
 
     if (!oficinaId) {
-        showPopup('Oficina não encontrada', 'Nenhuma oficina registrada. Redirecionando...', true);
+        // showPopup('Oficina não encontrada', 'Nenhuma oficina registrada. Redirecionando...', true); // Removed popup
         setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000);
         return;
     }
