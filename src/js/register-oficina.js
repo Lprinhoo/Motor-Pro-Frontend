@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('jwtToken');
     if (!token) {
         showPopup('Acesso Negado', 'Você não está logado. Redirecionando...', true);
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'html/index.html'; }, 2000);
         return;
     }
 
@@ -54,11 +54,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('oficinaId', data.id);
                 localStorage.setItem('oficinaNome', data.nome);
                 showPopup('Sucesso', `Oficina "${data.nome}" cadastrada! Redirecionando...`);
-                setTimeout(() => { hidePopup(); window.location.href = 'dashboard.html'; }, 1500);
+                setTimeout(() => { hidePopup(); window.location.href = 'html/dashboard.html'; }, 1500);
             } else if (response.status === 403) {
                 localStorage.removeItem('jwtToken');
                 showPopup('Sessão Expirada', 'Sua sessão expirou. Redirecionando para o login.', true);
-                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                setTimeout(() => { window.location.href = 'html/index.html'; }, 2000);
             } else {
                 const errorText = await response.text();
                 showPopup('Erro', errorText || 'Erro ao cadastrar oficina. Tente novamente.', true);

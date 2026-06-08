@@ -1,13 +1,13 @@
 @font-face {
     font-family: 'Ardela';
-    src: url('fonts/Ardela.ttf') format('truetype');
+    src: url('../fonts/Ardela.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Sora';
-    src: url('fonts/Sora.ttf') format('truetype');
+    src: url('../fonts/Sora.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }

@@ -22,14 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
-        // showPopup('Acesso Negado', 'Você não está logado. Redirecionando...', true); // Removed popup
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'html/index.html'; }, 2000);
         return;
     }
 
     if (!oficinaId) {
-        // showPopup('Oficina não encontrada', 'Nenhuma oficina registrada. Redirecionando...', true); // Removed popup
-        setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'html/register-oficina.html'; }, 2000);
         return;
     }
 
@@ -54,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('oficinaId');
         localStorage.removeItem('oficinaNome');
-        window.location.href = 'index.html';
+        window.location.href = 'html/index.html';
     });
 
     // ─── Carrega dados da API ─────────────────────────────────
@@ -69,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (resOficina.status === 403) {
                 localStorage.removeItem('jwtToken');
-                window.location.href = 'index.html';
+                window.location.href = 'html/index.html';
                 return;
             }
 

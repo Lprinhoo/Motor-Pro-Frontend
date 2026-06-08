@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // showPopup('Sucesso', 'Login realizado! Redirecionando...'); // Removido popup
                 setTimeout(() => {
                     // hidePopup(); // Removido popup
-                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                    window.location.href = temOficina ? 'html/dashboard.html' : 'html/register-oficina.html';
                 }, 500); // Reduzido o tempo para redirecionar mais rápido
             } else {
                 showPopup('Erro', text || 'Usuário ou senha incorretos.', true);
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const token = await loginResponse.text();
                 localStorage.setItem('jwtToken', token);
                 // showPopup('Sucesso', 'Conta criada! Agora cadastre sua oficina.'); // Removido popup
-                setTimeout(() => { /* hidePopup(); */ window.location.href = 'register-oficina.html'; }, 500); // Reduzido o tempo para redirecionar mais rápido
+                setTimeout(() => { /* hidePopup(); */ window.location.href = 'html/register-oficina.html'; }, 500); // Reduzido o tempo para redirecionar mais rápido
             } else {
                 // showPopup('Conta criada!', 'Faça login para continuar.'); // Removido popup
                 setTimeout(() => { /* hidePopup(); */ flipTo(false); }, 500); // Reduzido o tempo

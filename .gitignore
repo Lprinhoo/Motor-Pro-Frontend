@@ -39,4 +39,4 @@ build/
 .DS_Store
 
 # Custom additions
-src/config.js
+src/js/config.js

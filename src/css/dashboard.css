@@ -29,6 +29,7 @@ body.dashboard-body {
 }
 
 .sb-logo h1 {
+    font-family: 'Ardela', sans-serif; /* Adicionado Ardela aqui */
     font-size: 11px;
     letter-spacing: 4px;
     font-weight: 300;
