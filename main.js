@@ -3,10 +3,10 @@ const path = require('path');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
+    // Removidos width e height, pois fullscreen os sobrescreve
     minWidth: 800,
     minHeight: 600,
+    fullscreen: true, // Adicionado para iniciar em tela cheia
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
