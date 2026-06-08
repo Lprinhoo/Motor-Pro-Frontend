@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor Pro CRM - Dashboard</title>
+    <title>Motor Pro CRM — Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/dashboard.css">
+    <!-- Adicionada a importação direta da fonte Tabler Icons via CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 <body class="dashboard-body">
 
@@ -14,96 +16,92 @@
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sb-logo">
+            <div class="sb-logo-mark">
+                <span class="sb-logo-dot"></span>
+            </div>
             <h1>MOTOR PRO <span>CRM</span></h1>
         </div>
+
         <div class="sb-oficina">
-            <div class="sb-oficina-label">OFICINA</div>
-            <div class="sb-oficina-name" id="sbOficinaName">Carregando...</div>
+            <div class="sb-oficina-avatar" id="sbOficinaAvatar">M</div>
+            <div class="sb-oficina-info">
+                <div class="sb-oficina-label">OFICINA ATIVA</div>
+                <div class="sb-oficina-name" id="sbOficinaName">Carregando...</div>
+            </div>
         </div>
+
         <nav class="sb-nav">
             <div class="nav-section">PRINCIPAL</div>
             <div class="nav-item active" data-page="dashboard">
-                <i class="ti ti-layout-dashboard"></i> Dashboard
+                <i class="ti ti-layout-dashboard"></i><span>Dashboard</span>
             </div>
             <div class="nav-item" data-page="clientes">
-                <i class="ti ti-users"></i> Clientes
+                <i class="ti ti-users"></i><span>Clientes</span>
             </div>
             <div class="nav-item" data-page="ordens">
-                <i class="ti ti-clipboard-list"></i> Ordens de Serviço
+                <i class="ti ti-clipboard-list"></i><span>Ordens de Serviço</span>
+                <span class="nav-badge">12</span>
             </div>
+
             <div class="nav-section">GESTÃO</div>
             <div class="nav-item" data-page="veiculos">
-                <i class="ti ti-car"></i> Veículos
+                <i class="ti ti-car"></i><span>Veículos</span>
             </div>
             <div class="nav-item" data-page="relatorios">
-                <i class="ti ti-chart-bar"></i> Relatórios
+                <i class="ti ti-chart-bar"></i><span>Relatórios</span>
             </div>
+
             <div class="nav-section">SISTEMA</div>
             <div class="nav-item" data-page="configuracoes">
-                <i class="ti ti-settings"></i> Configurações
+                <i class="ti ti-settings"></i><span>Configurações</span>
             </div>
         </nav>
+
         <div class="sb-bottom">
-            <button class="btn-logout" id="logoutBtn">SAIR DO SISTEMA</button>
+            <button class="btn-logout" id="logoutBtn">
+                <i class="ti ti-logout"></i> SAIR DO SISTEMA
+            </button>
         </div>
     </aside>
 
     <!-- Conteúdo principal -->
     <main class="db-content">
-        <div class="top-bar">
+        <header class="top-bar">
             <div>
-                <div class="page-title">DASHBOARD</div>
-                <div class="page-subtitle">Visão geral da oficina</div>
+                <div class="page-eyebrow">VISÃO GERAL</div>
+                <h2 class="page-title">Serviços da Oficina</h2>
+                <div class="page-subtitle">Gerencie os serviços oferecidos pela sua oficina.</div>
             </div>
-        </div>
+            <div class="top-bar-actions">
+                <div class="search-box">
+                    <i class="ti ti-search"></i>
+                    <input type="text" placeholder="Buscar serviço...">
+                    <kbd>⌘K</kbd>
+                </div>
+                <!-- Botão de notificação removido -->
+            </div>
+        </header>
 
-        <!-- Métricas -->
-        <div class="metrics">
-            <div class="metric-card">
-                <div class="metric-label">CLIENTES</div>
-                <div class="metric-value" id="metricClientes">—</div>
-                <div class="metric-change up">Total cadastrados</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">OS ABERTAS</div>
-                <div class="metric-value" id="metricOS">—</div>
-                <div class="metric-change up">Em andamento</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">FATURAMENTO</div>
-                <div class="metric-value" id="metricFaturamento">—</div>
-                <div class="metric-change up">Este mês</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">VEÍCULOS</div>
-                <div class="metric-value" id="metricVeiculos">—</div>
-                <div class="metric-change">Cadastrados</div>
-            </div>
-        </div>
-
-        <!-- Clientes recentes + OS -->
-        <div class="grid2">
-            <div class="panel">
-                <div class="panel-title">CLIENTES RECENTES</div>
-                <div id="clientesRecentes">
-                    <div class="empty-state">Nenhum cliente cadastrado ainda.</div>
+        <!-- Painéis de Serviços da Oficina -->
+        <section class="panel">
+            <div class="panel-title-group">
+                <div>
+                    <div class="panel-title">SERVIÇOS DISPONÍVEIS</div>
+                    <div class="panel-hint">Catálogo de serviços que sua oficina oferece.</div>
+                </div>
+                <div class="panel-actions">
+                    <button class="btn-action ghost" id="editServicesBtn">
+                        <i class="ti ti-edit"></i> Editar
+                    </button>
+                    <button class="btn-action primary" id="addServiceBtn">
+                        <i class="ti ti-plus"></i> Novo Serviço
+                    </button>
                 </div>
             </div>
-            <div class="panel">
-                <div class="panel-title">ORDENS DE SERVIÇO</div>
-                <div id="ordensRecentes">
-                    <div class="empty-state">Nenhuma ordem de serviço ainda.</div>
-                </div>
+            <div id="servicePanelsContainer" class="service-panels-grid">
+                <!-- Os painéis de serviço serão renderizados aqui pelo JavaScript -->
             </div>
-        </div>
-
-        <!-- Serviços -->
-        <div class="panel">
-            <div class="panel-title">SERVIÇOS MAIS REALIZADOS</div>
-            <div id="servicosChart">
-                <div class="empty-state">Dados indisponíveis.</div>
-            </div>
-        </div>
+        </section>
     </main>
 </div>
 

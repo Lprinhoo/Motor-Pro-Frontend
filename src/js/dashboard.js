@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const popupCloseBtn = document.getElementById('popup-close-btn');
     const logoutBtn     = document.getElementById('logoutBtn');
 
+    // Reintroduzindo os botões de serviço
+    const addServiceBtn   = document.getElementById('addServiceBtn');
+    const editServicesBtn = document.getElementById('editServicesBtn');
+
     const API_BASE_URL = 'http://76.13.173.156:8080/api';
 
     const showPopup = (title, message, isError = false) => {
@@ -16,33 +20,36 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const hidePopup = () => popupOverlay.classList.add('hidden');
     popupCloseBtn.addEventListener('click', hidePopup);
+    popupOverlay.addEventListener('click', (e) => { if (e.target === popupOverlay) hidePopup(); });
 
     // ─── Autenticação ─────────────────────────────────────────
     const token     = localStorage.getItem('jwtToken');
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000); // Caminho corrigido
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
     }
-
     if (!oficinaId) {
-        setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000); // Caminho corrigido
+        setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000);
         return;
     }
 
-    // ─── Nome da oficina na sidebar ───────────────────────────
-    const oficinaNome = localStorage.getItem('oficinaNome');
-    document.getElementById('sbOficinaName').innerText = oficinaNome || `ID ${oficinaId}`;
+    // ─── Nome da oficina + avatar com inicial ────────────────
+    const oficinaNome = localStorage.getItem('oficinaNome') || `Oficina #${oficinaId}`;
+    document.getElementById('sbOficinaName').innerText = oficinaNome;
+    const avatarEl = document.getElementById('sbOficinaAvatar');
+    if (avatarEl) avatarEl.innerText = (oficinaNome.trim()[0] || 'O').toUpperCase();
 
-    // ─── Navegação sidebar (estrutura para futuras páginas) ───
+    // ─── Navegação sidebar ────────────────────────────────────
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             const page = item.dataset.page;
             if (page !== 'dashboard') {
-                showPopup('Em breve', `A seção "${item.innerText.trim()}" estará disponível em breve.`);
+                const label = item.querySelector('span')?.innerText || item.innerText.trim();
+                showPopup('Em breve', `A seção "${label}" estará disponível em breve.`);
             }
         });
     });
@@ -52,99 +59,70 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('oficinaId');
         localStorage.removeItem('oficinaNome');
-        window.location.href = 'index.html'; // Caminho corrigido
+        window.location.href = 'index.html';
     });
 
-    // ─── Carrega dados da API ─────────────────────────────────
+    // ─── Botões de Ação para Serviços ────────────────────────
+    if (addServiceBtn) {
+        addServiceBtn.addEventListener('click', () => {
+            showPopup('Funcionalidade em Desenvolvimento', 'A tela de adicionar serviços está em construção.');
+        });
+    }
+    if (editServicesBtn) {
+        editServicesBtn.addEventListener('click', () => {
+            showPopup('Funcionalidade em Desenvolvimento', 'A tela de edição de serviços está em construção.');
+        });
+    }
+
+    // ─── Dados mock ───────────────────────────────────────────
+    const SERVICOS_MOCK = [
+        { id: 1, nome: 'Troca de Óleo',              descricao: 'Serviço completo de troca de óleo e filtro.',                preco: 120.00, status: 'Disponível' },
+        { id: 2, nome: 'Revisão de Freios',          descricao: 'Verificação e substituição de pastilhas e discos.',          preco: 250.00, status: 'Disponível' },
+        { id: 3, nome: 'Alinhamento e Balanceamento',descricao: 'Ajuste da geometria e balanceamento das rodas.',             preco: 150.00, status: 'Disponível' },
+        { id: 4, nome: 'Diagnóstico Eletrônico',     descricao: 'Verificação de falhas no sistema eletrônico do veículo.',    preco: 180.00, status: 'Disponível' },
+        { id: 5, nome: 'Troca de Pneus',             descricao: 'Substituição e calibragem de pneus.',                        preco:  80.00, status: 'Disponível' },
+        { id: 6, nome: 'Troca de Bateria',           descricao: 'Substituição e teste de bateria automotiva.',                preco: 300.00, status: 'Disponível' },
+        { id: 7, nome: 'Revisão Geral',              descricao: 'Check-up completo do veículo, incluindo fluidos e componentes.', preco: 450.00, status: 'Disponível' }
+    ];
+
+    // ─── Carrega dados ────────────────────────────────────────
     carregarDados();
 
     async function carregarDados() {
         try {
             const headers = { 'Authorization': `Bearer ${token}` };
-
-            // Busca dados da oficina
             const resOficina = await fetch(`${API_BASE_URL}/oficinas/${oficinaId}`, { headers });
-
             if (resOficina.status === 403) {
                 localStorage.removeItem('jwtToken');
-                window.location.href = 'index.html'; // Caminho corrigido
+                window.location.href = 'index.html';
                 return;
             }
-
-            // Por ora renderiza dados mockados até os endpoints de CRM existirem
-            renderizarMetricas({ clientes: 0, os: 0, faturamento: 0, veiculos: 0 });
-            renderizarClientesRecentes([]);
-            renderizarOrdensRecentes([]);
-            renderizarServicos([]);
-
-        } catch {
-            renderizarMetricas({ clientes: 0, os: 0, faturamento: 0, veiculos: 0 });
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+        } finally {
+            // Renderiza os painéis de serviço com dados mockados
+            renderizarPaineisServicos(SERVICOS_MOCK);
         }
     }
 
     // ─── Renderização ─────────────────────────────────────────
-    function renderizarMetricas({ clientes, os, faturamento, veiculos }) {
-        document.getElementById('metricClientes').innerText    = clientes;
-        document.getElementById('metricOS').innerText          = os;
-        document.getElementById('metricFaturamento').innerText = faturamento > 0
-            ? `R$${(faturamento / 1000).toFixed(1)}k`
-            : 'R$0';
-        document.getElementById('metricVeiculos').innerText    = veiculos;
-    }
-
-    function renderizarClientesRecentes(clientes) {
-        const el = document.getElementById('clientesRecentes');
-        if (!clientes.length) {
-            el.innerHTML = '<div class="empty-state">Nenhum cliente cadastrado ainda.</div>';
-            return;
-        }
-        el.innerHTML = clientes.map(c => {
-            const iniciais = c.nome.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase();
-            return `
-                <div class="client-item">
-                    <div class="avatar">${iniciais}</div>
-                    <div>
-                        <div class="client-name">${c.nome}</div>
-                        <div class="client-sub">${c.veiculo || ''} · OS #${c.osId || '—'}</div>
-                    </div>
-                    <span class="badge ${c.status}">${c.statusLabel}</span>
-                </div>`;
-        }).join('');
-    }
-
-    function renderizarOrdensRecentes(ordens) {
-        const el = document.getElementById('ordensRecentes');
-        if (!ordens.length) {
-            el.innerHTML = '<div class="empty-state">Nenhuma ordem de serviço ainda.</div>';
-            return;
-        }
-        el.innerHTML = ordens.map(o => `
-            <div class="os-item">
-                <div>
-                    <div class="os-num">#${String(o.id).padStart(4,'0')}</div>
-                    <div class="os-desc">${o.descricao}</div>
-                    <div class="os-sub">${o.cliente} · ${o.veiculo}</div>
-                </div>
-                <div class="os-val">R$${o.valor}</div>
-            </div>`
-        ).join('');
-    }
-
-    function renderizarServicos(servicos) {
-        const el = document.getElementById('servicosChart');
+    function renderizarPaineisServicos(servicos) {
+        const el = document.getElementById('servicePanelsContainer');
+        if (!el) return;
         if (!servicos.length) {
-            el.innerHTML = '<div class="empty-state">Dados indisponíveis. Cadastre ordens de serviço para ver estatísticas.</div>';
+            el.innerHTML = '<div class="empty-state">Nenhum serviço cadastrado para exibir.</div>';
             return;
         }
-        const max = Math.max(...servicos.map(s => s.count));
-        el.innerHTML = servicos.map(s => {
-            const pct = Math.round((s.count / max) * 100);
-            return `
-                <div class="bar-row">
-                    <span class="bar-label">${s.nome}</span>
-                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-                    <span class="bar-pct">${s.count}x</span>
-                </div>`;
-        }).join('');
+        el.innerHTML = servicos.map(s => `
+            <article class="service-panel">
+                <h3>${s.nome}</h3>
+                <p>${s.descricao}</p>
+                <div class="service-details">
+                    <span class="price"><small>R$</small>${s.preco.toFixed(2).replace('.', ',')}</span>
+                    <span class="status ${s.status.toLowerCase().replace(/\s+/g, '-')}">${s.status}</span>
+                </div>
+                <button class="btn-add-service" type="button">Adicionar à OS</button>
+            </article>
+        `).join('');
     }
 });
