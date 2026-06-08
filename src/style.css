@@ -5,6 +5,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Sora';
+    src: url('fonts/Sora.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -14,7 +21,7 @@
 body {
     background-color: #0B0B0B;
     color: #F5F6FC;
-    font-family: 'Inter', sans-serif; /* Changed to Inter for consistency */
+    font-family: 'Sora', sans-serif;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -164,7 +171,7 @@ main {
     border: 1px solid rgba(245, 246, 252, 0.1);
     padding: 18px 20px;
     color: #F5F6FC;
-    font-family: 'Inter', sans-serif; /* Changed to Inter for consistency */
+    font-family: 'Sora', sans-serif;
     font-size: 0.95rem;
     border-radius: 4px;
     transition: all 0.3s ease;
@@ -179,7 +186,7 @@ main {
 
 button {
     width: 100%;
-    font-family: 'Inter', sans-serif; /* Changed to Inter for consistency */
+    font-family: 'Sora', sans-serif;
     background-color: #16BC4E;
     color: #F5F6FC;
     padding: 13px;
@@ -237,6 +244,81 @@ button:hover {
 
 .forgot-password:hover {
     color: #16BC4E;
+}
+
+/* Pop-up */
+#popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+#popup-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#popup-card {
+    background: rgba(30, 30, 30, 0.98);
+    border: 1px solid rgba(22, 188, 78, 0.3);
+    padding: 3rem 2.5rem;
+    border-radius: 10px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#popup-overlay.hidden #popup-card {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+#popup-title {
+    font-family: 'Ardela', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 4px;
+    margin-bottom: 1.2rem;
+    color: #16BC4E;
+    font-weight: 300;
+}
+
+#popup-message {
+    font-size: 1rem;
+    color: #F5F6FC;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+#popup-close-btn {
+    background-color: #16BC4E;
+    color: #F5F6FC;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: auto;
+}
+
+#popup-close-btn:hover {
+    background-color: #1bd65a;
+    transform: translateY(-1px);
 }
 
 /* Dashboard */

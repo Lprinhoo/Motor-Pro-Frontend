@@ -1,6 +1,3 @@
-import { API_BASE_URL } from './config.js';
-import { showPopup, hidePopup } from './utils.js';
-
 document.addEventListener('DOMContentLoaded', () => {
     const cardFlipContainer  = document.querySelector('.card-flip-container');
     const frontFace          = document.querySelector('.front-face');
@@ -10,8 +7,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAuthLogin    = document.getElementById('toggle-auth-login');
     const toggleAuthRegister = document.getElementById('toggle-auth-register');
     const forgotPass         = document.getElementById('forgot-pass');
+    const popupOverlay       = document.getElementById('popup-overlay');
+    const popupTitle         = document.getElementById('popup-title');
+    const popupMessage       = document.getElementById('popup-message');
+    const popupCloseBtn      = document.getElementById('popup-close-btn');
 
+    const API_BASE_URL = 'http://76.13.173.156:8080/api';
     let isAnimating = false;
+
+    // ─── Pop-up ───────────────────────────────────────────────
+    const showPopup = (title, message, isError = false) => {
+        popupTitle.innerText   = title;
+        popupMessage.innerText = message;
+        popupTitle.style.color = isError ? '#FF4D4D' : '#16BC4E';
+        popupCloseBtn.style.backgroundColor = isError ? '#FF4D4D' : '#16BC4E';
+        popupOverlay.classList.remove('hidden');
+    };
+    const hidePopup = () => popupOverlay.classList.add('hidden');
+    popupCloseBtn.addEventListener('click', hidePopup);
 
     // ─── Flip ─────────────────────────────────────────────────
     const HALF  = 120;
@@ -69,11 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Busca oficina do usuário na API após login ───────────
     async function buscarOficinaDoUsuario(token) {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/oficinas/minha`, {
+            const response = await fetch(`${API_BASE_URL}/oficinas/minha`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
                 const data = await response.json();
+                // A API retorna a oficina do usuário logado
                 const oficina = data;
                 if (oficina && oficina.id) {
                     localStorage.setItem('oficinaId', oficina.id);
@@ -99,26 +113,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
-            const data = await response.json(); // Altera para await response.json()
+            const text = await response.text();
 
             if (response.ok) {
-                localStorage.setItem('jwtToken', data.token); // Pega a propriedade 'token' do objeto JSON
+                localStorage.setItem('jwtToken', text);
 
-                const temOficina = await buscarOficinaDoUsuario(data.token); // Usa o token do objeto JSON
+                // Busca a oficina do usuário na API
+                const temOficina = await buscarOficinaDoUsuario(text);
 
-                // Redirecionamento direto após login bem-sucedido
-                window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                showPopup('Sucesso', 'Login realizado! Redirecionando...');
+                setTimeout(() => {
+                    hidePopup();
+                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                }, 1500);
             } else {
-                // Para erros, o backend ainda pode retornar uma string simples ou um JSON de erro.
-                // Se for uma string simples, response.text() é melhor. Se for JSON de erro, response.json().
-                // Por enquanto, vamos assumir que pode ser uma string simples para a mensagem de erro.
-                // Se o backend começar a retornar JSON para erros, você precisará ajustar aqui também.
-                showPopup('Erro', data.message || 'Usuário ou senha incorretos.', true); // Assumindo que a mensagem de erro pode vir em 'data.message'
+                showPopup('Erro', text || 'Usuário ou senha incorretos.', true);
             }
         } catch {
             showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
@@ -143,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const regResponse = await fetch(`${API_BASE_URL}/api/auth/register`, {
+            const regResponse = await fetch(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password }),
@@ -155,20 +169,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            // Login automático após cadastro
+            const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
 
             if (loginResponse.ok) {
-                const loginData = await loginResponse.json(); // Altera para await loginResponse.json()
-                localStorage.setItem('jwtToken', loginData.token); // Pega a propriedade 'token' do objeto JSON
-                // Redirecionamento direto após cadastro e login bem-sucedidos
-                window.location.href = 'register-oficina.html';
+                const token = await loginResponse.text();
+                localStorage.setItem('jwtToken', token);
+                showPopup('Sucesso', 'Conta criada! Agora cadastre sua oficina.');
+                setTimeout(() => { hidePopup(); window.location.href = 'register-oficina.html'; }, 1500);
             } else {
-                // Se o login automático falhar, apenas redireciona para a tela de login
-                flipTo(false);
+                showPopup('Conta criada!', 'Faça login para continuar.');
+                setTimeout(() => { hidePopup(); flipTo(false); }, 1500);
             }
         } catch {
             showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);

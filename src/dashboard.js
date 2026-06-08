@@ -1,22 +1,35 @@
-import { API_BASE_URL } from './config.js';
-import { showPopup, hidePopup } from './utils.js';
-
 document.addEventListener('DOMContentLoaded', () => {
+    const popupOverlay  = document.getElementById('popup-overlay');
+    const popupTitle    = document.getElementById('popup-title');
+    const popupMessage  = document.getElementById('popup-message');
+    const popupCloseBtn = document.getElementById('popup-close-btn');
     const logoutBtn     = document.getElementById('logoutBtn');
+
+    const API_BASE_URL = 'http://76.13.173.156:8080/api';
+
+    const showPopup = (title, message, isError = false) => {
+        popupTitle.innerText   = title;
+        popupMessage.innerText = message;
+        popupTitle.style.color = isError ? '#FF4D4D' : '#16BC4E';
+        popupCloseBtn.style.backgroundColor = isError ? '#FF4D4D' : '#16BC4E';
+        popupOverlay.classList.remove('hidden');
+    };
+    const hidePopup = () => popupOverlay.classList.add('hidden');
+    popupCloseBtn.addEventListener('click', hidePopup);
 
     // ─── Autenticação ─────────────────────────────────────────
     const token     = localStorage.getItem('jwtToken');
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
-        // Redirecionamento direto sem popup
-        window.location.href = 'index.html';
+        showPopup('Acesso Negado', 'Você não está logado. Redirecionando...', true);
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
         return;
     }
 
     if (!oficinaId) {
-        // Redirecionamento direto sem popup
-        window.location.href = 'register-oficina.html';
+        showPopup('Oficina não encontrada', 'Nenhuma oficina registrada. Redirecionando...', true);
+        setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000);
         return;
     }
 
@@ -52,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const headers = { 'Authorization': `Bearer ${token}` };
 
             // Busca dados da oficina
-            const resOficina = await fetch(`${API_BASE_URL}/api/oficinas/${oficinaId}`, { headers });
+            const resOficina = await fetch(`${API_BASE_URL}/oficinas/${oficinaId}`, { headers });
 
             if (resOficina.status === 403) {
                 localStorage.removeItem('jwtToken');
