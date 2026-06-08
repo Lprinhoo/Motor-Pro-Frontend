@@ -58,7 +58,7 @@ main {
 
 .scene {
     width: 100%;
-    max-width: 620px;
+    max-width: 320px; /* Reduzido de 360px para 320px */
     margin: auto;
 }
 
