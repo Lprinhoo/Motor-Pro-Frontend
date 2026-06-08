@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
-        setTimeout(() => { window.location.href = 'html/index.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 2000); // Caminho corrigido
         return;
     }
 
     if (!oficinaId) {
-        setTimeout(() => { window.location.href = 'html/register-oficina.html'; }, 2000);
+        setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000); // Caminho corrigido
         return;
     }
 
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('oficinaId');
         localStorage.removeItem('oficinaNome');
-        window.location.href = 'html/index.html';
+        window.location.href = 'index.html'; // Caminho corrigido
     });
 
     // ─── Carrega dados da API ─────────────────────────────────
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (resOficina.status === 403) {
                 localStorage.removeItem('jwtToken');
-                window.location.href = 'html/index.html';
+                window.location.href = 'index.html'; // Caminho corrigido
                 return;
             }
 
