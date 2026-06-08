@@ -14,7 +14,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'src/index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'src/html/index.html'));
 
   // Descomente para abrir DevTools durante desenvolvimento:
   // mainWindow.webContents.openDevTools();
