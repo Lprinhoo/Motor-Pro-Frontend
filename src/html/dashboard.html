@@ -6,7 +6,6 @@
     <title>Motor Pro CRM — Dashboard</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/dashboard.css">
-    <!-- Adicionada a importação direta da fonte Tabler Icons via CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 </head>
 <body class="dashboard-body">
@@ -66,11 +65,13 @@
 
     <!-- Conteúdo principal -->
     <main class="db-content">
+
+        <!-- Top bar -->
         <header class="top-bar">
             <div>
                 <div class="page-eyebrow">VISÃO GERAL</div>
-                <h2 class="page-title">Serviços da Oficina</h2>
-                <div class="page-subtitle">Gerencie os serviços oferecidos pela sua oficina.</div>
+                <h2 class="page-title">Dashboard</h2>
+                <div class="page-subtitle">Resumo de atividades e serviços da oficina.</div>
             </div>
             <div class="top-bar-actions">
                 <div class="search-box">
@@ -78,11 +79,42 @@
                     <input type="text" placeholder="Buscar serviço...">
                     <kbd>⌘K</kbd>
                 </div>
-                <!-- Botão de notificação removido -->
             </div>
         </header>
 
-        <!-- Painéis de Serviços da Oficina -->
+        <!-- Métricas -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">OS Abertas</div>
+                <div class="metric-value">12</div>
+                <div class="metric-delta delta--up">
+                    <i class="ti ti-trending-up"></i> +3 essa semana
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Faturamento do Mês</div>
+                <div class="metric-value"><small>R$</small>4.820</div>
+                <div class="metric-delta delta--up">
+                    <i class="ti ti-trending-up"></i> +18% vs mês anterior
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Clientes Ativos</div>
+                <div class="metric-value">34</div>
+                <div class="metric-delta delta--up">
+                    <i class="ti ti-trending-up"></i> +2 novos
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Serviços no Catálogo</div>
+                <div class="metric-value" id="metricServicos">7</div>
+                <div class="metric-delta delta--neutral">
+                    <i class="ti ti-point"></i> Nenhum pendente
+                </div>
+            </div>
+        </div>
+
+        <!-- Painel de serviços -->
         <section class="panel">
             <div class="panel-title-group">
                 <div>
@@ -99,15 +131,17 @@
                 </div>
             </div>
             <div id="servicePanelsContainer" class="service-panels-grid">
-                <!-- Os painéis de serviço serão renderizados aqui pelo JavaScript -->
+                <!-- Renderizado pelo dashboard.js -->
             </div>
         </section>
+
     </main>
 </div>
 
 <!-- Pop-up -->
 <div id="popup-overlay" class="hidden">
     <div id="popup-card">
+        <div class="popup-icon" id="popup-icon"></div>
         <h3 id="popup-title"></h3>
         <p id="popup-message"></p>
         <button id="popup-close-btn">OK</button>

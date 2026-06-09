@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const cardFlipContainer  = document.querySelector('.card-flip-container');
-    const frontFace          = document.querySelector('.front-face');
-    const backFace           = document.querySelector('.back-face');
+    const flipper            = document.getElementById('flipper');
     const loginForm          = document.getElementById('login-form');
     const registerForm       = document.getElementById('register-form');
     const toggleAuthLogin    = document.getElementById('toggle-auth-login');
@@ -10,93 +8,96 @@ document.addEventListener('DOMContentLoaded', () => {
     const popupOverlay       = document.getElementById('popup-overlay');
     const popupTitle         = document.getElementById('popup-title');
     const popupMessage       = document.getElementById('popup-message');
+    const popupIcon          = document.getElementById('popup-icon');
     const popupCloseBtn      = document.getElementById('popup-close-btn');
+    const cbRemember         = document.getElementById('cb-remember');
 
     const API_BASE_URL = 'http://76.13.173.156:8080/api';
-    let isAnimating = false;
 
     // ─── Pop-up ───────────────────────────────────────────────
     const showPopup = (title, message, isError = false) => {
         popupTitle.innerText   = title;
         popupMessage.innerText = message;
         popupTitle.style.color = isError ? '#FF4D4D' : '#16BC4E';
-        popupCloseBtn.style.backgroundColor = isError ? '#FF4D4D' : '#16BC4E';
+        popupCloseBtn.style.background = isError ? '#FF4D4D' : '#16BC4E';
+        popupCloseBtn.style.color = isError ? '#fff' : '#042B12';
+
+        if (popupIcon) {
+            popupIcon.style.background = isError
+                ? 'rgba(255,77,77,0.12)'
+                : 'rgba(22,188,78,0.12)';
+            popupIcon.style.border = isError
+                ? '1px solid rgba(255,77,77,0.25)'
+                : '1px solid rgba(22,188,78,0.25)';
+            popupIcon.innerHTML = isError
+                ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF4D4D" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+                : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16BC4E" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>';
+        }
+
         popupOverlay.classList.remove('hidden');
     };
     const hidePopup = () => popupOverlay.classList.add('hidden');
+
     popupCloseBtn.addEventListener('click', hidePopup);
+    popupOverlay.addEventListener('click', (e) => {
+        if (e.target === popupOverlay) hidePopup();
+    });
 
     // ─── Flip ─────────────────────────────────────────────────
-    const HALF  = 120;
-    const PIVOT = 85;
+    let isFlipping = false;
 
-    const flipTo = (showRegister) => {
-        if (isAnimating) return;
-        isAnimating = true;
-
-        const leaving  = showRegister ? frontFace : backFace;
-        const entering = showRegister ? backFace   : frontFace;
-
-        cardFlipContainer.style.height = leaving.offsetHeight + 'px';
-
-        entering.style.cssText = `
-            position: absolute; top: 0; left: 0; width: 100%;
-            opacity: 1; pointer-events: none;
-            transform: perspective(900px) rotateY(90deg);
-            transition: none;
-        `;
-
-        leaving.style.transition = `transform ${HALF}ms ease-in`;
-        leaving.style.transform  = 'perspective(900px) rotateY(-90deg)';
-
-        setTimeout(() => {
-            leaving.style.cssText = `
-                position: absolute; top: 0; left: 0; width: 100%;
-                opacity: 0; pointer-events: none;
-                transform: perspective(900px) rotateY(-90deg); transition: none;
-            `;
-            entering.style.cssText = `
-                position: relative; opacity: 1; pointer-events: all;
-                transform: perspective(900px) rotateY(90deg); transition: none;
-            `;
-            cardFlipContainer.style.height = entering.offsetHeight + 'px';
-
-            setTimeout(() => {
-                entering.style.transition = `transform ${HALF}ms ease-out`;
-                entering.style.transform  = 'perspective(900px) rotateY(0deg)';
-
-                setTimeout(() => {
-                    cardFlipContainer.classList.toggle('flipped', showRegister);
-                    leaving.style.cssText  = '';
-                    entering.style.cssText = '';
-                    cardFlipContainer.style.height = '';
-                    isAnimating = false;
-                }, HALF + 20);
-            }, 16);
-        }, PIVOT);
+    const flipTo = (showBack) => {
+        if (isFlipping) return;
+        isFlipping = true;
+        flipper.classList.toggle('flipped', showBack);
+        setTimeout(() => { isFlipping = false; }, 650);
     };
 
-    toggleAuthLogin.addEventListener('click', (e) => { e.preventDefault(); flipTo(true); });
-    toggleAuthRegister.addEventListener('click', (e) => { e.preventDefault(); flipTo(false); });
+    toggleAuthLogin?.addEventListener('click', (e) => { e.preventDefault(); flipTo(true); });
+    toggleAuthRegister?.addEventListener('click', (e) => { e.preventDefault(); flipTo(false); });
 
-    // ─── Busca oficina do usuário na API após login ───────────
+    // ─── Checkbox "Lembrar-me" ────────────────────────────────
+    cbRemember?.addEventListener('click', () => {
+        const isChecked = cbRemember.classList.toggle('checked');
+        cbRemember.setAttribute('aria-checked', isChecked);
+    });
+    cbRemember?.addEventListener('keydown', (e) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            cbRemember.click();
+        }
+    });
+
+    // ─── Mostrar/ocultar senha ────────────────────────────────
+    document.querySelectorAll('.eye-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.dataset.target;
+            const input    = document.getElementById(targetId);
+            if (!input) return;
+            const isPass = input.type === 'password';
+            input.type = isPass ? 'text' : 'password';
+            btn.querySelector('.eye-icon--show').style.display = isPass ? 'none' : '';
+            btn.querySelector('.eye-icon--hide').style.display = isPass ? '' : 'none';
+            btn.setAttribute('aria-label', isPass ? 'Ocultar senha' : 'Mostrar senha');
+        });
+    });
+
+    // ─── Busca oficina do usuário após login ──────────────────
     async function buscarOficinaDoUsuario(token) {
         try {
             const response = await fetch(`${API_BASE_URL}/oficinas/minha`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
-                const data = await response.json();
-                // A API retorna a oficina do usuário logado
-                const oficina = data;
+                const oficina = await response.json();
                 if (oficina && oficina.id) {
-                    localStorage.setItem('oficinaId', oficina.id);
+                    localStorage.setItem('oficinaId',   oficina.id);
                     localStorage.setItem('oficinaNome', oficina.nome || '');
                     return true;
                 }
             }
         } catch {
-            // ignora erro silenciosamente
+            // silencioso
         }
         return false;
     }
@@ -112,6 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const btn = loginForm.querySelector('.btn-primary');
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+
         try {
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
@@ -122,24 +127,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 localStorage.setItem('jwtToken', text);
-
-                // Busca a oficina do usuário na API
                 const temOficina = await buscarOficinaDoUsuario(text);
-
-                // showPopup('Sucesso', 'Login realizado! Redirecionando...'); // Removido popup
                 setTimeout(() => {
-                    // hidePopup(); // Removido popup
-                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html'; // Caminho corrigido
-                }, 500); // Reduzido o tempo para redirecionar mais rápido
+                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                }, 400);
             } else {
-                showPopup('Erro', text || 'Usuário ou senha incorretos.', true);
+                showPopup('Erro de acesso', text || 'Usuário ou senha incorretos.', true);
             }
         } catch {
             showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+        } finally {
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
         }
     });
 
-    // ─── Cadastro: registra e já faz login automaticamente ────
+    // ─── Cadastro ─────────────────────────────────────────────
     registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username        = document.getElementById('username-register').value.trim();
@@ -152,9 +155,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (password !== confirmPassword) {
-            showPopup('Erro', 'As senhas não coincidem.', true);
+            showPopup('Senhas diferentes', 'As senhas digitadas não coincidem.', true);
             return;
         }
+        if (password.length < 6) {
+            showPopup('Senha fraca', 'A senha deve ter pelo menos 6 caracteres.', true);
+            return;
+        }
+
+        const btn = registerForm.querySelector('.btn-primary');
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
 
         try {
             const regResponse = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -165,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!regResponse.ok) {
                 const err = await regResponse.text();
-                showPopup('Erro', err || 'Erro ao criar conta. Tente novamente.', true);
+                showPopup('Erro no cadastro', err || 'Erro ao criar conta. Tente novamente.', true);
                 return;
             }
 
@@ -179,19 +190,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (loginResponse.ok) {
                 const token = await loginResponse.text();
                 localStorage.setItem('jwtToken', token);
-                // showPopup('Sucesso', 'Conta criada! Agora cadastre sua oficina.'); // Removido popup
-                setTimeout(() => { /* hidePopup(); */ window.location.href = 'register-oficina.html'; }, 500); // Caminho corrigido
+                setTimeout(() => { window.location.href = 'register-oficina.html'; }, 400);
             } else {
-                // showPopup('Conta criada!', 'Faça login para continuar.'); // Removido popup
-                setTimeout(() => { /* hidePopup(); */ flipTo(false); }, 500); // Reduzido o tempo
+                flipTo(false);
             }
         } catch {
             showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+        } finally {
+            btn.style.opacity = '';
+            btn.style.pointerEvents = '';
         }
     });
 
     // ─── Esqueceu a senha ─────────────────────────────────────
-    forgotPass.addEventListener('click', (e) => {
+    forgotPass?.addEventListener('click', (e) => {
         e.preventDefault();
         showPopup('Indisponível', 'A redefinição de senha está temporariamente indisponível.', true);
     });

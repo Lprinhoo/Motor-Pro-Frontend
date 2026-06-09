@@ -7,67 +7,167 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<header>
-    <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
-</header>
 
-<main>
-    <div class="scene">
-        <div class="card-flip-container">
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow--tl"></div>
+<div class="bg-glow bg-glow--br"></div>
 
-            <!-- Frente: Login -->
-            <div class="card front-face">
-                <h2>LOGIN</h2>
-                <form id="login-form">
-                    <div class="input-group">
-                        <label for="username-login">USUÁRIO</label>
-                        <input type="text" id="username-login" placeholder="Digite seu usuário" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="password-login">SENHA</label>
-                        <input type="password" id="password-login" placeholder="Digite sua senha" required>
-                    </div>
-                    <button type="submit">ACESSAR SISTEMA</button>
-                </form>
-                <div class="auth-footer">
-                    <p>Não tem uma conta? <span id="toggle-auth-login">Cadastre-se</span></p>
-                    <p class="forgot-password" id="forgot-pass">Esqueceu sua senha?</p>
-                </div>
-            </div>
+<div class="page-wrap">
 
-            <!-- Verso: Cadastro -->
-            <div class="card back-face">
-                <h2>CADASTRO</h2>
-                <form id="register-form">
-                    <div class="input-group">
-                        <label for="username-register">USUÁRIO</label>
-                        <input type="text" id="username-register" placeholder="Escolha um nome de usuário" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="email-register">EMAIL</label>
-                        <input type="email" id="email-register" placeholder="Digite seu email" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="password-register">SENHA</label>
-                        <input type="password" id="password-register" placeholder="Crie sua senha" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="confirm-password-register">CONFIRMAR SENHA</label>
-                        <input type="password" id="confirm-password-register" placeholder="Confirme sua senha" required>
-                    </div>
-                    <button type="submit">CRIAR CONTA</button>
-                </form>
-                <div class="auth-footer">
-                    <p>Já possui uma conta? <span id="toggle-auth-register">Faça Login</span></p>
-                </div>
-            </div>
-
+    <header class="site-header">
+        <div class="logo">
+            <div class="logo-mark"><span class="logo-dot"></span></div>
+            <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
         </div>
-    </div>
-</main>
+    </header>
 
+    <main>
+        <div class="scene">
+            <div class="flipper" id="flipper">
+
+                <!-- FRENTE: LOGIN -->
+                <div class="card card--front">
+                    <div class="card-shine"></div>
+
+                    <div class="card-tag">
+                        <span class="tag-dot"></span>
+                        Acesso seguro
+                    </div>
+                    <h2 class="card-title">Bem-vindo de volta</h2>
+                    <p class="card-sub">Entre com suas credenciais para acessar o sistema.</p>
+
+                    <form id="login-form" novalidate>
+                        <div class="field">
+                            <label class="field-label" for="username-login">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                Usuário
+                            </label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                <input type="text" id="username-login" class="input" placeholder="Digite seu usuário" required autocomplete="username">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="password-login">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                Senha
+                            </label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                <input type="password" id="password-login" class="input input--pass" placeholder="Digite sua senha" required autocomplete="current-password">
+                                <button type="button" class="eye-btn" data-target="password-login" aria-label="Mostrar senha">
+                                    <svg class="eye-icon eye-icon--show" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="eye-icon eye-icon--hide" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <label class="remember">
+                                <span class="checkbox" id="cb-remember" role="checkbox" aria-checked="false" tabindex="0"></span>
+                                Lembrar-me
+                            </label>
+                            <span class="forgot-link" id="forgot-pass">Esqueceu a senha?</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                            Acessar Sistema
+                        </button>
+                    </form>
+
+                    <div class="card-footer">
+                        <p>Não tem uma conta? <span class="flip-link" id="toggle-auth-login">Cadastre-se</span></p>
+                        <p class="footer-hint">Acesso exclusivo para usuários cadastrados.</p>
+                    </div>
+                </div>
+
+                <!-- VERSO: CADASTRO -->
+                <div class="card card--back">
+                    <div class="card-shine"></div>
+
+                    <div class="card-tag">
+                        <span class="tag-dot"></span>
+                        Novo cadastro
+                    </div>
+                    <h2 class="card-title">Crie sua conta</h2>
+                    <p class="card-sub">Preencha os dados abaixo para começar.</p>
+
+                    <form id="register-form" novalidate>
+                        <div class="field">
+                            <label class="field-label" for="username-register">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                Usuário
+                            </label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                <input type="text" id="username-register" class="input" placeholder="Escolha um nome de usuário" required autocomplete="username">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="email-register">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                Email
+                            </label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <input type="email" id="email-register" class="input" placeholder="Digite seu email" required autocomplete="email">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="password-register">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                Senha
+                            </label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                <input type="password" id="password-register" class="input input--pass" placeholder="Crie sua senha" required autocomplete="new-password">
+                                <button type="button" class="eye-btn" data-target="password-register" aria-label="Mostrar senha">
+                                    <svg class="eye-icon eye-icon--show" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="eye-icon eye-icon--hide" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="field" style="margin-bottom: 1.4rem;">
+                            <label class="field-label" for="confirm-password-register">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                Confirmar Senha
+                            </label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                <input type="password" id="confirm-password-register" class="input input--pass" placeholder="Confirme sua senha" required autocomplete="new-password">
+                                <button type="button" class="eye-btn" data-target="confirm-password-register" aria-label="Mostrar senha">
+                                    <svg class="eye-icon eye-icon--show" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <svg class="eye-icon eye-icon--hide" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            Criar Conta
+                        </button>
+                    </form>
+
+                    <div class="card-footer">
+                        <p>Já possui uma conta? <span class="flip-link" id="toggle-auth-register">Faça Login</span></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<!-- Pop-up -->
 <div id="popup-overlay" class="hidden">
     <div id="popup-card">
+        <div class="popup-icon" id="popup-icon"></div>
         <h3 id="popup-title"></h3>
         <p id="popup-message"></p>
         <button id="popup-close-btn">OK</button>
