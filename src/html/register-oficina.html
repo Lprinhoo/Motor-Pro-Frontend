@@ -7,45 +7,103 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<header>
-    <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
-</header>
 
-<main>
-    <div class="scene">
-        <div class="card">
-            <h2>CADASTRAR OFICINA</h2>
-            <form id="oficina-form">
-                <div class="input-group">
-                    <label for="nomeOficina">NOME DA OFICINA</label>
-                    <input type="text" id="nomeOficina" placeholder="Digite o nome da oficina" required>
-                </div>
-                <div class="input-group">
-                    <label for="endereco">ENDEREÇO</label>
-                    <input type="text" id="endereco" placeholder="Digite o endereço da oficina" required>
-                </div>
-                <div class="input-group">
-                    <label for="telefone">TELEFONE</label>
-                    <input type="tel" id="telefone" placeholder="Digite o telefone de contato" required>
-                </div>
-                <div class="input-group">
-                    <label for="emailOficina">EMAIL DE CONTATO <span class="optional">(opcional)</span></label>
-                    <input type="email" id="emailOficina" placeholder="Digite o email de contato">
-                </div>
-                <button type="submit" id="btn-cadastrar-oficina">CADASTRAR OFICINA</button>
-            </form>
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow--tl"></div>
+<div class="bg-glow bg-glow--br"></div>
+
+<div class="page-wrap">
+
+    <header class="site-header">
+        <div class="logo">
+            <div class="logo-mark"><span class="logo-dot"></span></div>
+            <h1>MOTOR PRO <span>GERENCIAMENTO</span></h1>
         </div>
-    </div>
-</main>
+    </header>
 
+    <main>
+        <div class="scene">
+            <div class="card">
+                <div class="card-shine"></div>
+
+                <div class="card-tag">
+                    <span class="tag-dot"></span>
+                    Nova Oficina
+                </div>
+                <h2 class="card-title">Cadastre sua Oficina</h2>
+                <p class="card-sub">Preencha os dados para registrar sua oficina no sistema.</p>
+
+                <form id="oficina-form" novalidate>
+                    <div class="field">
+                        <label class="field-label" for="nomeOficina">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            Nome da Oficina
+                        </label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            <input type="text" id="nomeOficina" class="input" placeholder="Nome completo da oficina" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="endereco">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Endereço
+                        </label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <input type="text" id="endereco" class="input" placeholder="Rua, número, bairro" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="telefone">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-3.95-3.95A19.77 19.77 0 0 1 2 4.18 2 2 0 0 1 4.18 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            Telefone
+                        </label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-3.95-3.95A19.77 19.77 0 0 1 2 4.18 2 2 0 0 1 4.18 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <input type="tel" id="telefone" class="input" placeholder="Ex: (99) 99999-9999" required>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="field-label" for="emailOficina">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            Email de Contato <span class="optional">(opcional)</span>
+                        </label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <input type="email" id="emailOficina" class="input" placeholder="email@exemplo.com">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                        Cadastrar Oficina
+                    </button>
+                </form>
+
+                <div class="card-footer">
+                    <p>Já tem uma oficina cadastrada? <a href="dashboard.html" class="flip-link">Ir para o Dashboard</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<!-- Pop-up -->
 <div id="popup-overlay" class="hidden">
     <div id="popup-card">
+        <div class="popup-icon" id="popup-icon"></div>
         <h3 id="popup-title"></h3>
         <p id="popup-message"></p>
         <button id="popup-close-btn">OK</button>
     </div>
 </div>
 
+<script src="../js/script.js"></script> <!-- Carregado primeiro -->
 <script src="../js/register-oficina.js"></script>
 </body>
 </html>

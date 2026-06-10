@@ -1,3 +1,94 @@
+// Variáveis globais para controle de refresh de token
+let isRefreshing = false;
+let failedQueue = [];
+
+// Função para processar a fila de requisições falhas
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
+// Função utilitária para requisições autenticadas com refresh de token
+async function authFetch(url, options = {}) {
+    let accessToken = localStorage.getItem('jwtToken');
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    // Adiciona o Access Token ao cabeçalho da requisição
+    if (accessToken) {
+        options.headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${accessToken}`
+        };
+    }
+
+    let response = await fetch(url, options);
+
+    // Se a resposta for 401 (Unauthorized) ou 403 (Forbidden, assumindo token expirado)
+    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/auth/refresh`) {
+        // Se já estiver em processo de refresh, adiciona a requisição à fila
+        if (isRefreshing) {
+            return new Promise(function(resolve, reject) {
+                failedQueue.push({ resolve, reject });
+            }).then(token => {
+                options.headers['Authorization'] = 'Bearer ' + token;
+                return fetch(url, options);
+            }).catch(err => {
+                return Promise.reject(err);
+            });
+        }
+
+        isRefreshing = true;
+
+        try {
+            // Tenta obter um novo Access Token usando o Refresh Token
+            const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${refreshToken}` // Envia o Refresh Token aqui
+                }
+            });
+
+            if (refreshResponse.ok) {
+                // Assumindo que o refresh endpoint retorna { accessToken, refreshToken }
+                const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshResponse.json();
+                localStorage.setItem('jwtToken', newAccessToken);
+                localStorage.setItem('refreshToken', newRefreshToken); // Atualiza o Refresh Token também
+                accessToken = newAccessToken;
+
+                // Processa todas as requisições na fila com o novo token
+                processQueue(null, newAccessToken);
+
+                // Tenta a requisição original novamente com o novo Access Token
+                options.headers['Authorization'] = 'Bearer ' + accessToken;
+                response = await fetch(url, options);
+            } else {
+                // Refresh Token inválido ou expirado, força o logout
+                processQueue(new Error('Refresh Token inválido ou expirado'));
+                localStorage.clear();
+                window.location.href = 'index.html';
+                return Promise.reject('Refresh Token inválido ou expirado');
+            }
+        } catch (error) {
+            processQueue(error);
+            localStorage.clear();
+            window.location.href = 'index.html';
+            return Promise.reject(error);
+        } finally {
+            isRefreshing = false;
+        }
+    }
+
+    return response;
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const flipper            = document.getElementById('flipper');
     const loginForm          = document.getElementById('login-form');
@@ -85,9 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Busca oficina do usuário após login ──────────────────
     async function buscarOficinaDoUsuario(token) {
         try {
-            const response = await fetch(`${API_BASE_URL}/oficinas/minha`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            // Usando authFetch para esta requisição
+            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`); // authFetch já adiciona o token
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {
@@ -96,8 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     return true;
                 }
             }
-        } catch {
-            // silencioso
+        } catch (error) {
+            console.error('Erro ao buscar oficina do usuário:', error);
         }
         return false;
     }
@@ -123,19 +213,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
-            const text = await response.text();
 
             if (response.ok) {
-                localStorage.setItem('jwtToken', text);
-                const temOficina = await buscarOficinaDoUsuario(text);
+                let accessToken;
+                let refreshToken = null; // Assume null se não vier no JSON
+
+                try {
+                    const data = await response.json();
+                    accessToken = data.accessToken;
+                    refreshToken = data.refreshToken;
+                } catch (jsonError) {
+                    // Se falhar ao ler como JSON, tenta ler como texto (token puro)
+                    accessToken = await response.text();
+                    console.warn('Backend retornou token como texto puro. Refresh Token não será usado.');
+                }
+
+                if (!accessToken) {
+                    throw new Error('Token de acesso não recebido.');
+                }
+
+                localStorage.setItem('jwtToken', accessToken);
+                if (refreshToken) {
+                    localStorage.setItem('refreshToken', refreshToken);
+                } else {
+                    localStorage.removeItem('refreshToken'); // Garante que não haja refresh token antigo
+                }
+                
+                const temOficina = await buscarOficinaDoUsuario(accessToken);
                 setTimeout(() => {
                     window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
                 }, 400);
             } else {
-                showPopup('Erro de acesso', text || 'Usuário ou senha incorretos.', true);
+                let errorMessage = 'Usuário ou senha incorretos.';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = await response.text() || errorMessage;
+                }
+                showPopup('Erro de acesso', errorMessage, true);
             }
-        } catch {
-            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+        } catch (error) {
+            console.error('Erro no login:', error);
+            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
         } finally {
             btn.style.opacity = '';
             btn.style.pointerEvents = '';
@@ -175,8 +295,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!regResponse.ok) {
-                const err = await regResponse.text();
-                showPopup('Erro no cadastro', err || 'Erro ao criar conta. Tente novamente.', true);
+                let errorMessage = 'Erro ao criar conta. Tente novamente.';
+                try {
+                    const errorData = await regResponse.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = await regResponse.text() || errorMessage;
+                }
+                showPopup('Erro no cadastro', errorMessage, true);
                 return;
             }
 
@@ -188,14 +314,44 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (loginResponse.ok) {
-                const token = await loginResponse.text();
-                localStorage.setItem('jwtToken', token);
+                let accessToken;
+                let refreshToken = null;
+
+                try {
+                    const data = await loginResponse.json();
+                    accessToken = data.accessToken;
+                    refreshToken = data.refreshToken;
+                } catch (jsonError) {
+                    accessToken = await loginResponse.text();
+                    console.warn('Backend retornou token como texto puro após cadastro. Refresh Token não será usado.');
+                }
+
+                if (!accessToken) {
+                    throw new Error('Token de acesso não recebido após cadastro.');
+                }
+
+                localStorage.setItem('jwtToken', accessToken);
+                if (refreshToken) {
+                    localStorage.setItem('refreshToken', refreshToken);
+                } else {
+                    localStorage.removeItem('refreshToken');
+                }
+                
                 setTimeout(() => { window.location.href = 'register-oficina.html'; }, 400);
             } else {
-                flipTo(false);
+                let errorMessage = 'Erro ao fazer login automático após cadastro.';
+                try {
+                    const errorData = await loginResponse.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = await loginResponse.text() || errorMessage;
+                }
+                showPopup('Erro no login automático', errorMessage, true);
+                flipTo(false); // Volta para a tela de login
             }
-        } catch {
-            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+        } catch (error) {
+            console.error('Erro no cadastro ou login automático:', error);
+            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
         } finally {
             btn.style.opacity = '';
             btn.style.pointerEvents = '';
