@@ -216,16 +216,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 let accessToken;
-                let refreshToken = null; // Assume null se não vier no JSON
+                let refreshToken = null;
 
+                const text = await response.text(); // ← lê UMA vez como texto
                 try {
-                    const data = await response.json();
+                    const data = JSON.parse(text);  // ← tenta parsear como JSON
                     accessToken = data.accessToken;
                     refreshToken = data.refreshToken;
-                } catch (jsonError) {
-                    // Se falhar ao ler como JSON, tenta ler como texto (token puro)
-                    accessToken = await response.text();
-                    console.warn('Backend retornou token como texto puro. Refresh Token não será usado.');
+                } catch {
+                    accessToken = text.trim();      // ← se não for JSON, usa como token puro
+                    console.warn('Backend retornou token como texto puro.');
                 }
 
                 if (!accessToken) {
