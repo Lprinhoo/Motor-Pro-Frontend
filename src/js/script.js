@@ -317,13 +317,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 let accessToken;
                 let refreshToken = null;
 
+                const text = await loginResponse.text(); // ← lê UMA vez
                 try {
-                    const data = await loginResponse.json();
+                    const data = JSON.parse(text);       // ← tenta JSON
                     accessToken = data.accessToken;
                     refreshToken = data.refreshToken;
-                } catch (jsonError) {
-                    accessToken = await loginResponse.text();
-                    console.warn('Backend retornou token como texto puro após cadastro. Refresh Token não será usado.');
+                } catch {
+                    accessToken = text.trim();           // ← token puro
+                    console.warn('Backend retornou token como texto puro após cadastro.');
                 }
 
                 if (!accessToken) {
