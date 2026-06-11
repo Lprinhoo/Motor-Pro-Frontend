@@ -1,26 +1,48 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session } = require('electron');
 const path = require('path');
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
-    // Removidos width e height, pois fullscreen os sobrescreve
     minWidth: 800,
     minHeight: 600,
-    fullscreen: true, // Adicionado para iniciar em tela cheia
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      webSecurity: false  // ← desativa CORS no Electron
     }
   });
 
   mainWindow.loadFile(path.join(__dirname, 'src/html/index.html'));
-
-  // Descomente para abrir DevTools durante desenvolvimento:
-  // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
+  // Intercepta headers de resposta e injeta CORS
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Access-Control-Allow-Origin': ['*'],
+        'Access-Control-Allow-Methods': ['GET, POST, PUT, DELETE, OPTIONS'],
+        'Access-Control-Allow-Headers': ['*'],
+        'Access-Control-Allow-Credentials': ['true'],
+      }
+    });
+  });
+
+  // Intercepta requisições OPTIONS (preflight) e responde 200 direto
+  session.defaultSession.webRequest.onBeforeRequest(
+      { urls: ['*://*/*'] },
+      (details, callback) => {
+        if (details.method === 'OPTIONS') {
+          callback({ cancel: false });
+        } else {
+          callback({});
+        }
+      }
+  );
+
   createWindow();
 
   app.on('activate', () => {
