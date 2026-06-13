@@ -88,6 +88,7 @@ async function authFetch(url, options = {}) {
     return response;
 }
 
+export { authFetch }; // Export authFetch
 
 document.addEventListener('DOMContentLoaded', () => {
     const flipper            = document.getElementById('flipper');
@@ -177,7 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
     async function buscarOficinaDoUsuario(token) {
         try {
             // Usando authFetch para esta requisição
-            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`); // authFetch já adiciona o token
+            const response = await fetch(`${API_BASE_URL}/oficinas/minha`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {

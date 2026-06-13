@@ -1,3 +1,5 @@
+import { authFetch } from './script.js'; // Import authFetch
+
 document.addEventListener('DOMContentLoaded', () => {
     const popupOverlay  = document.getElementById('popup-overlay');
     const popupTitle    = document.getElementById('popup-title');
@@ -81,11 +83,61 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'index.html';
     });
 
+    // ─── Função para adicionar serviço ────────────────────────
+    async function handleAddService() {
+        const nome = prompt('Digite o nome do serviço:');
+        if (!nome) return;
+
+        const descricao = prompt('Digite a descrição do serviço:');
+        if (!descricao) return;
+
+        const valorStr = prompt('Digite o valor do serviço (ex: 150.00):');
+        const valor = parseFloat(valorStr);
+        if (isNaN(valor) || valor <= 0) {
+            showPopup('Erro', 'Valor inválido. Digite um número positivo.', true);
+            return;
+        }
+
+        const tempoMedioEmMinutosStr = prompt('Digite o tempo médio em minutos (ex: 60):');
+        const tempoMedioEmMinutos = parseInt(tempoMedioEmMinutosStr);
+        if (isNaN(tempoMedioEmMinutos) || tempoMedioEmMinutos <= 0) {
+            showPopup('Erro', 'Tempo médio inválido. Digite um número inteiro positivo.', true);
+            return;
+        }
+
+        const serviceData = {
+            nome,
+            descricao,
+            valor,
+            tempoMedioEmMinutos
+        };
+
+        try {
+            const response = await authFetch(`${API_BASE_URL}/servicos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(serviceData)
+            });
+
+            if (response.ok) {
+                showPopup('Sucesso', 'Serviço adicionado com sucesso!');
+                // Opcionalmente, recarregue a lista de serviços aqui
+                // carregarDados(); // Isso buscaria todos os dados novamente, incluindo os serviços
+            } else {
+                const errorData = await response.json();
+                showPopup('Erro', errorData.message || 'Erro ao adicionar serviço.', true);
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar serviço:', error);
+            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
+        }
+    }
+
     // ─── Botões de Ação para Serviços ────────────────────────
     if (addServiceBtn) {
-        addServiceBtn.addEventListener('click', () => {
-            showPopup('Funcionalidade em Desenvolvimento', 'A tela de adicionar serviços está em construção.');
-        });
+        addServiceBtn.addEventListener('click', handleAddService);
     }
     if (editServicesBtn) {
         editServicesBtn.addEventListener('click', () => {
