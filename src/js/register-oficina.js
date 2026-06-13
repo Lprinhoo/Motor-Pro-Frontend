@@ -1,43 +1,28 @@
+import { authFetch, API_BASE_URL } from './script.js';
+import { showPopup, hidePopup } from './utils.js'; // Import showPopup e hidePopup
+
 document.addEventListener('DOMContentLoaded', () => {
     const oficinaForm   = document.getElementById('oficina-form');
-    const popupOverlay  = document.getElementById('popup-overlay');
-    const popupTitle    = document.getElementById('popup-title');
-    const popupMessage  = document.getElementById('popup-message');
-    const popupIcon     = document.getElementById('popup-icon');
-    const popupCloseBtn = document.getElementById('popup-close-btn');
 
-    const API_BASE_URL = 'http://76.13.173.156:8080/api';
+    // Função de validação de telefone
+    const validatePhoneNumber = (phoneNumber) => {
+        // Regex para validar formatos de telefone brasileiro:
+        // (DD) 9XXXX-XXXX ou (DD) XXXX-XXXX
+        // DD9XXXX-XXXX ou DDXXXX-XXXX
+        // 9XXXX-XXXX ou XXXX-XXXX (sem DDD, assume-se local)
+        // Aceita espaços, hífens e parênteses opcionais
+        const regex = /^\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|6[1-9]|7[134579]|8[123456789])\)?\s?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$|^\(?[1-9][0-9]\)?\s?[9][0-9]{4}\-?[0-9]{4}$|^[9][0-9]{4}\-?[0-9]{4}$|^[2-8][0-9]{3}\-?[0-9]{4}$/;
+        // Uma regex mais simples e abrangente para números com 8 ou 9 dígitos, com ou sem DDD, e com ou sem formatação
+        const simpleRegex = /^\(?[1-9]{2}\)?\s?9?[0-9]{4}\-?[0-9]{4}$/;
+        // Regex para aceitar apenas números e ter entre 8 e 11 dígitos (considerando DDD e 9 extra)
+        const digitsOnlyRegex = /^[0-9]{8,11}$/;
 
-    // ─── Pop-up ───────────────────────────────────────────────
-    const showPopup = (title, message, isError = false) => {
-        popupTitle.innerText   = title;
-        popupMessage.innerText = message;
-        popupTitle.style.color = isError ? '#FF5252' : '#00E676'; // Usando nova cor da marca
-        popupCloseBtn.style.background = isError ? '#FF5252' : 'linear-gradient(135deg, #00E676 0%, #00C853 100%)'; // Usando gradiente
-        popupCloseBtn.style.color = isError ? '#fff' : '#0A0A0C'; // Usando bg-0 para texto escuro
+        // Remove tudo que não for dígito para validação final
+        const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
 
-        if (popupIcon) {
-            popupIcon.style.background = isError
-                ? 'rgba(255,82,82,0.15)' // Usando nova cor danger
-                : 'rgba(0,230,118,0.15)'; // Usando nova cor brand-soft
-            popupIcon.style.border = isError
-                ? '1px solid rgba(255,82,82,0.25)'
-                : '1px solid rgba(0,230,118,0.25)';
-            popupIcon.innerHTML = isError
-                ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF5252" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-                : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>';
-        }
-
-        popupOverlay.classList.remove('hidden');
+        // Valida se tem entre 8 e 11 dígitos (ex: 9999-9999, 99999-9999, 11999999999)
+        return digitsOnlyRegex.test(cleanPhoneNumber);
     };
-    const hidePopup = () => popupOverlay.classList.add('hidden');
-
-    popupCloseBtn.addEventListener('click', hidePopup);
-    popupOverlay.addEventListener('click', (e) => {
-        if (e.target === popupOverlay) hidePopup();
-    });
-
-    // Removida a verificação inicial de token. authFetch lidará com isso.
 
     oficinaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -52,17 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (!validatePhoneNumber(telefone)) {
+            showPopup('Erro de Validação', 'Por favor, insira um número de telefone válido (ex: (XX) 9XXXX-XXXX ou XXXXX-XXXX).', true);
+            return;
+        }
+
         const btn = oficinaForm.querySelector('.btn-primary');
         btn.style.opacity = '0.7';
         btn.style.pointerEvents = 'none';
 
         try {
-            // Usando authFetch para a requisição
-            const response = await authFetch(`${API_BASE_URL}/oficinas`, {
+            const response = await authFetch(`${API_BASE_URL}/api/oficinas`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // O cabeçalho Authorization é adicionado automaticamente por authFetch
                 },
                 body: JSON.stringify({ nome, endereco, telefone, email }),
             });
@@ -74,16 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 showPopup('Sucesso', `Oficina "${data.nome}" cadastrada! Redirecionando...`);
                 setTimeout(() => { hidePopup(); window.location.href = 'dashboard.html'; }, 1500);
             } else {
-                // authFetch já lida com 401/403 e redirecionamento.
-                // Aqui tratamos outros erros da API.
-                const errorData = await response.json(); // Assumindo que a API retorna JSON para erros
-                showPopup('Erro', errorData.message || 'Erro ao cadastrar oficina. Tente novamente.', true);
+                const errorText = await response.text();
+                let errorMessage = 'Erro ao cadastrar oficina. Tente novamente.';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = errorText || errorMessage;
+                }
+                showPopup('Erro', errorMessage, true);
             }
         } catch (error) {
             console.error('Erro ao cadastrar oficina:', error);
-            // Se o erro for do authFetch (ex: refresh token inválido), ele já redirecionou.
-            // Outros erros de conexão serão tratados aqui.
-            if (error.message !== 'Refresh Token inválido ou expirado') { // Evita pop-up duplicado se authFetch já redirecionou
+            if (error.message !== 'Refresh Token inválido ou expirado') {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             }
         } finally {

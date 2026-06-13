@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://76.13.173.156:8080/api'; // Alterado para incluir /api
+import { showPopup, hidePopup } from './utils.js'; // Import showPopup e hidePopup
+
+const API_BASE_URL = 'http://76.13.173.156:8080'; // Alterado: removido '/api'
 
 // Variáveis globais para controle de refresh de token
 let isRefreshing = false;
@@ -32,7 +34,7 @@ async function authFetch(url, options = {}) {
     let response = await fetch(url, options);
 
     // Se a resposta for 401 (Unauthorized) ou 403 (Forbidden, assumindo token expirado)
-    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/auth/refresh`) {
+    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/api/auth/refresh`) { // Adicionado '/api'
         // Se já estiver em processo de refresh, adiciona a requisição à fila
         if (isRefreshing) {
             return new Promise(function(resolve, reject) {
@@ -49,7 +51,7 @@ async function authFetch(url, options = {}) {
 
         try {
             // Tenta obter um novo Access Token usando o Refresh Token
-            const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+            const refreshResponse = await fetch(`${API_BASE_URL}/api/auth/refresh`, { // Adicionado '/api'
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,43 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAuthLogin    = document.getElementById('toggle-auth-login');
     const toggleAuthRegister = document.getElementById('toggle-auth-register');
     const forgotPass         = document.getElementById('forgot-pass');
-    const popupOverlay       = document.getElementById('popup-overlay');
-    const popupTitle         = document.getElementById('popup-title');
-    const popupMessage       = document.getElementById('popup-message');
-    const popupIcon          = document.getElementById('popup-icon');
-    const popupCloseBtn      = document.getElementById('popup-close-btn');
     const cbRemember         = document.getElementById('cb-remember');
-
-    // const API_BASE_URL = 'http://76.13.173.156:8080/api'; // Removido para usar a global
-
-    // ─── Pop-up ───────────────────────────────────────────────
-    const showPopup = (title, message, isError = false) => {
-        popupTitle.innerText   = title;
-        popupMessage.innerText = message;
-        popupTitle.style.color = isError ? '#FF4D4D' : '#16BC4E';
-        popupCloseBtn.style.background = isError ? '#FF4D4D' : '#16BC4E';
-        popupCloseBtn.style.color = isError ? '#fff' : '#042B12';
-
-        if (popupIcon) {
-            popupIcon.style.background = isError
-                ? 'rgba(255,77,77,0.12)'
-                : 'rgba(22,188,78,0.12)';
-            popupIcon.style.border = isError
-                ? '1px solid rgba(255,77,77,0.25)'
-                : '1px solid rgba(22,188,78,0.25)';
-            popupIcon.innerHTML = isError
-                ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF4D4D" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-                : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16BC4E" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>';
-        }
-
-        popupOverlay.classList.remove('hidden');
-    };
-    const hidePopup = () => popupOverlay.classList.add('hidden');
-
-    popupCloseBtn.addEventListener('click', hidePopup);
-    popupOverlay.addEventListener('click', (e) => {
-        if (e.target === popupOverlay) hidePopup();
-    });
 
     // ─── Flip ─────────────────────────────────────────────────
     let isFlipping = false;
@@ -180,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function buscarOficinaDoUsuario(token) {
         try {
             // Usando authFetch para esta requisição
-            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`); // authFetch já adiciona o token
+            const response = await authFetch(`${API_BASE_URL}/api/oficinas/minha`); // Adicionado '/api'
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {
@@ -211,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.pointerEvents = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, { // Adicionado '/api'
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -291,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.pointerEvents = 'none';
 
         try {
-            const regResponse = await fetch(`${API_BASE_URL}/auth/register`, {
+            const regResponse = await fetch(`${API_BASE_URL}/api/auth/register`, { // Adicionado '/api'
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password }),
@@ -310,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Login automático após cadastro
-            const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, {
+            const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, { // Adicionado '/api'
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -341,7 +307,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.removeItem('refreshToken');
                 }
                 
-                setTimeout(() => { window.location.href = 'register-oficina.html'; }, 400);
+                const temOficina = await buscarOficinaDoUsuario(accessToken);
+                setTimeout(() => {
+                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                }, 400);
             } else {
                 let errorMessage = 'Erro ao fazer login automático após cadastro.';
                 try {
