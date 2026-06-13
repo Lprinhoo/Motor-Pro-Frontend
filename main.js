@@ -6,6 +6,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     fullscreen: true,
+    icon: path.join(__dirname, 'assets/icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -18,7 +19,6 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Intercepta headers de resposta e injeta CORS
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
@@ -31,7 +31,6 @@ app.whenReady().then(() => {
     });
   });
 
-  // Intercepta requisições OPTIONS (preflight) e responde 200 direto
   session.defaultSession.webRequest.onBeforeRequest(
       { urls: ['*://*/*'] },
       (details, callback) => {

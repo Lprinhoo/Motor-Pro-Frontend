@@ -198,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const el = document.getElementById('servicePanelsContainer');
         if (!el) return;
 
-        // Adiciona uma verificação para garantir que 'servicos' é um array
         if (!Array.isArray(servicos)) {
             console.error('Dados de serviços recebidos não são um array:', servicos);
             el.innerHTML = '<div class="empty-state">Erro ao carregar serviços. Formato de dados inesperado.</div>';
@@ -210,24 +209,108 @@ document.addEventListener('DOMContentLoaded', () => {
             el.innerHTML = '<div class="empty-state">Nenhum serviço cadastrado para exibir.</div>';
             return;
         }
+
         el.innerHTML = servicos.map(s => {
             const nome = s.nome ?? 'Serviço sem nome';
             const descricao = s.descricao ?? 'Sem descrição.';
-            const valor = typeof s.valor === 'number' ? s.valor : 0.00;
+            const valor = typeof s.valor === 'number' ? s.valor : parseFloat(s.valor) || 0;
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
 
             return `
-                <article class="service-panel">
+                <article class="service-panel" data-id="${s.id}">
                     <h3>${nome}</h3>
                     <p>${descricao}</p>
                     <div class="service-details">
                         <span class="price"><small>R$</small>${valor.toFixed(2).replace('.', ',')}</span>
                         <span class="status ${statusClass}">${status}</span>
                     </div>
-                    <button class="btn-add-service" type="button">Adicionar à OS</button>
+                    <div class="service-actions">
+                        <button class="btn-add-service" type="button">Adicionar à OS</button>
+                        <button class="btn-delete-service" type="button" data-id="${s.id}" title="Excluir serviço">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14H6L5 6"/>
+                                <path d="M10 11v6M14 11v6"/>
+                                <path d="M9 6V4h6v2"/>
+                            </svg>
+                            Excluir
+                        </button>
+                    </div>
                 </article>
             `;
         }).join('');
+
+        // Adiciona evento de deletar em cada botão
+        el.querySelectorAll('.btn-delete-service').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const nomeServico = btn.closest('article').querySelector('h3').innerText;
+                confirmarDelecao(id, nomeServico);
+            });
+        });
+    }
+
+    // ─── Confirmação e deleção ────────────────────────────────────────────────
+    function confirmarDelecao(id, nome) {
+        const confirmHtml = `
+            <p style="margin-bottom: 1.2rem; color: var(--text-mute); font-size: 13px; line-height: 1.6;">
+                Tem certeza que deseja excluir o serviço<br>
+                <strong style="color: var(--text);">"${nome}"</strong>?<br>
+                <span style="color: var(--danger); font-size: 12px;">Essa ação não pode ser desfeita.</span>
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="confirm-delete-btn" style="
+                    background: var(--danger); color: #fff; border: none;
+                    border-radius: var(--radius); padding: 10px 22px;
+                    font-family: 'Sora', sans-serif; font-size: 11px;
+                    font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+                    cursor: pointer;">
+                    Excluir
+                </button>
+                <button id="cancel-delete-btn" style="
+                    background: rgba(255,255,255,0.06); color: var(--text-mute);
+                    border: 1px solid var(--border-2); border-radius: var(--radius);
+                    padding: 10px 22px; font-family: 'Sora', sans-serif;
+                    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+                    text-transform: uppercase; cursor: pointer;">
+                    Cancelar
+                </button>
+            </div>
+        `;
+
+        showPopup('Excluir Serviço', confirmHtml, true, true);
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            await deletarServico(id);
+        });
+        document.getElementById('cancel-delete-btn').addEventListener('click', hidePopup);
+    }
+
+    async function deletarServico(id) {
+        try {
+            const response = await authFetch(`${API_BASE_URL}/servicos/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok || response.status === 204) {
+                hidePopup();
+                showPopup('Sucesso', 'Serviço excluído com sucesso!');
+                carregarDados();
+            } else {
+                const errorText = await response.text();
+                let errorMessage = 'Erro ao excluir serviço.';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = errorText || errorMessage;
+                }
+                showPopup('Erro', errorMessage, true);
+            }
+        } catch (error) {
+            console.error('Erro ao deletar serviço:', error);
+            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+        }
     }
 });

@@ -777,3 +777,43 @@ body.dashboard-body {
 #popup-card #popup-title {
     margin-bottom: 1rem;
 }
+/* ── Ações do card de serviço ───────────────────────────── */
+.service-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.service-actions .btn-add-service {
+    flex: 1;
+}
+
+.btn-delete-service {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 77, 77, 0.08);
+    color: #FF4D4D;
+    border: 1px solid rgba(255, 77, 77, 0.22);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-delete-service:hover {
+    background: rgba(255, 77, 77, 0.18);
+    border-color: rgba(255, 77, 77, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-delete-service:active {
+    transform: translateY(0);
+}
