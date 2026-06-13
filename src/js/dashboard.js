@@ -1,4 +1,4 @@
-import { authFetch } from './script.js'; // Import authFetch
+import { authFetch, API_BASE_URL } from './script.js'; // Import authFetch e API_BASE_URL
 
 document.addEventListener('DOMContentLoaded', () => {
     const popupOverlay  = document.getElementById('popup-overlay');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addServiceBtn   = document.getElementById('addServiceBtn');
     const editServicesBtn = document.getElementById('editServicesBtn');
 
-    const API_BASE_URL = 'http://76.13.173.156:8080/api';
+    // const API_BASE_URL = 'http://76.13.173.156:8080/api'; // Removido para usar a global importada
 
     // ─── Pop-up ───────────────────────────────────────────────
     const showPopup = (title, message, isError = false) => {

@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://76.13.173.156:8080/api'; // Alterado para incluir /api
+
 // Variáveis globais para controle de refresh de token
 let isRefreshing = false;
 let failedQueue = [];
@@ -88,7 +90,7 @@ async function authFetch(url, options = {}) {
     return response;
 }
 
-export { authFetch }; // Export authFetch
+export { authFetch, API_BASE_URL }; // Export authFetch e API_BASE_URL
 
 document.addEventListener('DOMContentLoaded', () => {
     const flipper            = document.getElementById('flipper');
@@ -104,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const popupCloseBtn      = document.getElementById('popup-close-btn');
     const cbRemember         = document.getElementById('cb-remember');
 
-    const API_BASE_URL = 'http://76.13.173.156:8080/api';
+    // const API_BASE_URL = 'http://76.13.173.156:8080/api'; // Removido para usar a global
 
     // ─── Pop-up ───────────────────────────────────────────────
     const showPopup = (title, message, isError = false) => {
@@ -178,11 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function buscarOficinaDoUsuario(token) {
         try {
             // Usando authFetch para esta requisição
-            const response = await fetch(`${API_BASE_URL}/oficinas/minha`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`); // authFetch já adiciona o token
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {
