@@ -21,28 +21,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-export const showPopup = (title, message, isError = false) => {
+// isForm: quando true, esconde o botão OK e exibe o formulário sem conflito visual
+export const showPopup = (title, message, isError = false, isForm = false) => {
     if (!popupOverlay || !popupTitle || !popupMessage || !popupCloseBtn) {
         console.error('Popup elements not found in the DOM.');
         return;
     }
     popupTitle.innerText   = title;
-    popupMessage.innerHTML = message; // Alterado para innerHTML
-    // Padronizando as cores e ícones do popup
+    popupMessage.innerHTML = message;
     popupTitle.style.color = isError ? '#FF5252' : '#00E676';
-    popupCloseBtn.style.background = isError ? '#FF5252' : 'linear-gradient(135deg, #00E676 0%, #00C853 100%)';
-    popupCloseBtn.style.color = isError ? '#fff' : '#0A0A0C';
+
+    // Botão OK: oculto quando é formulário
+    if (isForm) {
+        popupCloseBtn.style.display = 'none';
+    } else {
+        popupCloseBtn.style.display = '';
+        popupCloseBtn.style.background = isError ? '#FF5252' : 'linear-gradient(135deg, #00E676 0%, #00C853 100%)';
+        popupCloseBtn.style.color = isError ? '#fff' : '#0A0A0C';
+    }
 
     if (popupIcon) {
-        popupIcon.style.background = isError
-            ? 'rgba(255,82,82,0.15)'
-            : 'rgba(0,230,118,0.15)';
-        popupIcon.style.border = isError
-            ? '1px solid rgba(255,82,82,0.25)'
-            : '1px solid rgba(0,230,118,0.25)';
+        // Em formulários, exibe ícone neutro (verde padrão)
+        const iconColor = isError ? '#FF5252' : '#00E676';
+        popupIcon.style.background = isError ? 'rgba(255,82,82,0.15)' : 'rgba(0,230,118,0.15)';
+        popupIcon.style.border = isError ? '1px solid rgba(255,82,82,0.25)' : '1px solid rgba(0,230,118,0.25)';
         popupIcon.innerHTML = isError
-            ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF5252" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-            : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00E676" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>';
+            ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+            : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
     }
 
     popupOverlay.classList.remove('hidden');
@@ -51,5 +56,7 @@ export const showPopup = (title, message, isError = false) => {
 export const hidePopup = () => {
     if (popupOverlay) {
         popupOverlay.classList.add('hidden');
+        // Garante que o botão OK volta a aparecer na próxima vez
+        if (popupCloseBtn) popupCloseBtn.style.display = '';
     }
 };

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn     = document.getElementById('logoutBtn');
     const addServiceBtn   = document.getElementById('addServiceBtn');
     const editServicesBtn = document.getElementById('editServicesBtn');
+    const metricServicosEl = document.getElementById('metricServicos'); // Adicionado para a métrica
 
     const token     = localStorage.getItem('jwtToken');
     const oficinaId = localStorage.getItem('oficinaId');
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </form>
         `;
 
-        showPopup('Adicionar Novo Serviço', formHtml);
+        showPopup('Adicionar Novo Serviço', formHtml, false, true);
 
         const addServiceForm = document.getElementById('add-service-form');
         const cancelBtn = document.getElementById('cancel-add-service');
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 try {
-                    const response = await authFetch(`${API_BASE_URL}/servicos`, { // Removido '/api' duplicado
+                    const response = await authFetch(`${API_BASE_URL}/servicos`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -154,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function carregarDados() {
         try {
             // Primeiro, verifica se a oficina existe e o token é válido
-            const resOficina = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}`); // Removido '/api' duplicado
+            const resOficina = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}`);
 
             if (!resOficina.ok) {
                 const errorText = await resOficina.text();
@@ -167,17 +168,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 showPopup('Erro', errorMessage, true);
                 renderizarPaineisServicos([]); // Renderiza vazio em caso de erro na oficina
+                if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
                 return;
             }
 
             // Se a oficina existe e o token é válido, busca os serviços
-            const resServicos = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/servicos`); // Removido '/api' duplicado
+            const resServicos = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/servicos`);
 
             if (resServicos.ok) {
+                // Se a resposta for OK (200), tenta parsear o JSON
                 const servicos = await resServicos.json();
+                console.log('Serviços recebidos da API:', servicos);
                 renderizarPaineisServicos(servicos); // Renderiza os serviços reais
-            } else {
+                if (metricServicosEl) metricServicosEl.innerText = servicos.length.toString(); // Atualiza a métrica
+            } else if (resServicos.status === 204 || resServicos.status === 404) {
+                // Se o status for 204 (No Content) ou 404 (Not Found), significa que não há serviços, mas não é um erro crítico.
+                console.log('Nenhum serviço encontrado para a oficina (Status:', resServicos.status, ')');
+                renderizarPaineisServicos([]); // Renderiza vazio
+                if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
+            }
+            else {
+                // Para outros status de erro (e.g., 400, 500), exibe o popup de erro
+                console.error('Erro na requisição de serviços. Status:', resServicos.status); // Log do status
                 const errorText = await resServicos.text();
+                console.error('Corpo da resposta de erro:', errorText); // Log do corpo da resposta
                 let errorMessage = 'Erro ao carregar serviços. Tente novamente.';
                 try {
                     const errorData = JSON.parse(errorText);
@@ -187,35 +201,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 showPopup('Erro', errorMessage, true);
                 renderizarPaineisServicos([]); // Renderiza vazio em caso de erro nos serviços
+                if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
             }
         } catch (error) {
             console.error('Erro ao carregar dados:', error);
+            console.error('Detalhes do erro de conexão:', error); // NOVO LOG
             // Se o erro for do authFetch (ex: refresh token inválido), ele já redirecionou.
             // Outros erros de conexão serão tratados aqui.
             if (error.message !== 'Refresh Token inválido ou expirado') {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             }
             renderizarPaineisServicos([]); // Renderiza vazio em caso de erro de conexão
+            if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
         }
     }
 
     function renderizarPaineisServicos(servicos) {
         const el = document.getElementById('servicePanelsContainer');
         if (!el) return;
+
+        // Adiciona uma verificação para garantir que 'servicos' é um array
+        if (!Array.isArray(servicos)) {
+            console.error('Dados de serviços recebidos não são um array:', servicos);
+            el.innerHTML = '<div class="empty-state">Erro ao carregar serviços. Formato de dados inesperado.</div>';
+            if (metricServicosEl) metricServicosEl.innerText = '0';
+            return;
+        }
+
         if (!servicos.length) {
             el.innerHTML = '<div class="empty-state">Nenhum serviço cadastrado para exibir.</div>';
             return;
         }
-        el.innerHTML = servicos.map(s => `
-            <article class="service-panel">
-                <h3>${s.nome}</h3>
-                <p>${s.descricao}</p>
-                <div class="service-details">
-                    <span class="price"><small>R$</small>${s.valor.toFixed(2).replace('.', ',')}</span>
-                    <span class="status ${s.status ? s.status.toLowerCase().replace(/\s+/g, '-') : 'disponivel'}">${s.status || 'Disponível'}</span>
-                </div>
-                <button class="btn-add-service" type="button">Adicionar à OS</button>
-            </article>
-        `).join('');
+        el.innerHTML = servicos.map(s => {
+            const nome = s.nome ?? 'Serviço sem nome';
+            const descricao = s.descricao ?? 'Sem descrição.';
+            const valor = typeof s.valor === 'number' ? s.valor : 0.00;
+            const status = s.status ?? 'Disponível';
+            const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+
+            return `
+                <article class="service-panel">
+                    <h3>${nome}</h3>
+                    <p>${descricao}</p>
+                    <div class="service-details">
+                        <span class="price"><small>R$</small>${valor.toFixed(2).replace('.', ',')}</span>
+                        <span class="status ${statusClass}">${status}</span>
+                    </div>
+                    <button class="btn-add-service" type="button">Adicionar à OS</button>
+                </article>
+            `;
+        }).join('');
     }
 });

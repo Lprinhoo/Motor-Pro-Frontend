@@ -713,3 +713,67 @@ body.dashboard-body {
     .metrics-grid  { grid-template-columns: 1fr 1fr; }
     .panel-title-group { flex-direction: column; align-items: stretch; }
 }
+
+/* --- Estilos Específicos para o Formulário no Popup --- */
+.popup-form {
+    text-align: left; /* Alinha o conteúdo do formulário à esquerda */
+    margin-top: 1.5rem; /* Adiciona um espaço acima do formulário */
+}
+
+.popup-form .field {
+    margin-bottom: 1.2rem; /* Aumenta o espaçamento entre os campos */
+}
+
+.popup-form .input-wrap {
+    margin-top: 5px; /* Pequeno espaço entre o rótulo e o input */
+}
+
+.popup-form textarea.input {
+    min-height: 80px; /* Define uma altura mínima para o textarea */
+    resize: vertical; /* Permite redimensionamento vertical */
+    padding-left: 14px; /* Remove o padding extra para ícone no textarea */
+}
+
+/* Esconde o ícone de input se houver um para o textarea */
+.popup-form textarea.input + .input-icon {
+    display: none;
+}
+
+.popup-form .form-actions {
+    display: flex;
+    gap: 10px; /* Espaço entre os botões */
+    justify-content: flex-end; /* Alinha os botões à direita */
+    margin-top: 2rem; /* Espaço acima dos botões */
+}
+
+.popup-form .btn-primary,
+.popup-form .btn-secondary {
+    flex: 1; /* Permite que os botões cresçam e preencham o espaço */
+    max-width: 180px; /* Limita a largura máxima para telas maiores */
+    padding: 10px 15px; /* Ajusta o preenchimento para melhor visual */
+    font-size: 11px; /* Ajusta o tamanho da fonte */
+    letter-spacing: 1.5px; /* Ajusta o espaçamento entre letras */
+}
+
+.popup-form .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border-2);
+    color: var(--text-mute);
+}
+
+.popup-form .btn-secondary:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-1px);
+}
+
+/* Ajusta a margem inferior da mensagem do popup quando contém um formulário */
+#popup-card #popup-message {
+    margin-bottom: 0;
+}
+
+/* Ajusta a margem inferior do título do popup para o contexto do formulário */
+#popup-card #popup-title {
+    margin-bottom: 1rem;
+}

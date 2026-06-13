@@ -20,8 +20,10 @@ const processQueue = (error, token = null) => {
 
 // Função utilitária para requisições autenticadas com refresh de token
 async function authFetch(url, options = {}) {
+    console.log('authFetch: Iniciando requisição para', url, 'com opções:', options);
     let accessToken = localStorage.getItem('jwtToken');
     let refreshToken = localStorage.getItem('refreshToken');
+    console.log('authFetch: Refresh Token no localStorage (antes da lógica de refresh):', refreshToken);
 
     // Adiciona o Access Token ao cabeçalho da requisição
     if (accessToken) {
@@ -29,35 +31,48 @@ async function authFetch(url, options = {}) {
             ...options.headers,
             'Authorization': `Bearer ${accessToken}`
         };
+        console.log('authFetch: Access Token adicionado ao cabeçalho.');
+    } else {
+        console.log('authFetch: Nenhum Access Token encontrado.');
     }
 
+    console.log('authFetch: Fazendo requisição inicial...');
     let response = await fetch(url, options);
+    console.log('authFetch: Resposta inicial recebida. Status:', response.status);
 
     // Se a resposta for 401 (Unauthorized) ou 403 (Forbidden, assumindo token expirado)
-    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/auth/refresh`) { // Removido '/api' duplicado
+    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/auth/refresh`) {
+        console.warn(`authFetch: Requisição para ${url} falhou com status ${response.status}. Tentando refresh de token...`);
+        console.log('authFetch: Refresh Token atual (para refresh):', refreshToken);
+
         // Se já estiver em processo de refresh, adiciona a requisição à fila
         if (isRefreshing) {
+            console.log('authFetch: Refresh já em andamento, adicionando requisição à fila.');
             return new Promise(function(resolve, reject) {
                 failedQueue.push({ resolve, reject });
             }).then(token => {
                 options.headers['Authorization'] = 'Bearer ' + token;
+                console.log('authFetch: Retentando requisição com novo token da fila.');
                 return fetch(url, options);
             }).catch(err => {
+                console.error('authFetch: Erro ao retentar requisição da fila:', err);
                 return Promise.reject(err);
             });
         }
 
         isRefreshing = true;
+        console.log('authFetch: Iniciando processo de refresh de token.');
 
         try {
             // Tenta obter um novo Access Token usando o Refresh Token
-            const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, { // Removido '/api' duplicado
+            const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${refreshToken}` // Envia o Refresh Token aqui
                 }
             });
+            console.log('authFetch: Resposta do refresh de token. Status:', refreshResponse.status);
 
             if (refreshResponse.ok) {
                 // Assumindo que o refresh endpoint retorna { accessToken, refreshToken }
@@ -65,275 +80,41 @@ async function authFetch(url, options = {}) {
                 localStorage.setItem('jwtToken', newAccessToken);
                 localStorage.setItem('refreshToken', newRefreshToken); // Atualiza o Refresh Token também
                 accessToken = newAccessToken;
+                console.log('authFetch: Novos tokens recebidos e salvos. Novo Access Token:', newAccessToken);
 
                 // Processa todas as requisições na fila com o novo token
                 processQueue(null, newAccessToken);
 
                 // Tenta a requisição original novamente com o novo Access Token
                 options.headers['Authorization'] = 'Bearer ' + accessToken;
+                console.log('authFetch: Retentando requisição original com novo Access Token.');
                 response = await fetch(url, options);
+                console.log('authFetch: Resposta da requisição original retentada. Status:', response.status);
             } else {
                 // Refresh Token inválido ou expirado, força o logout
+                console.error('authFetch: Falha no refresh de token. Status:', refreshResponse.status);
                 processQueue(new Error('Refresh Token inválido ou expirado'));
                 localStorage.clear();
                 window.location.href = 'index.html';
                 return Promise.reject('Refresh Token inválido ou expirado');
             }
         } catch (error) {
+            console.error('authFetch: Erro durante o processo de refresh de token:', error);
             processQueue(error);
             localStorage.clear();
             window.location.href = 'index.html';
             return Promise.reject(error);
         } finally {
             isRefreshing = false;
+            console.log('authFetch: Processo de refresh de token finalizado.');
         }
     }
 
+    console.log('authFetch: Retornando resposta final com status:', response.status);
     return response;
 }
 
 export { authFetch, API_BASE_URL }; // Export authFetch e API_BASE_URL
 
-document.addEventListener('DOMContentLoaded', () => {
-    const flipper            = document.getElementById('flipper');
-    const loginForm          = document.getElementById('login-form');
-    const registerForm       = document.getElementById('register-form');
-    const toggleAuthLogin    = document.getElementById('toggle-auth-login');
-    const toggleAuthRegister = document.getElementById('toggle-auth-register');
-    const forgotPass         = document.getElementById('forgot-pass');
-    const cbRemember         = document.getElementById('cb-remember');
-
-    // ─── Flip ─────────────────────────────────────────────────
-    let isFlipping = false;
-
-    const flipTo = (showBack) => {
-        if (isFlipping) return;
-        isFlipping = true;
-        flipper.classList.toggle('flipped', showBack);
-        setTimeout(() => { isFlipping = false; }, 650);
-    };
-
-    toggleAuthLogin?.addEventListener('click', (e) => { e.preventDefault(); flipTo(true); });
-    toggleAuthRegister?.addEventListener('click', (e) => { e.preventDefault(); flipTo(false); });
-
-    // ─── Checkbox "Lembrar-me" ────────────────────────────────
-    cbRemember?.addEventListener('click', () => {
-        const isChecked = cbRemember.classList.toggle('checked');
-        cbRemember.setAttribute('aria-checked', isChecked);
-    });
-    cbRemember?.addEventListener('keydown', (e) => {
-        if (e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
-            cbRemember.click();
-        }
-    });
-
-    // ─── Mostrar/ocultar senha ────────────────────────────────
-    document.querySelectorAll('.eye-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetId = btn.dataset.target;
-            const input    = document.getElementById(targetId);
-            if (!input) return;
-            const isPass = input.type === 'password';
-            input.type = isPass ? 'text' : 'password';
-            btn.querySelector('.eye-icon--show').style.display = isPass ? 'none' : '';
-            btn.querySelector('.eye-icon--hide').style.display = isPass ? '' : 'none';
-            btn.setAttribute('aria-label', isPass ? 'Ocultar senha' : 'Mostrar senha');
-        });
-    });
-
-    // ─── Busca oficina do usuário após login ──────────────────
-    async function buscarOficinaDoUsuario(token) {
-        try {
-            // Usando authFetch para esta requisição
-            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`); // Removido '/api' duplicado
-            if (response.ok) {
-                const oficina = await response.json();
-                if (oficina && oficina.id) {
-                    localStorage.setItem('oficinaId',   oficina.id);
-                    localStorage.setItem('oficinaNome', oficina.nome || '');
-                    return true;
-                }
-            }
-        } catch (error) {
-            console.error('Erro ao buscar oficina do usuário:', error);
-        }
-        return false;
-    }
-
-    // ─── Login ────────────────────────────────────────────────
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('username-login').value.trim();
-        const password = document.getElementById('password-login').value;
-
-        if (!username || !password) {
-            showPopup('Atenção', 'Preencha usuário e senha.', true);
-            return;
-        }
-
-        const btn = loginForm.querySelector('.btn-primary');
-        btn.style.opacity = '0.7';
-        btn.style.pointerEvents = 'none';
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, { // Removido '/api' duplicado
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            if (response.ok) {
-                let accessToken;
-                let refreshToken = null;
-
-                const text = await response.text(); // ← lê UMA vez como texto
-                try {
-                    const data = JSON.parse(text);  // ← tenta parsear como JSON
-                    accessToken = data.accessToken;
-                    refreshToken = data.refreshToken;
-                } catch {
-                    accessToken = text.trim();      // ← se não for JSON, usa como token puro
-                    console.warn('Backend retornou token como texto puro.');
-                }
-
-                if (!accessToken) {
-                    throw new Error('Token de acesso não recebido.');
-                }
-
-                localStorage.setItem('jwtToken', accessToken);
-                if (refreshToken) {
-                    localStorage.setItem('refreshToken', refreshToken);
-                } else {
-                    localStorage.removeItem('refreshToken'); // Garante que não haja refresh token antigo
-                }
-                
-                const temOficina = await buscarOficinaDoUsuario(accessToken);
-                setTimeout(() => {
-                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                }, 400);
-            } else {
-                let errorMessage = 'Usuário ou senha incorretos.';
-                try {
-                    const errorData = await response.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch {
-                    errorMessage = await response.text() || errorMessage;
-                }
-                showPopup('Erro de acesso', errorMessage, true);
-            }
-        } catch (error) {
-            console.error('Erro no login:', error);
-            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
-        } finally {
-            btn.style.opacity = '';
-            btn.style.pointerEvents = '';
-        }
-    });
-
-    // ─── Cadastro ─────────────────────────────────────────────
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username        = document.getElementById('username-register').value.trim();
-        const email           = document.getElementById('email-register').value.trim();
-        const password        = document.getElementById('password-register').value;
-        const confirmPassword = document.getElementById('confirm-password-register').value;
-
-        if (!username || !email || !password || !confirmPassword) {
-            showPopup('Atenção', 'Preencha todos os campos.', true);
-            return;
-        }
-        if (password !== confirmPassword) {
-            showPopup('Senhas diferentes', 'As senhas digitadas não coincidem.', true);
-            return;
-        }
-        if (password.length < 6) {
-            showPopup('Senha fraca', 'A senha deve ter pelo menos 6 caracteres.', true);
-            return;
-        }
-
-        const btn = registerForm.querySelector('.btn-primary');
-        btn.style.opacity = '0.7';
-        btn.style.pointerEvents = 'none';
-
-        try {
-            const regResponse = await fetch(`${API_BASE_URL}/auth/register`, { // Removido '/api' duplicado
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password }),
-            });
-
-            if (!regResponse.ok) {
-                let errorMessage = 'Erro ao criar conta. Tente novamente.';
-                try {
-                    const errorData = await regResponse.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch {
-                    errorMessage = await regResponse.text() || errorMessage;
-                }
-                showPopup('Erro no cadastro', errorMessage, true);
-                return;
-            }
-
-            // Login automático após cadastro
-            const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, { // Removido '/api' duplicado
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            if (loginResponse.ok) {
-                let accessToken;
-                let refreshToken = null;
-
-                const text = await loginResponse.text(); // ← lê UMA vez
-                try {
-                    const data = JSON.parse(text);       // ← tenta JSON
-                    accessToken = data.accessToken;
-                    refreshToken = data.refreshToken;
-                } catch {
-                    accessToken = text.trim();           // ← token puro
-                    console.warn('Backend retornou token como texto puro após cadastro.');
-                }
-
-                if (!accessToken) {
-                    throw new Error('Token de acesso não recebido após cadastro.');
-                }
-
-                localStorage.setItem('jwtToken', accessToken);
-                if (refreshToken) {
-                    localStorage.setItem('refreshToken', refreshToken);
-                } else {
-                    localStorage.removeItem('refreshToken');
-                }
-                
-                const temOficina = await buscarOficinaDoUsuario(accessToken);
-                setTimeout(() => {
-                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                }, 400);
-            } else {
-                let errorMessage = 'Erro ao fazer login automático após cadastro.';
-                try {
-                    const errorData = await loginResponse.json();
-                    errorMessage = errorData.message || errorMessage;
-                } catch {
-                    errorMessage = await loginResponse.text() || errorMessage;
-                }
-                showPopup('Erro no login automático', errorMessage, true);
-                flipTo(false); // Volta para a tela de login
-            }
-        } catch (error) {
-            console.error('Erro no cadastro ou login automático:', error);
-            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
-        } finally {
-            btn.style.opacity = '';
-            btn.style.pointerEvents = '';
-        }
-    });
-
-    // ─── Esqueceu a senha ─────────────────────────────────────
-    forgotPass?.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPopup('Indisponível', 'A redefinição de senha está temporariamente indisponível.', true);
-    });
-});
+// Removido todo o bloco document.addEventListener('DOMContentLoaded', ...)
+// A lógica específica do index.html foi movida para index-page.js
