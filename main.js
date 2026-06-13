@@ -6,7 +6,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     fullscreen: true,
-    icon: path.join(__dirname, 'assets/icon.ico'),
+    icon: path.join(__dirname, 'src/assets/icon.ico'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,

@@ -110,23 +110,17 @@ body {
     align-items: center;
     gap: 12px;
 }
-.logo-mark {
+.logo-image {
     width: 32px;
     height: 32px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 18px -6px rgba(22, 188, 78, 0.55);
+    object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
 }
-.logo-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+.sb-logo-image {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
+
 .logo h1 {
     font-family: 'Ardela', sans-serif;
     font-size: 14px;
