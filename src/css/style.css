@@ -51,7 +51,7 @@ body {
     color: var(--text);
     font-family: 'Sora', system-ui, sans-serif;
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow: hidden; /* remove scroll vertical e horizontal */
     -webkit-font-smoothing: antialiased;
 }
 
@@ -150,6 +150,8 @@ body {
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+    /* Altura definida pelo lado maior (cadastro), evita scroll */
+    display: grid;
 }
 .flipper.flipped {
     transform: rotateY(180deg);
@@ -191,11 +193,10 @@ body {
 }
 
 .card--front {
-    position: relative;
+    grid-area: 1 / 1;
 }
 .card--back {
-    position: absolute;
-    top: 0; left: 0;
+    grid-area: 1 / 1;
     transform: rotateY(180deg);
 }
 

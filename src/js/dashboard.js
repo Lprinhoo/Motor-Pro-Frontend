@@ -154,44 +154,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarDados() {
         try {
-            // Primeiro, verifica se a oficina existe e o token é válido
-            const resOficina = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}`);
-
-            if (!resOficina.ok) {
-                const errorText = await resOficina.text();
-                let errorMessage = 'Erro ao carregar dados da oficina. Tente novamente.';
-                try {
-                    const errorData = JSON.parse(errorText);
-                    errorMessage = errorData.message || errorMessage;
-                } catch {
-                    errorMessage = errorText || errorMessage;
-                }
-                showPopup('Erro', errorMessage, true);
-                renderizarPaineisServicos([]); // Renderiza vazio em caso de erro na oficina
-                if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
-                return;
-            }
-
-            // Se a oficina existe e o token é válido, busca os serviços
-            const resServicos = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/servicos`);
+            // Busca serviços diretamente pelo usuário autenticado (rota correta do backend)
+            const resServicos = await authFetch(`${API_BASE_URL}/servicos`);
 
             if (resServicos.ok) {
-                // Se a resposta for OK (200), tenta parsear o JSON
                 const servicos = await resServicos.json();
                 console.log('Serviços recebidos da API:', servicos);
-                renderizarPaineisServicos(servicos); // Renderiza os serviços reais
-                if (metricServicosEl) metricServicosEl.innerText = servicos.length.toString(); // Atualiza a métrica
-            } else if (resServicos.status === 204 || resServicos.status === 404) {
-                // Se o status for 204 (No Content) ou 404 (Not Found), significa que não há serviços, mas não é um erro crítico.
-                console.log('Nenhum serviço encontrado para a oficina (Status:', resServicos.status, ')');
-                renderizarPaineisServicos([]); // Renderiza vazio
-                if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
-            }
-            else {
-                // Para outros status de erro (e.g., 400, 500), exibe o popup de erro
-                console.error('Erro na requisição de serviços. Status:', resServicos.status); // Log do status
+                renderizarPaineisServicos(Array.isArray(servicos) ? servicos : []);
+                if (metricServicosEl) metricServicosEl.innerText = (Array.isArray(servicos) ? servicos.length : 0).toString();
+
+            } else if (resServicos.status === 204) {
+                // Sem conteúdo — lista vazia, não é erro
+                console.log('Nenhum serviço cadastrado ainda.');
+                renderizarPaineisServicos([]);
+                if (metricServicosEl) metricServicosEl.innerText = '0';
+
+            } else {
+                // Erro real do servidor (400, 500, etc.)
+                console.error('Erro ao buscar serviços. Status:', resServicos.status);
                 const errorText = await resServicos.text();
-                console.error('Corpo da resposta de erro:', errorText); // Log do corpo da resposta
                 let errorMessage = 'Erro ao carregar serviços. Tente novamente.';
                 try {
                     const errorData = JSON.parse(errorText);
@@ -200,19 +181,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     errorMessage = errorText || errorMessage;
                 }
                 showPopup('Erro', errorMessage, true);
-                renderizarPaineisServicos([]); // Renderiza vazio em caso de erro nos serviços
-                if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
+                renderizarPaineisServicos([]);
+                if (metricServicosEl) metricServicosEl.innerText = '0';
             }
         } catch (error) {
             console.error('Erro ao carregar dados:', error);
-            console.error('Detalhes do erro de conexão:', error); // NOVO LOG
-            // Se o erro for do authFetch (ex: refresh token inválido), ele já redirecionou.
-            // Outros erros de conexão serão tratados aqui.
             if (error.message !== 'Refresh Token inválido ou expirado') {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             }
-            renderizarPaineisServicos([]); // Renderiza vazio em caso de erro de conexão
-            if (metricServicosEl) metricServicosEl.innerText = '0'; // Atualiza a métrica
+            renderizarPaineisServicos([]);
+            if (metricServicosEl) metricServicosEl.innerText = '0';
         }
     }
 

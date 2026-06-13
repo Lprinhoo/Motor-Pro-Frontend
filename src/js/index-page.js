@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ─── Busca oficina do usuário após login ──────────────────
-    async function buscarOficinaDoUsuario(token) {
+    async function buscarOficinaDoUsuario() { // token removido — authFetch já lê do localStorage
         try {
             // Usando authFetch para esta requisição
             const response = await authFetch(`${API_BASE_URL}/oficinas/minha`);
@@ -136,17 +136,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('refreshToken', refreshToken || ''); // Salva o refreshToken ou uma string vazia
                     console.log('Login: Tokens recebidos e salvos.');
                     
-                    const temOficina = await buscarOficinaDoUsuario(accessToken);
+                    const temOficina = await buscarOficinaDoUsuario();
                     setTimeout(() => {
                         window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
                     }, 400);
                 } else {
                     let errorMessage = 'Usuário ou senha incorretos.';
                     try {
-                        const errorData = JSON.parse(await response.text());
-                        errorMessage = errorData.message || errorMessage;
+                        const errorText = await response.text(); // lê UMA única vez
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorText || errorMessage;
                     } catch {
-                        errorMessage = await response.text() || errorMessage;
+                        // JSON.parse falhou — errorMessage mantém o valor padrão
                     }
                     showPopup('Erro de acesso', errorMessage, true);
                 }
@@ -198,10 +199,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!regResponse.ok) {
                     let errorMessage = 'Erro ao criar conta. Tente novamente.';
                     try {
-                        const errorData = JSON.parse(await regResponse.text());
-                        errorMessage = errorData.message || errorMessage;
+                        const errorText = await regResponse.text(); // lê UMA única vez
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorText || errorMessage;
                     } catch {
-                        errorMessage = await regResponse.text() || errorMessage;
+                        // JSON.parse falhou — errorMessage mantém o valor padrão
                     }
                     showPopup('Erro no cadastro', errorMessage, true);
                     return;
@@ -231,17 +233,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('refreshToken', refreshToken || ''); // Salva o refreshToken ou uma string vazia
                     console.log('Cadastro: Tokens recebidos e salvos.');
                     
-                    const temOficina = await buscarOficinaDoUsuario(accessToken);
+                    const temOficina = await buscarOficinaDoUsuario();
                     setTimeout(() => {
                         window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
                     }, 400);
                 } else {
                     let errorMessage = 'Erro ao fazer login automático após cadastro.';
                     try {
-                        const errorData = JSON.parse(await loginResponse.text());
-                        errorMessage = errorData.message || errorMessage;
+                        const errorText = await loginResponse.text(); // lê UMA única vez
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorText || errorMessage;
                     } catch {
-                        errorMessage = await loginResponse.text() || errorMessage;
+                        // JSON.parse falhou — errorMessage mantém o valor padrão
                     }
                     showPopup('Erro no login automático', errorMessage, true);
                     flipTo(false); // Volta para a tela de login

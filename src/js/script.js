@@ -68,9 +68,9 @@ async function authFetch(url, options = {}) {
             const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${refreshToken}` // Envia o Refresh Token aqui
-                }
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ refreshToken }) // Refresh Token enviado no body (padrão REST)
             });
             console.log('authFetch: Resposta do refresh de token. Status:', refreshResponse.status);
 
@@ -93,10 +93,11 @@ async function authFetch(url, options = {}) {
             } else {
                 // Refresh Token inválido ou expirado, força o logout
                 console.error('authFetch: Falha no refresh de token. Status:', refreshResponse.status);
-                processQueue(new Error('Refresh Token inválido ou expirado'));
+                const refreshError = new Error('Refresh Token inválido ou expirado');
+                processQueue(refreshError);
                 localStorage.clear();
                 window.location.href = 'index.html';
-                return Promise.reject('Refresh Token inválido ou expirado');
+                return Promise.reject(refreshError);
             }
         } catch (error) {
             console.error('authFetch: Erro durante o processo de refresh de token:', error);
