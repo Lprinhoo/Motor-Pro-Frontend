@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 try {
-                    const response = await authFetch(`${API_BASE_URL}/api/servicos`, { // Adicionado '/api'
+                    const response = await authFetch(`${API_BASE_URL}/servicos`, { // Removido '/api' duplicado
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function carregarDados() {
         try {
             // Primeiro, verifica se a oficina existe e o token é válido
-            const resOficina = await authFetch(`${API_BASE_URL}/api/oficinas/${oficinaId}`); // Adicionado '/api'
+            const resOficina = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}`); // Removido '/api' duplicado
 
             if (!resOficina.ok) {
                 const errorText = await resOficina.text();
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Se a oficina existe e o token é válido, busca os serviços
-            const resServicos = await authFetch(`${API_BASE_URL}/api/oficinas/${oficinaId}/servicos`); // Adicionado '/api'
+            const resServicos = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/servicos`); // Removido '/api' duplicado
 
             if (resServicos.ok) {
                 const servicos = await resServicos.json();

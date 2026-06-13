@@ -1,6 +1,6 @@
 import { showPopup, hidePopup } from './utils.js'; // Import showPopup e hidePopup
 
-const API_BASE_URL = 'http://76.13.173.156:8080'; // Alterado: removido '/api'
+const API_BASE_URL = 'http://76.13.173.156:8080/api'; // Alterado: '/api' incluído na base
 
 // Variáveis globais para controle de refresh de token
 let isRefreshing = false;
@@ -34,7 +34,7 @@ async function authFetch(url, options = {}) {
     let response = await fetch(url, options);
 
     // Se a resposta for 401 (Unauthorized) ou 403 (Forbidden, assumindo token expirado)
-    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/api/auth/refresh`) { // Adicionado '/api'
+    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/auth/refresh`) { // Removido '/api' duplicado
         // Se já estiver em processo de refresh, adiciona a requisição à fila
         if (isRefreshing) {
             return new Promise(function(resolve, reject) {
@@ -51,7 +51,7 @@ async function authFetch(url, options = {}) {
 
         try {
             // Tenta obter um novo Access Token usando o Refresh Token
-            const refreshResponse = await fetch(`${API_BASE_URL}/api/auth/refresh`, { // Adicionado '/api'
+            const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, { // Removido '/api' duplicado
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function buscarOficinaDoUsuario(token) {
         try {
             // Usando authFetch para esta requisição
-            const response = await authFetch(`${API_BASE_URL}/api/oficinas/minha`); // Adicionado '/api'
+            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`); // Removido '/api' duplicado
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.pointerEvents = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/auth/login`, { // Adicionado '/api'
+            const response = await fetch(`${API_BASE_URL}/auth/login`, { // Removido '/api' duplicado
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.pointerEvents = 'none';
 
         try {
-            const regResponse = await fetch(`${API_BASE_URL}/api/auth/register`, { // Adicionado '/api'
+            const regResponse = await fetch(`${API_BASE_URL}/auth/register`, { // Removido '/api' duplicado
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, email, password }),
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Login automático após cadastro
-            const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, { // Adicionado '/api'
+            const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, { // Removido '/api' duplicado
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),

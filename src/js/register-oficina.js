@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.pointerEvents = 'none';
 
         try {
-            const response = await authFetch(`${API_BASE_URL}/api/oficinas`, {
+            const response = await authFetch(`${API_BASE_URL}/oficinas`, { // Removido '/api' duplicado
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
