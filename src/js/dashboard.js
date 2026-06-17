@@ -54,8 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="field">
                     <label class="field-label" for="service-description">Descrição</label>
                     <div class="input-wrap">
-                        <textarea id="service-description" class="input" placeholder="Descrição detalhada do serviço" required></textarea>
+                        <textarea id="service-description" class="input" placeholder="Descrição detalhada do serviço (mínimo 10 caracteres)" minlength="10" maxlength="500" required></textarea>
                     </div>
+                    <small id="service-description-counter" style="display:block; margin-top:4px; opacity:0.7;">0 / 500 caracteres (mínimo 10)</small>
                 </div>
                 <div class="field">
                     <label class="field-label" for="service-value">Valor (R$)</label>
@@ -80,6 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const addServiceForm = document.getElementById('add-service-form');
         const cancelBtn = document.getElementById('cancel-add-service');
+        const descricaoField = document.getElementById('service-description');
+        const descricaoCounter = document.getElementById('service-description-counter');
+
+        if (descricaoField && descricaoCounter) {
+            descricaoField.addEventListener('input', () => {
+                const len = descricaoField.value.trim().length;
+                descricaoCounter.innerText = `${len} / 500 caracteres (mínimo 10)`;
+                descricaoCounter.style.color = (len < 10 || len > 500) ? '#FF5252' : '';
+            });
+        }
 
         if (addServiceForm) {
             addServiceForm.addEventListener('submit', async (e) => {
@@ -93,8 +104,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const valor = parseFloat(valorStr);
                 const tempoMedioEmMinutos = parseInt(tempoMedioEmMinutosStr);
 
-                if (!nome || !descricao || isNaN(valor) || valor <= 0 || isNaN(tempoMedioEmMinutos) || tempoMedioEmMinutos <= 0) {
+                if (!nome || isNaN(valor) || valor <= 0 || isNaN(tempoMedioEmMinutos) || tempoMedioEmMinutos <= 0) {
                     showPopup('Erro de Validação', 'Por favor, preencha todos os campos corretamente. Valor e Tempo Médio devem ser números positivos.', true);
+                    return;
+                }
+
+                const DESCRICAO_MIN = 10;
+                const DESCRICAO_MAX = 500;
+                if (descricao.length < DESCRICAO_MIN || descricao.length > DESCRICAO_MAX) {
+                    showPopup(
+                        'Erro de Validação',
+                        `A descrição deve ter entre ${DESCRICAO_MIN} e ${DESCRICAO_MAX} caracteres. Atualmente tem ${descricao.length}.`,
+                        true
+                    );
                     return;
                 }
 
@@ -123,11 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         let errorMessage = 'Erro ao adicionar serviço.';
                         try {
                             const errorData = JSON.parse(errorText);
-                            errorMessage = errorData.message || errorMessage;
+                            if (errorData.errors && typeof errorData.errors === 'object') {
+                                errorMessage = Object.values(errorData.errors).join(' ');
+                            } else if (errorData.message) {
+                                errorMessage = errorData.message;
+                            }
                         } catch {
                             errorMessage = errorText || errorMessage;
                         }
-                        showPopup('Erro', errorMessage, true);
+                        showPopup('Erro de Validação', errorMessage, true);
                     }
                 } catch (error) {
                     console.error('Erro ao adicionar serviço:', error);
@@ -159,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (resServicos.ok) {
                 const servicos = await resServicos.json();
-                console.log('Serviços recebidos da API:', servicos);
                 renderizarPaineisServicos(Array.isArray(servicos) ? servicos : []);
                 if (metricServicosEl) metricServicosEl.innerText = (Array.isArray(servicos) ? servicos.length : 0).toString();
 
@@ -213,7 +238,18 @@ document.addEventListener('DOMContentLoaded', () => {
         el.innerHTML = servicos.map(s => {
             const nome = s.nome ?? 'Serviço sem nome';
             const descricao = s.descricao ?? 'Sem descrição.';
-            const valor = typeof s.valor === 'number' ? s.valor : parseFloat(s.valor) || 0;
+
+            // O backend pode retornar o valor com nomes de campo diferentes
+            // dependendo da versão/rota da API. Tentamos as variações mais comuns
+            // antes de cair em 0.
+            const valorBruto = s.valor ?? s.preco ?? s.valorServico ?? s.valorUnitario ?? s.price;
+            const valor = typeof valorBruto === 'number' ? valorBruto : parseFloat(valorBruto);
+            const valorFinal = isNaN(valor) ? 0 : valor;
+
+            if (isNaN(valor)) {
+                console.warn('Não foi possível identificar o campo de valor do serviço. Objeto recebido:', s);
+            }
+
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
 
@@ -222,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3>${nome}</h3>
                     <p>${descricao}</p>
                     <div class="service-details">
-                        <span class="price"><small>R$</small>${valor.toFixed(2).replace('.', ',')}</span>
+                        <span class="price"><small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}</span>
                         <span class="status ${statusClass}">${status}</span>
                     </div>
                     <div class="service-actions">
