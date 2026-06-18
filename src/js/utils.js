@@ -41,13 +41,18 @@ export const showPopup = (title, message, isError = false, isForm = false) => {
     }
 
     if (popupIcon) {
-        // Em formulários, exibe ícone neutro (verde padrão)
         const iconColor = isError ? '#FF5252' : '#00E676';
         popupIcon.style.background = isError ? 'rgba(255,82,82,0.15)' : 'rgba(0,230,118,0.15)';
         popupIcon.style.border = isError ? '1px solid rgba(255,82,82,0.25)' : '1px solid rgba(0,230,118,0.25)';
-        popupIcon.innerHTML = isError
-            ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
-            : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+
+        if (isForm && !isError) {
+            // Formulário de criação: ícone de "+" em vez do check de sucesso
+            popupIcon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+        } else {
+            popupIcon.innerHTML = isError
+                ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+                : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+        }
     }
 
     popupOverlay.classList.remove('hidden');

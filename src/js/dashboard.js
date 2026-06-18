@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Função para adicionar serviço (agora com formulário modal) ────────────────────────
     async function handleAddService() {
         const formHtml = `
+            <p class="popup-subtitle">Preencha os dados para incluir um novo serviço no catálogo da sua oficina.</p>
             <form id="add-service-form" class="popup-form">
                 <div class="field">
                     <label class="field-label" for="service-name">Nome do Serviço</label>
@@ -54,25 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="field">
                     <label class="field-label" for="service-description">Descrição</label>
                     <div class="input-wrap">
-                        <textarea id="service-description" class="input" placeholder="Descrição detalhada do serviço (mínimo 10 caracteres)" minlength="10" maxlength="500" required></textarea>
+                        <textarea id="service-description" class="input" placeholder="Descreva o que esse serviço inclui..." minlength="10" maxlength="500" required></textarea>
                     </div>
-                    <small id="service-description-counter" style="display:block; margin-top:4px; opacity:0.7;">0 / 500 caracteres (mínimo 10)</small>
+                    <small id="service-description-counter" class="field-hint">0 / 500 (mínimo 10 caracteres)</small>
                 </div>
-                <div class="field">
-                    <label class="field-label" for="service-value">Valor (R$)</label>
-                    <div class="input-wrap">
-                        <input type="number" id="service-value" class="input" step="0.01" min="0.01" placeholder="Ex: 150.00" required>
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label" for="service-value">Valor</label>
+                        <div class="input-wrap prefix-input">
+                            <span>R$</span>
+                            <input type="text" id="service-value" inputmode="numeric" placeholder="0,00" required>
+                        </div>
                     </div>
-                </div>
-                <div class="field">
-                    <label class="field-label" for="service-time">Tempo Médio (minutos)</label>
-                    <div class="input-wrap">
-                        <input type="number" id="service-time" class="input" min="1" placeholder="Ex: 60" required>
+                    <div class="field">
+                        <label class="field-label" for="service-time">Tempo Médio</label>
+                        <div class="input-wrap prefix-input">
+                            <input type="number" id="service-time" min="1" placeholder="60" required>
+                            <span>min</span>
+                        </div>
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-primary">Adicionar Serviço</button>
                     <button type="button" class="btn-secondary" id="cancel-add-service">Cancelar</button>
+                    <button type="submit" class="btn-primary">Adicionar Serviço</button>
                 </div>
             </form>
         `;
@@ -83,12 +88,41 @@ document.addEventListener('DOMContentLoaded', () => {
         const cancelBtn = document.getElementById('cancel-add-service');
         const descricaoField = document.getElementById('service-description');
         const descricaoCounter = document.getElementById('service-description-counter');
+        const valorField = document.getElementById('service-value');
 
         if (descricaoField && descricaoCounter) {
             descricaoField.addEventListener('input', () => {
                 const len = descricaoField.value.trim().length;
-                descricaoCounter.innerText = `${len} / 500 caracteres (mínimo 10)`;
+                descricaoCounter.innerText = `${len} / 500 (mínimo 10 caracteres)`;
                 descricaoCounter.style.color = (len < 10 || len > 500) ? '#FF5252' : '';
+            });
+        }
+
+        // ─── Máscara de moeda no campo Valor (digita em centavos, formata em tempo real) ──
+        if (valorField) {
+            valorField.addEventListener('input', () => {
+                // Mantém só os dígitos digitados
+                let digits = valorField.value.replace(/\D/g, '');
+                // Remove zeros à esquerda excedentes, mas mantém ao menos "0"
+                digits = digits.replace(/^0+(?=\d)/, '');
+                if (!digits) digits = '0';
+
+                // Trata os dígitos como centavos
+                const cents = parseInt(digits, 10);
+                const reais = Math.floor(cents / 100);
+                const centavos = (cents % 100).toString().padStart(2, '0');
+
+                // Formata a parte inteira com separador de milhar
+                const reaisFormatado = reais.toLocaleString('pt-BR');
+
+                valorField.value = `${reaisFormatado},${centavos}`;
+            });
+
+            // Posiciona o cursor sempre no final ao focar
+            valorField.addEventListener('focus', () => {
+                requestAnimationFrame(() => {
+                    valorField.setSelectionRange(valorField.value.length, valorField.value.length);
+                });
             });
         }
 
@@ -101,7 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const valorStr = document.getElementById('service-value').value;
                 const tempoMedioEmMinutosStr = document.getElementById('service-time').value;
 
-                const valor = parseFloat(valorStr);
+                // O campo de valor usa máscara de moeda BR (ex: "1.250,90") — converte para número
+                const valor = parseFloat(valorStr.replace(/\./g, '').replace(',', '.'));
                 const tempoMedioEmMinutos = parseInt(tempoMedioEmMinutosStr);
 
                 if (!nome || isNaN(valor) || valor <= 0 || isNaN(tempoMedioEmMinutos) || tempoMedioEmMinutos <= 0) {
@@ -255,24 +290,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
                 <article class="service-panel" data-id="${s.id}">
+                    <div class="service-panel-head">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                            </svg>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn-delete-service" type="button" data-id="${s.id}" title="Excluir serviço">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6l-1 14H6L5 6"/>
+                                    <path d="M10 11v6M14 11v6"/>
+                                    <path d="M9 6V4h6v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                     <h3>${nome}</h3>
                     <p>${descricao}</p>
                     <div class="service-details">
                         <span class="price"><small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}</span>
                         <span class="status ${statusClass}">${status}</span>
                     </div>
-                    <div class="service-actions">
-                        <button class="btn-add-service" type="button">Adicionar à OS</button>
-                        <button class="btn-delete-service" type="button" data-id="${s.id}" title="Excluir serviço">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6l-1 14H6L5 6"/>
-                                <path d="M10 11v6M14 11v6"/>
-                                <path d="M9 6V4h6v2"/>
-                            </svg>
-                            Excluir
-                        </button>
-                    </div>
+                    <button class="btn-add-service" type="button">
+                        <i class="ti ti-plus"></i> Adicionar à OS
+                    </button>
                 </article>
             `;
         }).join('');
@@ -290,28 +333,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Confirmação e deleção ────────────────────────────────────────────────
     function confirmarDelecao(id, nome) {
         const confirmHtml = `
-            <p style="margin-bottom: 1.2rem; color: var(--text-mute); font-size: 13px; line-height: 1.6;">
+            <p class="confirm-text">
                 Tem certeza que deseja excluir o serviço<br>
-                <strong style="color: var(--text);">"${nome}"</strong>?<br>
-                <span style="color: var(--danger); font-size: 12px;">Essa ação não pode ser desfeita.</span>
+                <strong>"${nome}"</strong>?<br>
+                <span class="confirm-warning">Essa ação não pode ser desfeita.</span>
             </p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button id="confirm-delete-btn" style="
-                    background: var(--danger); color: #fff; border: none;
-                    border-radius: var(--radius); padding: 10px 22px;
-                    font-family: 'Sora', sans-serif; font-size: 11px;
-                    font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
-                    cursor: pointer;">
-                    Excluir
-                </button>
-                <button id="cancel-delete-btn" style="
-                    background: rgba(255,255,255,0.06); color: var(--text-mute);
-                    border: 1px solid var(--border-2); border-radius: var(--radius);
-                    padding: 10px 22px; font-family: 'Sora', sans-serif;
-                    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-                    text-transform: uppercase; cursor: pointer;">
-                    Cancelar
-                </button>
+            <div class="confirm-actions">
+                <button id="cancel-delete-btn" class="btn-secondary">Cancelar</button>
+                <button id="confirm-delete-btn" class="btn-danger">Excluir</button>
             </div>
         `;
 

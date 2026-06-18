@@ -453,9 +453,10 @@ body.dashboard-body {
 /* ── Grid de serviços ───────────────────────────────────── */
 .service-panels-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-    gap: 12px;
-    padding: 1rem 1.2rem;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    align-content: start;
+    gap: 14px;
+    padding: 1.1rem 1.3rem;
     overflow-y: auto;
     flex: 1;
 }
@@ -464,23 +465,13 @@ body.dashboard-body {
 .service-panel {
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 15px;
+    border-radius: var(--radius-lg);
+    padding: 18px;
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
     transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-}
-.service-panel::before {
-    content: "";
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 2px;
-    background: var(--brand);
-    opacity: 0;
-    transition: opacity 0.22s;
-    border-radius: 0;
 }
 .service-panel::after {
     content: "";
@@ -494,26 +485,44 @@ body.dashboard-body {
 }
 .service-panel:hover {
     transform: translateY(-3px);
-    border-color: rgba(22,188,78,0.3);
-    box-shadow: 0 12px 28px -14px rgba(0,0,0,0.7), 0 0 0 1px rgba(22,188,78,0.07);
+    border-color: rgba(22,188,78,0.25);
+    box-shadow: 0 14px 30px -16px rgba(0,0,0,0.7);
 }
-.service-panel:hover::before { opacity: 1; }
 .service-panel:hover::after  { opacity: 1; }
+
+/* Cabeçalho do card: ícone + nome, e excluir discreto no canto */
+.service-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.service-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: var(--brand-soft);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.service-icon svg { width: 16px; height: 16px; }
 
 .service-panel h3 {
     font-size: 14px;
     font-weight: 600;
     color: var(--text);
-    margin: 0 0 6px;
+    margin: 0;
     letter-spacing: -0.1px;
-    line-height: 1.3;
+    line-height: 1.35;
 }
 .service-panel p {
     font-size: 12px;
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--text-mute);
-    margin: 0 0 12px;
-    flex-grow: 1;
+    margin: 0 0 16px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -524,10 +533,13 @@ body.dashboard-body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 11px;
+    margin-bottom: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-2);
 }
 .service-details .price {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text);
     font-feature-settings: "tnum" 1;
@@ -562,13 +574,13 @@ body.dashboard-body {
     border: 1px solid var(--brand-border);
 }
 
-/* Botão Adicionar à OS */
+/* Botão Adicionar à OS — única ação primária e visível do card */
 .btn-add-service {
     width: 100%;
     background: var(--brand-soft);
     color: var(--brand);
     border: 1px solid var(--brand-border);
-    padding: 9px 14px;
+    padding: 10px 14px;
     border-radius: var(--radius-sm);
     font-family: inherit;
     font-size: 12px;
@@ -578,7 +590,7 @@ body.dashboard-body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     letter-spacing: 0.2px;
 }
 .btn-add-service i { font-size: 13px; }
@@ -616,13 +628,19 @@ body.dashboard-body {
     background: var(--surface);
     border: 1px solid var(--border-2);
     border-radius: var(--radius-lg);
-    padding: 2rem 1.8rem;
+    padding: 1.9rem 1.8rem;
     width: min(400px, 90vw);
     box-shadow: 0 24px 60px rgba(0,0,0,0.65);
     text-align: center;
     animation: popIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
     position: relative;
     overflow: hidden;
+}
+/* Quando o popup carrega um formulário, dá mais espaço e respiro */
+#popup-card:has(.popup-form) {
+    width: min(480px, 92vw);
+    max-height: 88vh;
+    overflow-y: auto;
 }
 #popup-card::before {
     content: "";
@@ -714,106 +732,217 @@ body.dashboard-body {
     .panel-title-group { flex-direction: column; align-items: stretch; }
 }
 
-/* --- Estilos Específicos para o Formulário no Popup --- */
-.popup-form {
-    text-align: left; /* Alinha o conteúdo do formulário à esquerda */
-    margin-top: 1.5rem; /* Adiciona um espaço acima do formulário */
-}
-
-.popup-form .field {
-    margin-bottom: 1.2rem; /* Aumenta o espaçamento entre os campos */
-}
-
-.popup-form .input-wrap {
-    margin-top: 5px; /* Pequeno espaço entre o rótulo e o input */
-}
-
-.popup-form textarea.input {
-    min-height: 80px; /* Define uma altura mínima para o textarea */
-    resize: vertical; /* Permite redimensionamento vertical */
-    padding-left: 14px; /* Remove o padding extra para ícone no textarea */
-}
-
-/* Esconde o ícone de input se houver um para o textarea */
-.popup-form textarea.input + .input-icon {
-    display: none;
-}
-
-.popup-form .form-actions {
-    display: flex;
-    gap: 10px; /* Espaço entre os botões */
-    justify-content: flex-end; /* Alinha os botões à direita */
-    margin-top: 2rem; /* Espaço acima dos botões */
-}
-
-.popup-form .btn-primary,
-.popup-form .btn-secondary {
-    flex: 1; /* Permite que os botões cresçam e preencham o espaço */
-    max-width: 180px; /* Limita a largura máxima para telas maiores */
-    padding: 10px 15px; /* Ajusta o preenchimento para melhor visual */
-    font-size: 11px; /* Ajusta o tamanho da fonte */
-    letter-spacing: 1.5px; /* Ajusta o espaçamento entre letras */
-}
-
-.popup-form .btn-secondary {
+/* ── Botões genéricos de popup (usados fora e dentro de formulários) ── */
+.btn-secondary {
     background: transparent;
     border: 1px solid var(--border-2);
     color: var(--text-mute);
-}
-
-.popup-form .btn-secondary:hover {
-    background: rgba(255,255,255,0.05);
-    color: var(--text);
-    border-color: rgba(255,255,255,0.18);
-    transform: translateY(-1px);
-}
-
-/* Ajusta a margem inferior da mensagem do popup quando contém um formulário */
-#popup-card #popup-message {
-    margin-bottom: 0;
-}
-
-/* Ajusta a margem inferior do título do popup para o contexto do formulário */
-#popup-card #popup-title {
-    margin-bottom: 1rem;
-}
-/* ── Ações do card de serviço ───────────────────────────── */
-.service-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    align-items: center;
-}
-
-.service-actions .btn-add-service {
-    flex: 1;
-}
-
-.btn-delete-service {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 77, 77, 0.08);
-    color: #FF4D4D;
-    border: 1px solid rgba(255, 77, 77, 0.22);
     border-radius: var(--radius);
-    padding: 8px 14px;
+    padding: 11px 15px;
     font-family: 'Sora', sans-serif;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s, border-color 0.2s;
-    white-space: nowrap;
+    transition: all 0.2s;
 }
-
-.btn-delete-service:hover {
-    background: rgba(255, 77, 77, 0.18);
-    border-color: rgba(255, 77, 77, 0.45);
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.18);
     transform: translateY(-1px);
 }
 
+.btn-danger {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 15px;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s;
+}
+.btn-danger:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* Diálogo de confirmação (ex: excluir serviço) */
+.confirm-text {
+    margin-bottom: 1.3rem;
+    color: var(--text-mute);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.confirm-text strong { color: var(--text); }
+.confirm-warning {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--danger);
+    font-size: 11.5px;
+}
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+}
+.confirm-actions button { flex: 1; }
+
+/* --- Formulário dentro do popup (ex: Adicionar Serviço) --- */
+.popup-form {
+    text-align: left;
+    margin-top: 1.4rem;
+}
+
+.popup-form .field {
+    margin-bottom: 1.1rem;
+}
+
+/* Linha com dois campos lado a lado (ex: Valor + Tempo) */
+.popup-form .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.popup-form .input-wrap {
+    margin-top: 6px;
+    position: relative;
+}
+
+/* Inputs sem ícone: remove o espaço reservado à esquerda */
+.popup-form .input {
+    padding-left: 14px;
+}
+.popup-form .input-wrap .input-icon {
+    display: none;
+}
+
+.popup-form textarea.input {
+    min-height: 76px;
+    max-height: 76px;
+    resize: none;
+    line-height: 1.5;
+    overflow-y: auto;
+}
+
+.popup-form .field-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 10.5px;
+    color: var(--text-faint);
+    text-align: right;
+    transition: color 0.15s;
+}
+
+.popup-form .prefix-input {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    overflow: hidden;
+}
+.popup-form .prefix-input:focus-within {
+    border-color: rgba(22, 188, 78, 0.45);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+    background: rgba(22, 188, 78, 0.025);
+}
+.popup-form .prefix-input span {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.popup-form .prefix-input input {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 6px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 13.5px;
+}
+.popup-form .prefix-input input::placeholder { color: var(--text-faint); }
+
+/* Remove as setinhas de incremento/decremento dos inputs numéricos */
+.popup-form input[type="number"]::-webkit-outer-spin-button,
+.popup-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.popup-form input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.popup-form .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 1.7rem;
+}
+
+.popup-form .btn-primary,
+.popup-form .btn-secondary {
+    flex: 1;
+    padding: 11px 12px;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* Ajusta margens do título/mensagem do popup quando tem formulário */
+#popup-card #popup-message {
+    margin-bottom: 0;
+}
+#popup-card #popup-title {
+    margin-bottom: 0.3rem;
+}
+#popup-card .popup-subtitle {
+    font-size: 12px;
+    color: var(--text-mute);
+    margin: 0 0 0.3rem;
+}
+/* ── Ações do card de serviço ───────────────────────────── */
+.service-actions {
+    display: flex;
+    align-items: center;
+}
+
+/* Excluir: ícone discreto no canto do header, só ganha destaque no hover */
+.btn-delete-service {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    background: transparent;
+    color: var(--text-faint);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-delete-service svg { width: 14px; height: 14px; }
+
+.service-panel:hover .btn-delete-service {
+    color: var(--text-dim);
+}
+
+.btn-delete-service:hover {
+    background: rgba(255, 77, 77, 0.1);
+    border-color: rgba(255, 77, 77, 0.3);
+    color: #FF4D4D;
+}
+
 .btn-delete-service:active {
-    transform: translateY(0);
+    transform: scale(0.94);
 }
