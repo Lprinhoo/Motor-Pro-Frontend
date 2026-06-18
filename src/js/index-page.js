@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.setItem('oficinaNome', oficina.nome || '');
                     return true;
                 }
+            } else if (response.status === 204) {
+                return false;
             }
         } catch (error) {
             // Erro silencioso — será tratado pelo redirecionamento
