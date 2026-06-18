@@ -535,7 +535,7 @@ body.dashboard-body {
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 12px;
+    margin-bottom: 0; /* Removido o margin-bottom para o time-chip ficar mais próximo */
     margin-top: auto;
     padding-top: 12px;
     border-top: 1px dashed var(--border-2);
@@ -578,20 +578,23 @@ body.dashboard-body {
 
 /* ── Chip de tempo médio no card ────────────────────────── */
 .time-chip {
-    display: inline-flex;
+    display: flex; /* Alterado para flex para alinhar o SVG e o texto */
     align-items: center;
     gap: 4px;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 12px; /* Aumentado */
+    font-weight: 600; /* Aumentado */
     letter-spacing: 0.3px;
-    color: var(--text-mute);
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border-2);
-    border-radius: 20px;
-    padding: 3px 8px 3px 6px;
+    color: var(--text-mute); /* Cor mais suave */
+    background: transparent; /* Removido */
+    border: none; /* Removido */
+    border-radius: 0; /* Removido */
+    padding: 0; /* Removido */
+    margin-top: 4px; /* Ajustado para ficar abaixo do valor */
+    margin-bottom: 12px; /* Espaçamento antes do botão */
 }
 .time-chip svg {
-    width: 11px; height: 11px;
+    width: 13px; /* Aumentado */
+    height: 13px; /* Aumentado */
     stroke: var(--text-dim);
     flex-shrink: 0;
 }

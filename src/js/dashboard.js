@@ -303,7 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const valorFinal = isNaN(valor) ? 0 : valor;
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+            
             const tempoBruto = s.tempoMedioEmMinutos ?? s.tempoMedioMinutos ?? s.tempoMedio ?? s.tempoEmMinutos ?? s.tempo ?? s.duration ?? s.estimatedTime ?? s.estimatedMinutes;
+            
             const tempoFormatado = formatarTempo(tempoBruto);
 
             const article = document.createElement('article');
@@ -341,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             p.textContent = descricao;
             article.appendChild(p);
 
-            // Detalhes
+            // Detalhes (agora sem o timeChip)
             const details = document.createElement('div');
             details.className = 'service-details';
             const priceSpan = document.createElement('span');
@@ -349,19 +351,18 @@ document.addEventListener('DOMContentLoaded', () => {
             priceSpan.innerHTML = `<small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}`;
             details.appendChild(priceSpan);
 
-            // Chip de tempo médio (só exibe se existir)
-            if (tempoFormatado) {
-                const timeChip = document.createElement('span');
-                timeChip.className = 'time-chip';
-                timeChip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${tempoFormatado}`;
-                details.appendChild(timeChip);
-            }
-
             const statusSpan = document.createElement('span');
             statusSpan.className = `status ${statusClass}`;
             statusSpan.textContent = status;
             details.appendChild(statusSpan);
-            article.appendChild(details);
+            article.appendChild(details); // Adiciona o div de detalhes ao article
+
+            // Chip de tempo médio (agora um elemento separado, após os detalhes)
+            const timeChip = document.createElement('span');
+            timeChip.className = 'time-chip';
+            const displayTempo = tempoFormatado ? tempoFormatado : 'Não informado';
+            timeChip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${displayTempo}`;
+            article.appendChild(timeChip); // Adiciona o timeChip diretamente ao article
 
             // Botão OS
             const btnOs = document.createElement('button');
