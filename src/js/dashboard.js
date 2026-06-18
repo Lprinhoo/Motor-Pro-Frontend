@@ -1,11 +1,35 @@
 import { authFetch, API_BASE_URL } from './script.js';
-import { showPopup, hidePopup } from './utils.js'; // Import showPopup e hidePopup
+import { showPopup, hidePopup } from './utils.js';
+
+// Converte minutos para string legível (ex: 90 → "1h 30min", 1440 → "1 dia")
+function formatarTempo(minutos) {
+    if (!minutos || isNaN(minutos) || minutos <= 0) return null;
+    const dias  = Math.floor(minutos / 1440);
+    const horas = Math.floor((minutos % 1440) / 60);
+    const mins  = minutos % 60;
+    const partes = [];
+    if (dias)  partes.push(`${dias}d`);
+    if (horas) partes.push(`${horas}h`);
+    if (mins)  partes.push(`${mins}min`);
+    return partes.join(' ');
+}
+
+// Escapa caracteres HTML para prevenir XSS
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    const logoutBtn     = document.getElementById('logoutBtn');
-    const addServiceBtn   = document.getElementById('addServiceBtn');
+    const logoutBtn      = document.getElementById('logoutBtn');
+    const addServiceBtn  = document.getElementById('addServiceBtn');
     const editServicesBtn = document.getElementById('editServicesBtn');
-    const metricServicosEl = document.getElementById('metricServicos'); // Adicionado para a métrica
+    const metricServicosEl = document.getElementById('metricServicos');
 
     const token     = localStorage.getItem('jwtToken');
     const oficinaId = localStorage.getItem('oficinaId');
@@ -19,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const oficinaNome = localStorage.getItem('oficinaNome') || `Oficina #${oficinaId}`;
+    const oficinaNome = localStorage.getItem('oficinaNome') || `Oficina #${escapeHtml(oficinaId)}`;
     document.getElementById('sbOficinaName').innerText = oficinaNome;
     const avatarEl = document.getElementById('sbOficinaAvatar');
     if (avatarEl) avatarEl.innerText = (oficinaNome.trim()[0] || 'O').toUpperCase();
@@ -31,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const page = item.dataset.page;
             if (page !== 'dashboard') {
                 const label = item.querySelector('span')?.innerText || item.innerText.trim();
-                showPopup('Em breve', `A seção "${label}" estará disponível em breve.`);
+                showPopup('Em breve', `A seção "${escapeHtml(label)}" estará disponível em breve.`);
             }
         });
     });
@@ -41,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'index.html';
     });
 
-    // ─── Função para adicionar serviço (agora com formulário modal) ────────────────────────
+    // ─── Adicionar serviço ────────────────────────────────────────────────────
     async function handleAddService() {
         const formHtml = `
             <p class="popup-subtitle">Preencha os dados para incluir um novo serviço no catálogo da sua oficina.</p>
@@ -69,10 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="field">
                         <label class="field-label" for="service-time">Tempo Médio</label>
-                        <div class="input-wrap prefix-input">
+                        <div class="input-wrap time-input-wrap">
                             <input type="number" id="service-time" min="1" placeholder="60" required>
-                            <span>min</span>
+                            <select id="service-time-unit" class="time-unit-select">
+                                <option value="min">min</option>
+                                <option value="h">horas</option>
+                                <option value="d">dias</option>
+                            </select>
                         </div>
+                        <small id="service-time-preview" class="field-hint time-preview"></small>
                     </div>
                 </div>
                 <div class="form-actions">
@@ -98,27 +127,36 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // ─── Máscara de moeda no campo Valor (digita em centavos, formata em tempo real) ──
+        // Preview de tempo em tempo real
+        const timeField    = document.getElementById('service-time');
+        const timeUnit     = document.getElementById('service-time-unit');
+        const timePreview  = document.getElementById('service-time-preview');
+
+        function atualizarPreviewTempo() {
+            const val  = parseInt(timeField?.value);
+            const unit = timeUnit?.value;
+            if (!val || isNaN(val) || val <= 0) { if (timePreview) timePreview.textContent = ''; return; }
+            let minutos = val;
+            if (unit === 'h') minutos = val * 60;
+            if (unit === 'd') minutos = val * 1440;
+            const fmt = formatarTempo(minutos);
+            if (timePreview) timePreview.textContent = fmt ? `≈ ${fmt}` : '';
+        }
+
+        if (timeField)  timeField.addEventListener('input',  atualizarPreviewTempo);
+        if (timeUnit)   timeUnit.addEventListener('change',  atualizarPreviewTempo);
+
         if (valorField) {
             valorField.addEventListener('input', () => {
-                // Mantém só os dígitos digitados
                 let digits = valorField.value.replace(/\D/g, '');
-                // Remove zeros à esquerda excedentes, mas mantém ao menos "0"
                 digits = digits.replace(/^0+(?=\d)/, '');
                 if (!digits) digits = '0';
-
-                // Trata os dígitos como centavos
                 const cents = parseInt(digits, 10);
                 const reais = Math.floor(cents / 100);
                 const centavos = (cents % 100).toString().padStart(2, '0');
-
-                // Formata a parte inteira com separador de milhar
                 const reaisFormatado = reais.toLocaleString('pt-BR');
-
                 valorField.value = `${reaisFormatado},${centavos}`;
             });
-
-            // Posiciona o cursor sempre no final ao focar
             valorField.addEventListener('focus', () => {
                 requestAnimationFrame(() => {
                     valorField.setSelectionRange(valorField.value.length, valorField.value.length);
@@ -133,11 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const nome = document.getElementById('service-name').value.trim();
                 const descricao = document.getElementById('service-description').value.trim();
                 const valorStr = document.getElementById('service-value').value;
-                const tempoMedioEmMinutosStr = document.getElementById('service-time').value;
+                const tempoVal  = parseInt(document.getElementById('service-time').value);
+                const tempoUnit = document.getElementById('service-time-unit').value;
 
-                // O campo de valor usa máscara de moeda BR (ex: "1.250,90") — converte para número
+                // Converte tudo para minutos antes de enviar
+                let tempoMedioEmMinutos = tempoVal;
+                if (tempoUnit === 'h') tempoMedioEmMinutos = tempoVal * 60;
+                if (tempoUnit === 'd') tempoMedioEmMinutos = tempoVal * 1440;
+
                 const valor = parseFloat(valorStr.replace(/\./g, '').replace(',', '.'));
-                const tempoMedioEmMinutos = parseInt(tempoMedioEmMinutosStr);
 
                 if (!nome || isNaN(valor) || valor <= 0 || isNaN(tempoMedioEmMinutos) || tempoMedioEmMinutos <= 0) {
                     showPopup('Erro de Validação', 'Por favor, preencha todos os campos corretamente. Valor e Tempo Médio devem ser números positivos.', true);
@@ -155,26 +197,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const serviceData = {
-                    nome,
-                    descricao,
-                    valor,
-                    tempoMedioEmMinutos
-                };
+                const serviceData = { nome, descricao, valor, tempoMedioEmMinutos };
 
                 try {
                     const response = await authFetch(`${API_BASE_URL}/servicos`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(serviceData)
                     });
 
                     if (response.ok) {
-                        hidePopup(); // Fecha o formulário modal
+                        hidePopup();
                         showPopup('Sucesso', 'Serviço adicionado com sucesso!');
-                        carregarDados(); // Recarrega a lista de serviços
+                        carregarDados();
                     } else {
                         const errorText = await response.text();
                         let errorMessage = 'Erro ao adicionar serviço.';
@@ -188,10 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         } catch {
                             errorMessage = errorText || errorMessage;
                         }
-                        showPopup('Erro de Validação', errorMessage, true);
+                        showPopup('Erro de Validação', escapeHtml(errorMessage), true);
                     }
                 } catch (error) {
-                    console.error('Erro ao adicionar serviço:', error);
                     showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
                 }
             });
@@ -202,9 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (addServiceBtn) {
-        addServiceBtn.addEventListener('click', handleAddService);
-    }
+    if (addServiceBtn) addServiceBtn.addEventListener('click', handleAddService);
     if (editServicesBtn) {
         editServicesBtn.addEventListener('click', () => {
             showPopup('Funcionalidade em Desenvolvimento', 'A tela de edição de serviços está em construção.');
@@ -215,23 +247,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarDados() {
         try {
-            // Busca serviços diretamente pelo usuário autenticado (rota correta do backend)
             const resServicos = await authFetch(`${API_BASE_URL}/servicos`);
 
             if (resServicos.ok) {
                 const servicos = await resServicos.json();
                 renderizarPaineisServicos(Array.isArray(servicos) ? servicos : []);
                 if (metricServicosEl) metricServicosEl.innerText = (Array.isArray(servicos) ? servicos.length : 0).toString();
-
             } else if (resServicos.status === 204) {
-                // Sem conteúdo — lista vazia, não é erro
-                console.log('Nenhum serviço cadastrado ainda.');
                 renderizarPaineisServicos([]);
                 if (metricServicosEl) metricServicosEl.innerText = '0';
-
             } else {
-                // Erro real do servidor (400, 500, etc.)
-                console.error('Erro ao buscar serviços. Status:', resServicos.status);
                 const errorText = await resServicos.text();
                 let errorMessage = 'Erro ao carregar serviços. Tente novamente.';
                 try {
@@ -240,12 +265,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch {
                     errorMessage = errorText || errorMessage;
                 }
-                showPopup('Erro', errorMessage, true);
+                showPopup('Erro', escapeHtml(errorMessage), true);
                 renderizarPaineisServicos([]);
                 if (metricServicosEl) metricServicosEl.innerText = '0';
             }
         } catch (error) {
-            console.error('Erro ao carregar dados:', error);
             if (error.message !== 'Refresh Token inválido ou expirado') {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             }
@@ -259,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!el) return;
 
         if (!Array.isArray(servicos)) {
-            console.error('Dados de serviços recebidos não são um array:', servicos);
             el.innerHTML = '<div class="empty-state">Erro ao carregar serviços. Formato de dados inesperado.</div>';
             if (metricServicosEl) metricServicosEl.innerText = '0';
             return;
@@ -270,62 +293,88 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        el.innerHTML = servicos.map(s => {
+        // Usa textContent / createElement para evitar XSS — dados da API não são confiáveis
+        el.innerHTML = '';
+        servicos.forEach(s => {
             const nome = s.nome ?? 'Serviço sem nome';
             const descricao = s.descricao ?? 'Sem descrição.';
-
-            // O backend pode retornar o valor com nomes de campo diferentes
-            // dependendo da versão/rota da API. Tentamos as variações mais comuns
-            // antes de cair em 0.
             const valorBruto = s.valor ?? s.preco ?? s.valorServico ?? s.valorUnitario ?? s.price;
             const valor = typeof valorBruto === 'number' ? valorBruto : parseFloat(valorBruto);
             const valorFinal = isNaN(valor) ? 0 : valor;
-
-            if (isNaN(valor)) {
-                console.warn('Não foi possível identificar o campo de valor do serviço. Objeto recebido:', s);
-            }
-
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+            const tempoBruto = s.tempoMedioEmMinutos ?? s.tempoMedio ?? s.tempo ?? s.duration;
+            const tempoFormatado = formatarTempo(tempoBruto);
 
-            return `
-                <article class="service-panel" data-id="${s.id}">
-                    <div class="service-panel-head">
-                        <div class="service-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                            </svg>
-                        </div>
-                        <div class="service-actions">
-                            <button class="btn-delete-service" type="button" data-id="${s.id}" title="Excluir serviço">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <polyline points="3 6 5 6 21 6"/>
-                                    <path d="M19 6l-1 14H6L5 6"/>
-                                    <path d="M10 11v6M14 11v6"/>
-                                    <path d="M9 6V4h6v2"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <h3>${nome}</h3>
-                    <p>${descricao}</p>
-                    <div class="service-details">
-                        <span class="price"><small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}</span>
-                        <span class="status ${statusClass}">${status}</span>
-                    </div>
-                    <button class="btn-add-service" type="button">
-                        <i class="ti ti-plus"></i> Adicionar à OS
+            const article = document.createElement('article');
+            article.className = 'service-panel';
+            article.dataset.id = s.id;
+
+            // Cabeçalho
+            const head = document.createElement('div');
+            head.className = 'service-panel-head';
+            head.innerHTML = `
+                <div class="service-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                </div>
+                <div class="service-actions">
+                    <button class="btn-delete-service" type="button" title="Excluir serviço">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14H6L5 6"/>
+                            <path d="M10 11v6M14 11v6"/>
+                            <path d="M9 6V4h6v2"/>
+                        </svg>
                     </button>
-                </article>
+                </div>
             `;
-        }).join('');
+            article.appendChild(head);
 
-        // Adiciona evento de deletar em cada botão
-        el.querySelectorAll('.btn-delete-service').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.dataset.id;
-                const nomeServico = btn.closest('article').querySelector('h3').innerText;
-                confirmarDelecao(id, nomeServico);
+            // Título e descrição via textContent (seguro contra XSS)
+            const h3 = document.createElement('h3');
+            h3.textContent = nome;
+            article.appendChild(h3);
+
+            const p = document.createElement('p');
+            p.textContent = descricao;
+            article.appendChild(p);
+
+            // Detalhes
+            const details = document.createElement('div');
+            details.className = 'service-details';
+            const priceSpan = document.createElement('span');
+            priceSpan.className = 'price';
+            priceSpan.innerHTML = `<small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}`;
+            details.appendChild(priceSpan);
+
+            // Chip de tempo médio (só exibe se existir)
+            if (tempoFormatado) {
+                const timeChip = document.createElement('span');
+                timeChip.className = 'time-chip';
+                timeChip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${tempoFormatado}`;
+                details.appendChild(timeChip);
+            }
+
+            const statusSpan = document.createElement('span');
+            statusSpan.className = `status ${statusClass}`;
+            statusSpan.textContent = status;
+            details.appendChild(statusSpan);
+            article.appendChild(details);
+
+            // Botão OS
+            const btnOs = document.createElement('button');
+            btnOs.className = 'btn-add-service';
+            btnOs.type = 'button';
+            btnOs.innerHTML = '<i class="ti ti-plus"></i> Adicionar à OS';
+            article.appendChild(btnOs);
+
+            el.appendChild(article);
+
+            // Evento de deletar
+            head.querySelector('.btn-delete-service').addEventListener('click', () => {
+                confirmarDelecao(s.id, nome);
             });
         });
     }
@@ -335,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmHtml = `
             <p class="confirm-text">
                 Tem certeza que deseja excluir o serviço<br>
-                <strong>"${nome}"</strong>?<br>
+                <strong></strong>?<br>
                 <span class="confirm-warning">Essa ação não pode ser desfeita.</span>
             </p>
             <div class="confirm-actions">
@@ -345,6 +394,9 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         showPopup('Excluir Serviço', confirmHtml, true, true);
+
+        // Preenche o nome via textContent (seguro)
+        document.querySelector('.confirm-text strong').textContent = `"${nome}"`;
 
         document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
             await deletarServico(id);
@@ -371,10 +423,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch {
                     errorMessage = errorText || errorMessage;
                 }
-                showPopup('Erro', errorMessage, true);
+                showPopup('Erro', escapeHtml(errorMessage), true);
             }
         } catch (error) {
-            console.error('Erro ao deletar serviço:', error);
             showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
         }
     }

@@ -1,5 +1,5 @@
-import { showPopup, hidePopup } from './utils.js'; // Import showPopup e hidePopup
-import { authFetch, API_BASE_URL } from './script.js'; // Import authFetch e API_BASE_URL
+import { showPopup, hidePopup } from './utils.js';
+import { authFetch, API_BASE_URL } from './script.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const flipper            = document.getElementById('flipper');
@@ -10,39 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const forgotPass         = document.getElementById('forgot-pass');
     const cbRemember         = document.getElementById('cb-remember');
 
-    // Adiciona console logs para verificar se os elementos são encontrados
-    console.log('index-page.js: DOMContentLoaded - flipper:', flipper);
-    console.log('index-page.js: DOMContentLoaded - loginForm:', loginForm);
-    console.log('index-page.js: DOMContentLoaded - registerForm:', registerForm);
-    console.log('index-page.js: DOMContentLoaded - toggleAuthLogin:', toggleAuthLogin);
-    console.log('index-page.js: DOMContentLoaded - toggleAuthRegister:', toggleAuthRegister);
-    console.log('index-page.js: DOMContentLoaded - forgotPass:', forgotPass);
-    console.log('index-page.js: DOMContentLoaded - cbRemember:', cbRemember);
-
     // ─── Flip ─────────────────────────────────────────────────
     let isFlipping = false;
 
     const flipTo = (showBack) => {
-        if (!flipper) {
-            console.warn('index-page.js: flipper element not found for flipTo function.');
-            return;
-        }
+        if (!flipper) return;
         if (isFlipping) return;
         isFlipping = true;
         flipper.classList.toggle('flipped', showBack);
         setTimeout(() => { isFlipping = false; }, 650);
     };
 
-    if (toggleAuthLogin) {
-        toggleAuthLogin.addEventListener('click', (e) => { e.preventDefault(); flipTo(true); });
-    } else {
-        console.warn('index-page.js: toggleAuthLogin element not found. Skipping event listener.');
-    }
-    if (toggleAuthRegister) {
-        toggleAuthRegister.addEventListener('click', (e) => { e.preventDefault(); flipTo(false); });
-    } else {
-        console.warn('index-page.js: toggleAuthRegister element not found. Skipping event listener.');
-    }
+    if (toggleAuthLogin) toggleAuthLogin.addEventListener('click', (e) => { e.preventDefault(); flipTo(true); });
+    if (toggleAuthRegister) toggleAuthRegister.addEventListener('click', (e) => { e.preventDefault(); flipTo(false); });
 
     // ─── Checkbox "Lembrar-me" ────────────────────────────────
     if (cbRemember) {
@@ -56,8 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 cbRemember.click();
             }
         });
-    } else {
-        console.warn('index-page.js: cbRemember element not found. Skipping event listener.');
     }
 
     // ─── Mostrar/ocultar senha ────────────────────────────────
@@ -65,10 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             const targetId = btn.dataset.target;
             const input    = document.getElementById(targetId);
-            if (!input) {
-                console.warn(`index-page.js: Input element with ID "${targetId}" not found for eye-btn.`);
-                return;
-            }
+            if (!input) return;
             const isPass = input.type === 'password';
             input.type = isPass ? 'text' : 'password';
             btn.querySelector('.eye-icon--show').style.display = isPass ? 'none' : '';
@@ -78,9 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ─── Busca oficina do usuário após login ──────────────────
-    async function buscarOficinaDoUsuario() { // token removido — authFetch já lê do localStorage
+    async function buscarOficinaDoUsuario() {
         try {
-            // Usando authFetch para esta requisição
             const response = await authFetch(`${API_BASE_URL}/oficinas/minha`);
             if (response.ok) {
                 const oficina = await response.json();
@@ -91,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            console.error('Erro ao buscar oficina do usuário:', error);
+            // Erro silencioso — será tratado pelo redirecionamento
         }
         return false;
     }
@@ -120,22 +94,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (response.ok) {
-                    const data = await response.json(); // Sempre espera JSON
-                    const accessToken = data.accessToken;
+                    const data = await response.json();
+                    const accessToken  = data.accessToken;
                     const refreshToken = data.refreshToken;
 
                     if (!accessToken) {
                         showPopup('Erro de Login', 'Token de acesso não recebido na resposta do servidor.', true);
-                        throw new Error('Token de acesso não recebido.');
-                    }
-                    if (!refreshToken) {
-                        console.warn('Login: Refresh Token não recebido na resposta do servidor. Refresh automático não será possível.');
+                        return;
                     }
 
-                    localStorage.setItem('jwtToken', accessToken);
-                    localStorage.setItem('refreshToken', refreshToken || ''); // Salva o refreshToken ou uma string vazia
-                    console.log('Login: Tokens recebidos e salvos.');
-                    
+                    localStorage.setItem('jwtToken',      accessToken);
+                    localStorage.setItem('refreshToken',  refreshToken || '');
+
                     const temOficina = await buscarOficinaDoUsuario();
                     setTimeout(() => {
                         window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
@@ -143,24 +113,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     let errorMessage = 'Usuário ou senha incorretos.';
                     try {
-                        const errorText = await response.text(); // lê UMA única vez
+                        const errorText = await response.text();
                         const errorData = JSON.parse(errorText);
                         errorMessage = errorData.message || errorText || errorMessage;
-                    } catch {
-                        // JSON.parse falhou — errorMessage mantém o valor padrão
-                    }
+                    } catch { /* mantém padrão */ }
                     showPopup('Erro de acesso', errorMessage, true);
                 }
             } catch (error) {
-                console.error('Erro no login:', error);
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             } finally {
                 btn.style.opacity = '';
                 btn.style.pointerEvents = '';
             }
         });
-    } else {
-        console.warn('index-page.js: loginForm element not found. Skipping event listener.');
     }
 
     // ─── Cadastro ─────────────────────────────────────────────
@@ -180,8 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 showPopup('Senhas diferentes', 'As senhas digitadas não coincidem.', true);
                 return;
             }
-            if (password.length < 6) {
-                showPopup('Senha fraca', 'A senha deve ter pelo menos 6 caracteres.', true);
+            // Mínimo elevado de 6 para 8 caracteres (ponto médio da análise de segurança)
+            if (password.length < 8) {
+                showPopup('Senha fraca', 'A senha deve ter pelo menos 8 caracteres.', true);
                 return;
             }
 
@@ -199,12 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!regResponse.ok) {
                     let errorMessage = 'Erro ao criar conta. Tente novamente.';
                     try {
-                        const errorText = await regResponse.text(); // lê UMA única vez
+                        const errorText = await regResponse.text();
                         const errorData = JSON.parse(errorText);
                         errorMessage = errorData.message || errorText || errorMessage;
-                    } catch {
-                        // JSON.parse falhou — errorMessage mantém o valor padrão
-                    }
+                    } catch { /* mantém padrão */ }
                     showPopup('Erro no cadastro', errorMessage, true);
                     return;
                 }
@@ -217,22 +181,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (loginResponse.ok) {
-                    const data = await loginResponse.json(); // Sempre espera JSON
-                    const accessToken = data.accessToken;
+                    const data = await loginResponse.json();
+                    const accessToken  = data.accessToken;
                     const refreshToken = data.refreshToken;
 
                     if (!accessToken) {
                         showPopup('Erro no Cadastro', 'Token de acesso não recebido após cadastro.', true);
-                        throw new Error('Token de acesso não recebido.');
-                    }
-                    if (!refreshToken) {
-                        console.warn('Cadastro: Refresh Token não recebido na resposta do servidor. Refresh automático não será possível.');
+                        return;
                     }
 
-                    localStorage.setItem('jwtToken', accessToken);
-                    localStorage.setItem('refreshToken', refreshToken || ''); // Salva o refreshToken ou uma string vazia
-                    console.log('Cadastro: Tokens recebidos e salvos.');
-                    
+                    localStorage.setItem('jwtToken',      accessToken);
+                    localStorage.setItem('refreshToken',  refreshToken || '');
+
                     const temOficina = await buscarOficinaDoUsuario();
                     setTimeout(() => {
                         window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
@@ -240,25 +200,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     let errorMessage = 'Erro ao fazer login automático após cadastro.';
                     try {
-                        const errorText = await loginResponse.text(); // lê UMA única vez
+                        const errorText = await loginResponse.text();
                         const errorData = JSON.parse(errorText);
                         errorMessage = errorData.message || errorText || errorMessage;
-                    } catch {
-                        // JSON.parse falhou — errorMessage mantém o valor padrão
-                    }
+                    } catch { /* mantém padrão */ }
                     showPopup('Erro no login automático', errorMessage, true);
-                    flipTo(false); // Volta para a tela de login
+                    flipTo(false);
                 }
             } catch (error) {
-                console.error('Erro no cadastro ou login automático:', error);
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             } finally {
                 btn.style.opacity = '';
                 btn.style.pointerEvents = '';
             }
         });
-    } else {
-        console.warn('index-page.js: registerForm element not found. Skipping event listener.');
     }
 
     // ─── Esqueceu a senha ─────────────────────────────────────
@@ -267,7 +222,5 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             showPopup('Indisponível', 'A redefinição de senha está temporariamente indisponível.', true);
         });
-    } else {
-        console.warn('index-page.js: forgotPass element not found. Skipping event listener.');
     }
 });
