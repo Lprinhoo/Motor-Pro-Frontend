@@ -1066,3 +1066,56 @@ body.dashboard-body {
 .btn-delete-service:active {
     transform: scale(0.94);
 }
+
+/* ── Card de Contato ────────────────────────────────────── */
+.contact-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.contact-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(22,188,78,0.25);
+    box-shadow: 0 14px 30px -16px rgba(0,0,0,0.7);
+}
+.contact-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.contact-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: var(--brand-soft);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.contact-icon i {
+    font-size: 18px;
+}
+.contact-type {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.1px;
+    line-height: 1.35;
+    text-transform: capitalize; /* Para deixar o tipo mais legível */
+}
+.contact-value {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-mute);
+    margin: 0 0 16px;
+    word-break: break-all; /* Para lidar com valores longos como emails */
+}

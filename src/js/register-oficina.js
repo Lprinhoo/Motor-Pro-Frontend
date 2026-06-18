@@ -4,41 +4,17 @@ import { showPopup, hidePopup } from './utils.js'; // Import showPopup e hidePop
 document.addEventListener('DOMContentLoaded', () => {
     const oficinaForm   = document.getElementById('oficina-form');
 
-    // Função de validação de telefone
-    const validatePhoneNumber = (phoneNumber) => {
-        // Regex para validar formatos de telefone brasileiro:
-        // (DD) 9XXXX-XXXX ou (DD) XXXX-XXXX
-        // DD9XXXX-XXXX ou DDXXXX-XXXX
-        // 9XXXX-XXXX ou XXXX-XXXX (sem DDD, assume-se local)
-        // Aceita espaços, hífens e parênteses opcionais
-        const regex = /^\(?(?:[14689][1-9]|2[12478]|3[1234578]|5[1345]|6[1-9]|7[134579]|8[123456789])\)?\s?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$|^\(?[1-9][0-9]\)?\s?[9][0-9]{4}\-?[0-9]{4}$|^[9][0-9]{4}\-?[0-9]{4}$|^[2-8][0-9]{3}\-?[0-9]{4}$/;
-        // Uma regex mais simples e abrangente para números com 8 ou 9 dígitos, com ou sem DDD, e com ou sem formatação
-        const simpleRegex = /^\(?[1-9]{2}\)?\s?9?[0-9]{4}\-?[0-9]{4}$/;
-        // Regex para aceitar apenas números e ter entre 8 e 11 dígitos (considerando DDD e 9 extra)
-        const digitsOnlyRegex = /^[0-9]{8,11}$/;
-
-        // Remove tudo que não for dígito para validação final
-        const cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
-
-        // Valida se tem entre 8 e 11 dígitos (ex: 9999-9999, 99999-9999, 11999999999)
-        return digitsOnlyRegex.test(cleanPhoneNumber);
-    };
+    // A função validatePhoneNumber e suas chamadas foram removidas, pois o telefone não é mais enviado diretamente.
 
     oficinaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const nome     = document.getElementById('nomeOficina').value.trim();
         const endereco = document.getElementById('endereco').value.trim();
-        const telefone = document.getElementById('telefone').value.trim();
-        const email    = document.getElementById('emailOficina').value.trim();
+        // Telefone e email foram removidos do formulário e não são mais coletados aqui.
 
-        if (!nome || !endereco || !telefone) {
-            showPopup('Atenção', 'Preencha os campos obrigatórios: Nome, Endereço e Telefone.', true);
-            return;
-        }
-
-        if (!validatePhoneNumber(telefone)) {
-            showPopup('Erro de Validação', 'Por favor, insira um número de telefone válido (ex: (XX) 9XXXX-XXXX ou XXXXX-XXXX).', true);
+        if (!nome || !endereco) { // A validação agora é apenas para nome e endereço
+            showPopup('Atenção', 'Preencha os campos obrigatórios: Nome e Endereço.', true);
             return;
         }
 
@@ -47,12 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.pointerEvents = 'none';
 
         try {
-            const response = await authFetch(`${API_BASE_URL}/oficinas`, { // Removido '/api' duplicado
+            const response = await authFetch(`${API_BASE_URL}/oficinas`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ nome, endereco, telefone, email }),
+                body: JSON.stringify({ nome, endereco }), // Envia apenas nome e endereço
             });
 
             if (response.ok) {

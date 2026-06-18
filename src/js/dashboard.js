@@ -25,11 +25,24 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
+// Retorna o ícone Tabler apropriado para cada tipo de contato
+function getContactIcon(tipo) {
+    switch (tipo) {
+        case 'WHATSAPP': return '<i class="ti ti-brand-whatsapp"></i>';
+        case 'TELEFONE': return '<i class="ti ti-phone"></i>';
+        case 'EMAIL':    return '<i class="ti ti-mail"></i>';
+        case 'INSTAGRAM':return '<i class="ti ti-brand-instagram"></i>';
+        case 'FACEBOOK': return '<i class="ti ti-brand-facebook"></i>';
+        default:         return '<i class="ti ti-address-book"></i>'; // Ícone padrão
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn      = document.getElementById('logoutBtn');
     const addServiceBtn  = document.getElementById('addServiceBtn');
     const editServicesBtn = document.getElementById('editServicesBtn');
     const metricServicosEl = document.getElementById('metricServicos');
+    const dbContent = document.querySelector('.db-content'); // Adicionado para acesso ao conteúdo principal
 
     const token     = localStorage.getItem('jwtToken');
     const oficinaId = localStorage.getItem('oficinaId');
@@ -53,9 +66,23 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             const page = item.dataset.page;
-            if (page !== 'dashboard') {
-                const label = item.querySelector('span')?.innerText || item.innerText.trim();
-                showPopup('Em breve', `A seção "${escapeHtml(label)}" estará disponível em breve.`);
+            
+            // Limpa o conteúdo principal antes de renderizar a nova seção
+            if (dbContent) dbContent.innerHTML = '';
+
+            switch (page) {
+                case 'dashboard':
+                    // Recarrega o conteúdo original do dashboard (métricas e serviços)
+                    renderDashboardContent();
+                    carregarDados(); // Recarrega os serviços
+                    break;
+                case 'contatos':
+                    renderContatosSection();
+                    break;
+                default:
+                    const label = item.querySelector('span')?.innerText || item.innerText.trim();
+                    showPopup('Em breve', `A seção "${escapeHtml(label)}" estará disponível em breve.`);
+                    break;
             }
         });
     });
@@ -64,6 +91,391 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.clear();
         window.location.href = 'index.html';
     });
+
+    // Função para renderizar o conteúdo padrão do dashboard
+    function renderDashboardContent() {
+        if (!dbContent) return;
+        dbContent.innerHTML = `
+            <header class="top-bar">
+                <div>
+                    <div class="page-eyebrow">VISÃO GERAL</div>
+                    <h2 class="page-title">Dashboard</h2>
+                    <div class="page-subtitle">Resumo de atividades e serviços da oficina.</div>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="search-box">
+                        <i class="ti ti-search"></i>
+                        <input type="text" placeholder="Buscar serviço...">
+                    </div>
+                </div>
+            </header>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">OS Abertas</div>
+                    <div class="metric-value"></div>
+                    <div class="metric-delta"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Faturamento do Mês</div>
+                    <div class="metric-value"></div>
+                    <div class="metric-delta"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Clientes Ativos</div>
+                    <div class="metric-value"></div>
+                    <div class="metric-delta"></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Serviços no Catálogo</div>
+                    <div class="metric-value" id="metricServicos"></div>
+                    <div class="metric-delta"></div>
+                </div>
+            </div>
+
+            <section class="panel">
+                <div class="panel-title-group">
+                    <div>
+                        <div class="panel-title">SERVIÇOS DISPONÍVEIS</div>
+                        <div class="panel-hint">Catálogo de serviços que sua oficina oferece.</div>
+                    </div>
+                    <div class="panel-actions">
+                        <button class="btn-action ghost" id="editServicesBtn">
+                            <i class="ti ti-edit"></i> Editar
+                        </button>
+                        <button class="btn-action primary" id="addServiceBtn">
+                            <i class="ti ti-plus"></i> Novo Serviço
+                        </button>
+                    </div>
+                </div>
+                <div id="servicePanelsContainer" class="service-panels-grid">
+                    <!-- Renderizado pelo dashboard.js -->
+                </div>
+            </section>
+        `;
+        // Re-obter referências aos botões e elementos após re-renderizar o HTML
+        const newAddServiceBtn = document.getElementById('addServiceBtn');
+        if (newAddServiceBtn) newAddServiceBtn.addEventListener('click', handleAddService);
+        const newEditServicesBtn = document.getElementById('editServicesBtn');
+        if (newEditServicesBtn) {
+            newEditServicesBtn.addEventListener('click', () => {
+                showPopup('Funcionalidade em Desenvolvimento', 'A tela de edição de serviços está em construção.');
+            });
+        }
+    }
+
+    // ─── Seção de Contatos ────────────────────────────────────────────────────
+    function renderContatosSection() {
+        if (!dbContent) return;
+        dbContent.innerHTML = `
+            <header class="top-bar">
+                <div>
+                    <div class="page-eyebrow">GERENCIAMENTO</div>
+                    <h2 class="page-title">Contatos da Oficina</h2>
+                    <div class="page-subtitle">Gerencie as formas de contato da sua oficina.</div>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="btn-action primary" id="addContatoBtn">
+                        <i class="ti ti-plus"></i> Adicionar Contato
+                    </button>
+                </div>
+            </header>
+
+            <section class="panel">
+                <div class="panel-title-group">
+                    <div>
+                        <div class="panel-title">LISTA DE CONTATOS</div>
+                        <div class="panel-hint">Adicione e edite os contatos que aparecerão para seus clientes.</div>
+                    </div>
+                </div>
+                <div id="contatosListContainer" class="service-panels-grid">
+                    <!-- Contatos serão renderizados aqui -->
+                    <div class="empty-state">Nenhum contato cadastrado.</div>
+                </div>
+            </section>
+        `;
+        document.getElementById('addContatoBtn')?.addEventListener('click', handleAddContato);
+        carregarContatos(); // Chama a função para carregar os contatos
+    }
+
+    // ─── Adicionar Contato ────────────────────────────────────────────────────
+    async function handleAddContato() {
+        const formHtml = `
+            <p class="popup-subtitle">Adicione uma nova forma de contato para sua oficina.</p>
+            <form id="add-contact-form" class="popup-form">
+                <div class="field">
+                    <label class="field-label" for="contact-type">Tipo de Contato</label>
+                    <div class="input-wrap">
+                        <select id="contact-type" class="input" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="WHATSAPP">WhatsApp</option>
+                            <option value="TELEFONE">Telefone</option>
+                            <option value="EMAIL">E-mail</option>
+                            <option value="INSTAGRAM">Instagram</option>
+                            <option value="FACEBOOK">Facebook</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="contact-value">Valor</label>
+                    <div class="input-wrap">
+                        <input type="text" id="contact-value" class="input" placeholder="Ex: (99) 99999-9999 ou @usuario" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancel-add-contact">Cancelar</button>
+                    <button type="submit" class="btn-primary">Adicionar</button>
+                </div>
+            </form>
+        `;
+
+        showPopup('Adicionar Contato', formHtml, false, true);
+
+        const addContactForm = document.getElementById('add-contact-form');
+        const cancelBtn = document.getElementById('cancel-add-contact');
+
+        if (addContactForm) {
+            addContactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const tipo = document.getElementById('contact-type').value;
+                const valor = document.getElementById('contact-value').value.trim();
+
+                if (!tipo || !valor) {
+                    showPopup('Erro de Validação', 'Por favor, selecione o tipo e preencha o valor do contato.', true);
+                    return;
+                }
+
+                try {
+                    const response = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/contatos`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tipo, valor })
+                    });
+
+                    if (response.ok) {
+                        hidePopup();
+                        showPopup('Sucesso', 'Contato adicionado com sucesso!');
+                        carregarContatos(); // Recarrega a lista de contatos
+                    } else {
+                        const errorText = await response.text();
+                        let errorMessage = 'Erro ao adicionar contato.';
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || errorMessage;
+                        } catch {
+                            errorMessage = errorText || errorMessage;
+                        }
+                        showPopup('Erro', escapeHtml(errorMessage), true);
+                    }
+                } catch (error) {
+                    showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
+                }
+            });
+        }
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', hidePopup);
+        }
+    }
+
+    // ─── Carregar Contatos ────────────────────────────────────────────────────
+    async function carregarContatos() {
+        const contatosListContainer = document.getElementById('contatosListContainer');
+        if (!contatosListContainer) return;
+
+        try {
+            const response = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/contatos`);
+            if (response.ok) {
+                const contatos = await response.json();
+                renderizarContatos(Array.isArray(contatos) ? contatos : []); // Garante que seja sempre um array
+            } else if (response.status === 204) {
+                contatosListContainer.innerHTML = '<div class="empty-state">Nenhum contato cadastrado.</div>';
+            } else {
+                const errorText = await response.text();
+                let errorMessage = 'Erro ao carregar contatos.';
+                try {
+                    const errorData = JSON.parse(errorText);
+                    errorMessage = errorData.message || errorMessage;
+                } catch {
+                    errorMessage = errorText || errorMessage;
+                }
+                showPopup('Erro', escapeHtml(errorMessage), true);
+                contatosListContainer.innerHTML = '<div class="empty-state">Erro ao carregar contatos.</div>';
+            }
+        } catch (error) {
+            showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor para carregar contatos.', true);
+            contatosListContainer.innerHTML = '<div class="empty-state">Erro de conexão.</div>';
+        }
+    }
+
+    // ─── Renderizar Contatos ──────────────────────────────────────────────────
+    function renderizarContatos(contatos) {
+        const contatosListContainer = document.getElementById('contatosListContainer');
+        if (!contatosListContainer) return;
+
+        if (!contatos.length) {
+            contatosListContainer.innerHTML = '<div class="empty-state">Nenhum contato cadastrado.</div>';
+            return;
+        }
+
+        contatosListContainer.innerHTML = '';
+        contatos.forEach(contato => {
+            const contatoElement = document.createElement('div');
+            contatoElement.className = 'service-panel contact-card'; // Adiciona uma nova classe para estilização específica
+            contatoElement.innerHTML = `
+                <div class="contact-card-header">
+                    <div class="contact-icon">${getContactIcon(contato.tipo)}</div>
+                    <h3 class="contact-type">${escapeHtml(contato.tipo)}</h3>
+                </div>
+                <p class="contact-value">${escapeHtml(contato.valor)}</p>
+                <div class="service-actions">
+                    <button class="btn-action ghost edit-contato-btn" data-id="${contato.id}">
+                        <i class="ti ti-edit"></i> Editar
+                    </button>
+                    <button class="btn-delete-service delete-contato-btn" data-id="${contato.id}">
+                        <i class="ti ti-trash"></i> Excluir
+                    </button>
+                </div>
+            `;
+            contatosListContainer.appendChild(contatoElement);
+
+            contatoElement.querySelector('.edit-contato-btn')?.addEventListener('click', () => handleEditContato(contato.id, contato));
+            contatoElement.querySelector('.delete-contato-btn')?.addEventListener('click', () => handleDeleteContato(contato.id, contato.valor));
+        });
+    }
+
+    // ─── Editar Contato ───────────────────────────────────────────────────────
+    async function handleEditContato(id, currentContato) {
+        const formHtml = `
+            <p class="popup-subtitle">Edite as informações do contato.</p>
+            <form id="edit-contact-form" class="popup-form">
+                <div class="field">
+                    <label class="field-label" for="edit-contact-type">Tipo de Contato</label>
+                    <div class="input-wrap">
+                        <select id="edit-contact-type" class="input" required>
+                            <option value="WHATSAPP">WhatsApp</option>
+                            <option value="TELEFONE">Telefone</option>
+                            <option value="EMAIL">E-mail</option>
+                            <option value="INSTAGRAM">Instagram</option>
+                            <option value="FACEBOOK">Facebook</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="edit-contact-value">Valor</label>
+                    <div class="input-wrap">
+                        <input type="text" id="edit-contact-value" class="input" placeholder="Ex: (99) 99999-9999 ou @usuario" required>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancel-edit-contact">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        `;
+
+        showPopup('Editar Contato', formHtml, false, true);
+
+        const editContactForm = document.getElementById('edit-contact-form');
+        const cancelBtn = document.getElementById('cancel-edit-contact');
+        const contactTypeField = document.getElementById('edit-contact-type');
+        const contactValueField = document.getElementById('edit-contact-value');
+
+        if (contactTypeField && contactValueField) {
+            contactTypeField.value = currentContato.tipo;
+            contactValueField.value = currentContato.valor;
+        }
+
+        if (editContactForm) {
+            editContactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const tipo = contactTypeField.value;
+                const valor = contactValueField.value.trim();
+
+                if (!tipo || !valor) {
+                    showPopup('Erro de Validação', 'Por favor, selecione o tipo e preencha o valor do contato.', true);
+                    return;
+                }
+
+                try {
+                    const response = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/contatos/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tipo, valor })
+                    });
+
+                    if (response.ok) {
+                        hidePopup();
+                        showPopup('Sucesso', 'Contato atualizado com sucesso!');
+                        carregarContatos(); // Recarrega a lista de contatos
+                    } else {
+                        const errorText = await response.text();
+                        let errorMessage = 'Erro ao atualizar contato.';
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || errorMessage;
+                        } catch {
+                            errorMessage = errorText || errorMessage;
+                        }
+                        showPopup('Erro', escapeHtml(errorMessage), true);
+                    }
+                } catch (error) {
+                    showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
+                }
+            });
+        }
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', hidePopup);
+        }
+    }
+
+    // ─── Deletar Contato ──────────────────────────────────────────────────────
+    async function handleDeleteContato(id, valor) {
+        const confirmHtml = `
+            <p class="confirm-text">
+                Tem certeza que deseja excluir o contato<br>
+                <strong>"${escapeHtml(valor)}"</strong>?<br>
+                <span class="confirm-warning">Essa ação não pode ser desfeita.</span>
+            </p>
+            <div class="confirm-actions">
+                <button id="cancel-delete-btn" class="btn-secondary">Cancelar</button>
+                <button id="confirm-delete-btn" class="btn-danger">Excluir</button>
+            </div>
+        `;
+
+        showPopup('Excluir Contato', confirmHtml, false, true); // Alterado para não fechar automaticamente
+
+        document.getElementById('confirm-delete-btn')?.addEventListener('click', async () => {
+            try {
+                const response = await authFetch(`${API_BASE_URL}/oficinas/${oficinaId}/contatos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok || response.status === 204) {
+                    hidePopup();
+                    showPopup('Sucesso', 'Contato excluído com sucesso!');
+                    carregarContatos(); // Recarrega a lista de contatos
+                } else {
+                    const errorText = await response.text();
+                    let errorMessage = 'Erro ao excluir contato.';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch {
+                        errorMessage = errorText || errorMessage;
+                    }
+                    showPopup('Erro', escapeHtml(errorMessage), true);
+                }
+            } catch (error) {
+                showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+            }
+        });
+        document.getElementById('cancel-delete-btn')?.addEventListener('click', hidePopup);
+    }
+
 
     // ─── Adicionar serviço ────────────────────────────────────────────────────
     async function handleAddService() {
@@ -243,6 +655,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Inicializa o dashboard com o conteúdo padrão
+    renderDashboardContent();
     carregarDados();
 
     async function carregarDados() {
@@ -399,10 +813,32 @@ document.addEventListener('DOMContentLoaded', () => {
         // Preenche o nome via textContent (seguro)
         document.querySelector('.confirm-text strong').textContent = `"${nome}"`;
 
-        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
-            await deletarServico(id);
+        document.getElementById('confirm-delete-btn')?.addEventListener('click', async () => {
+            try {
+                const response = await authFetch(`${API_BASE_URL}/servicos/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok || response.status === 204) {
+                    hidePopup();
+                    showPopup('Sucesso', 'Serviço excluído com sucesso!');
+                    carregarDados();
+                } else {
+                    const errorText = await response.text();
+                    let errorMessage = 'Erro ao excluir serviço.';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch {
+                        errorMessage = errorText || errorMessage;
+                    }
+                    showPopup('Erro', escapeHtml(errorMessage), true);
+                }
+            } catch (error) {
+                showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
+            }
         });
-        document.getElementById('cancel-delete-btn').addEventListener('click', hidePopup);
+        document.getElementById('cancel-delete-btn')?.addEventListener('click', hidePopup);
     }
 
     async function deletarServico(id) {
