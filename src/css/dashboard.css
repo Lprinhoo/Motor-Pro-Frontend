@@ -614,9 +614,10 @@ body.dashboard-body {
     border: none !important;
     border-radius: 0 !important;
     background: transparent;
-    padding: 10px 12px;
+    padding: 12px 6px;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 13.5px;
+    line-height: 1; /* Adicionado */
     color: var(--text);
     outline: none;
     min-width: 0;
@@ -628,18 +629,19 @@ body.dashboard-body {
     background: rgba(255,255,255,0.04);
     color: var(--text-mute);
     font-family: inherit;
-    font-size: 12px;
+    font-size: 13.5px;
+    line-height: 1; /* Adicionado */
     font-weight: 600;
-    padding: 0 10px 0 8px;
+    width: 58px;
+    flex-shrink: 0;
     cursor: pointer;
     outline: none;
-    transition: background 0.15s, color 0.15s;
     appearance: none;
     -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(245%2C246%2C252%2C0.35)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 6px center;
-    padding-right: 22px;
+    padding: 12px 20px 12px 8px;
 }
 .time-unit-select:hover,
 .time-unit-select:focus {
@@ -887,27 +889,22 @@ body.dashboard-body {
 }
 
 /* Linha com dois campos lado a lado (ex: Valor + Tempo) */
+/* Linha com dois campos lado a lado (Valor + Tempo) */
 .popup-form .field-row {
     display: grid;
-    grid-template-columns: 0.8fr 1.2fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
-
-/* Alinha os wrappers sem forçar altura */
-.popup-form .field-row .input-wrap,
-.popup-form .field-row .time-input-wrap {
-    margin-top: 6px;
+.popup-form .field-row .field {
+    min-width: 0;
 }
-
 .popup-form .field-row .prefix-input,
 .popup-form .field-row .time-input-wrap {
+    width: 100%;
+    box-sizing: border-box;
     height: auto;
-}
-
-.popup-form .field-row .prefix-input input,
-.popup-form .field-row .time-input-wrap input {
-    height: auto;
-    padding: 11px 8px;
+    margin-top: 6px;
+    min-width: 0; /* Adicionado para garantir que possam encolher */
 }
 
 .popup-form .time-input-wrap {
@@ -922,7 +919,7 @@ body.dashboard-body {
 .popup-form .time-input-wrap input {
     font-family: 'Sora', sans-serif;
     font-size: 13.5px;
-    padding: 11px 8px;
+    line-height: 1; /* Adicionado */
 }
 
 .popup-form .input-wrap {
@@ -971,7 +968,8 @@ body.dashboard-body {
 }
 .popup-form .prefix-input span {
     padding: 12px 14px;
-    font-size: 13px;
+    font-size: 13.5px;
+    line-height: 1; /* Adicionado */
     color: var(--text-dim);
     font-weight: 600;
     flex-shrink: 0;
@@ -987,6 +985,7 @@ body.dashboard-body {
     color: var(--text);
     font-family: 'Sora', sans-serif;
     font-size: 13.5px;
+    line-height: 1; /* Adicionado */
 }
 .popup-form .prefix-input input::placeholder { color: var(--text-faint); }
 
