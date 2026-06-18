@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const valorFinal = isNaN(valor) ? 0 : valor;
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
-            const tempoBruto = s.tempoMedioEmMinutos ?? s.tempoMedio ?? s.tempo ?? s.duration;
+            const tempoBruto = s.tempoMedioEmMinutos ?? s.tempoMedioMinutos ?? s.tempoMedio ?? s.tempoEmMinutos ?? s.tempo ?? s.duration ?? s.estimatedTime ?? s.estimatedMinutes;
             const tempoFormatado = formatarTempo(tempoBruto);
 
             const article = document.createElement('article');

@@ -889,8 +889,40 @@ body.dashboard-body {
 /* Linha com dois campos lado a lado (ex: Valor + Tempo) */
 .popup-form .field-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 0.8fr 1.2fr;
     gap: 12px;
+}
+
+/* Alinha os wrappers sem forçar altura */
+.popup-form .field-row .input-wrap,
+.popup-form .field-row .time-input-wrap {
+    margin-top: 6px;
+}
+
+.popup-form .field-row .prefix-input,
+.popup-form .field-row .time-input-wrap {
+    height: auto;
+}
+
+.popup-form .field-row .prefix-input input,
+.popup-form .field-row .time-input-wrap input {
+    height: auto;
+    padding: 11px 8px;
+}
+
+.popup-form .time-input-wrap {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: var(--border);
+}
+.popup-form .time-input-wrap:focus-within {
+    border-color: rgba(22, 188, 78, 0.45);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+    background: rgba(22, 188, 78, 0.025);
+}
+.popup-form .time-input-wrap input {
+    font-family: 'Sora', sans-serif;
+    font-size: 13.5px;
+    padding: 11px 8px;
 }
 
 .popup-form .input-wrap {
