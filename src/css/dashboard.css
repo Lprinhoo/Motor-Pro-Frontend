@@ -799,7 +799,7 @@ body.dashboard-body {
     border-radius: 8px;
 }
 .sb-nav::-webkit-scrollbar-thumb:hover,
-.service-panels-grid::-webkit-scrollbar-thumb:hover {
+.service-panels-grid::-webkit-panels-grid::-webkit-scrollbar-thumb:hover {
     background: rgba(255,255,255,0.11);
 }
 
@@ -1175,6 +1175,22 @@ body.dashboard-body {
     box-shadow: none !important; /* Remove qualquer box-shadow de btn-delete-service */
 }
 
+/* Novo estilo para o botão Excluir no card de contato (com sombreamento vermelho) */
+.contact-card .service-actions .delete-contato-btn {
+    border-color: rgba(255, 77, 77, 0.22); /* Borda sutilmente vermelha */
+    color: rgba(255, 77, 77, 0.8); /* Cor do texto sutilmente vermelha */
+    box-shadow: 0 2px 8px -4px rgba(255, 77, 77, 0.4); /* Sombreamento vermelho */
+    background: transparent; /* Garante que o fundo seja transparente */
+}
+
+.contact-card .service-actions .delete-contato-btn:hover {
+    background: rgba(255, 77, 77, 0.07); /* Fundo levemente vermelho no hover */
+    border-color: var(--danger); /* Borda mais forte no hover */
+    color: var(--danger); /* Cor do texto mais forte no hover */
+    box-shadow: 0 4px 12px -6px rgba(255, 77, 77, 0.6); /* Sombreamento mais intenso no hover */
+    transform: translateY(-1px); /* Pequeno efeito de elevação */
+}
+
 .contact-card .service-actions .btn-delete-service {
     /* Este é o botão de exclusão APENAS para ícones. */
     /* Se você deseja um botão de texto "Excluir", use a classe .btn-danger */
@@ -1241,7 +1257,6 @@ select.input:focus {
     border-color: var(--border-2);
 }
 
-/* Opções do select: fundo dark para evitar o branco nativo */
 select.input option {
     background-color: #17181E;
     color: var(--text);
@@ -1249,15 +1264,20 @@ select.input option {
     font-size: 13px;
     padding: 10px 14px;
 }
+select.input option:hover {
+    background-color: var(--surface) !important; /* Força o fundo no hover */
+    color: var(--text) !important; /* Força a cor do texto no hover */
+}
 select.input option:checked {
-    background-color: rgba(22, 188, 78, 0.18);
-    color: var(--brand);
+    background-color: var(--surface) !important; /* Fundo escuro consistente */
+    color: var(--brand) !important; /* Força a cor do texto para verde (brand) */
+    /* A borda não é consistentemente suportada em <option>, então a removemos */
+    padding: 10px 14px !important; /* Volta ao padding original */
 }
 select.input option[value=""] {
     color: var(--text-faint);
 }
 
-/* ── Botão primário genérico (fora do popup-form) ────────── */
 .btn-primary {
     background: var(--gradient-brand);
     color: #061B0C;
@@ -1277,4 +1297,96 @@ select.input option[value=""] {
     filter: brightness(1.07);
     transform: translateY(-1px);
     box-shadow: 0 8px 20px -8px rgba(22,188,78,0.7);
+}
+
+/* ── Custom Select (Dropdown) ───────────────────────────── */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 6px;
+}
+
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    padding-right: 14px; /* Ajuste para o ícone */
+}
+
+.custom-select-trigger:focus {
+    border-color: rgba(22, 188, 78, 0.45);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+    background: rgba(22, 188, 78, 0.025);
+}
+
+.custom-select-trigger span {
+    flex: 1;
+    text-align: left;
+    color: var(--text-faint); /* Cor padrão para "Selecione o tipo" */
+}
+
+.custom-select-trigger.input {
+    /* Reutiliza estilos de input, mas ajusta padding e background-image */
+    background-image: none; /* Remove a seta padrão do select */
+    padding-right: 14px; /* Ajusta padding para o ícone customizado */
+}
+
+.custom-select-arrow {
+    font-size: 16px;
+    color: var(--text-dim);
+    transition: transform 0.2s ease;
+}
+
+.custom-select-arrow.rotate {
+    transform: rotate(180deg);
+}
+
+.custom-options-container {
+    position: absolute;
+    top: 100%; /* Posiciona abaixo do trigger */
+    left: 0;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    max-height: 200px; /* Limita a altura para scroll */
+    overflow-y: auto;
+    margin-top: 4px;
+}
+
+.custom-options-container.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.custom-option {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    text-align: left;
+}
+
+.custom-option:first-child {
+    color: var(--text-faint); /* "Selecione o tipo" */
+}
+
+.custom-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-option.selected {
+    background: var(--brand-soft);
+    color: var(--brand);
+    font-weight: 600;
 }

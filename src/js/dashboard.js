@@ -204,16 +204,21 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="popup-subtitle">Adicione uma nova forma de contato para sua oficina.</p>
             <form id="add-contact-form" class="popup-form">
                 <div class="field">
-                    <label class="field-label" for="contact-type">Tipo de Contato</label>
-                    <div class="input-wrap">
-                        <select id="contact-type" class="input" required>
-                            <option value="">Selecione o tipo</option>
-                            <option value="WHATSAPP">WhatsApp</option>
-                            <option value="TELEFONE">Telefone</option>
-                            <option value="EMAIL">E-mail</option>
-                            <option value="INSTAGRAM">Instagram</option>
-                            <option value="FACEBOOK">Facebook</option>
-                        </select>
+                    <label class="field-label" for="contact-type-hidden">Tipo de Contato</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select-trigger input" id="contact-type-trigger" tabindex="0">
+                            <span id="contact-type-display">Selecione o tipo</span>
+                            <i class="ti ti-chevron-down custom-select-arrow"></i>
+                        </div>
+                        <div class="custom-options-container" id="contact-type-options-container">
+                            <div class="custom-option" data-value="">Selecione o tipo</div>
+                            <div class="custom-option" data-value="WHATSAPP">WhatsApp</div>
+                            <div class="custom-option" data-value="TELEFONE">Telefone</div>
+                            <div class="custom-option" data-value="EMAIL">E-mail</div>
+                            <div class="custom-option" data-value="INSTAGRAM">Instagram</div>
+                            <div class="custom-option" data-value="FACEBOOK">Facebook</div>
+                        </div>
+                        <input type="hidden" id="contact-type-hidden" name="tipo" value="" required>
                     </div>
                 </div>
                 <div class="field">
@@ -234,11 +239,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const addContactForm = document.getElementById('add-contact-form');
         const cancelBtn = document.getElementById('cancel-add-contact');
 
+        // --- Lógica para o Custom Select ---
+        const customSelectTrigger = document.getElementById('contact-type-trigger');
+        const customSelectDisplay = document.getElementById('contact-type-display');
+        const customSelectArrow = document.querySelector('.custom-select-arrow');
+        const customOptionsContainer = document.getElementById('contact-type-options-container');
+        const hiddenInput = document.getElementById('contact-type-hidden');
+        const customOptions = customOptionsContainer.querySelectorAll('.custom-option');
+
+        // Inicializa o valor do hidden input e a exibição
+        hiddenInput.value = '';
+        customSelectDisplay.textContent = 'Selecione o tipo';
+        customOptions[0].classList.add('selected'); // Marca a primeira como selecionada visualmente
+
+        customSelectTrigger.addEventListener('click', () => {
+            customOptionsContainer.classList.toggle('active');
+            customSelectArrow.classList.toggle('rotate');
+        });
+
+        customOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                customOptions.forEach(opt => opt.classList.remove('selected')); // Remove seleção de todos
+                option.classList.add('selected'); // Adiciona seleção ao clicado
+
+                customSelectDisplay.textContent = option.textContent;
+                hiddenInput.value = option.dataset.value;
+                customOptionsContainer.classList.remove('active');
+                customSelectArrow.classList.remove('rotate');
+            });
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!customSelectTrigger.contains(e.target) && !customOptionsContainer.contains(e.target)) {
+                customOptionsContainer.classList.remove('active');
+                customSelectArrow.classList.remove('rotate');
+            }
+        });
+        // --- Fim da Lógica para o Custom Select ---
+
         if (addContactForm) {
             addContactForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const tipo = document.getElementById('contact-type').value;
+                const tipo = hiddenInput.value; // Pega o valor do hidden input
                 const valor = document.getElementById('contact-value').value.trim();
 
                 if (!tipo || !valor) {
