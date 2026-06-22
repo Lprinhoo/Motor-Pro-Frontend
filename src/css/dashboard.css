@@ -1131,31 +1131,50 @@ body.dashboard-body {
 .contact-card .service-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 12px; /* Espaçamento entre os botões */
     margin-top: auto;
 }
 .contact-card .service-actions .btn-action {
-    flex-grow: 0;
+    display: inline-flex; /* Garante comportamento flexível para alinhamento */
+    align-items: center;
     justify-content: center;
+    flex-grow: 0;
     font-size: 11.5px;
-    padding: 7px 10px;
-    width: auto;
-    height: auto;
+    padding: 7px 10px !important; /* Força o padding */
+    width: auto !important; /* Força a largura a se adaptar ao conteúdo */
+    height: auto !important; /* Força a altura a se adaptar ao conteúdo */
+    min-width: fit-content !important; /* Força o botão a se ajustar ao texto */
     border-radius: var(--radius-sm);
+    white-space: nowrap; /* Evita que o texto quebre linha */
+    box-sizing: border-box; /* Inclui padding na largura/altura */
 }
 /* Ajustes para botões secundários e de perigo dentro do card de contato */
 .contact-card .service-actions .btn-secondary,
 .contact-card .service-actions .btn-danger {
-    display: inline-flex;
+    display: inline-flex; /* Explicitamente definido para consistência */
     align-items: center;
     justify-content: center;
-    padding: 7px 10px;
+    padding: 7px 10px !important; /* Força o padding */
     font-size: 11.5px;
     flex-grow: 0;
-    width: auto !important;
-    height: auto !important;
+    width: auto !important; /* Força a largura a se adaptar ao conteúdo */
+    height: auto !important; /* Força a altura a se adaptar ao conteúdo */
+    min-width: fit-content !important; /* Força o botão a se ajustar ao texto */
     border-radius: var(--radius-sm);
+    white-space: nowrap;
+    box-sizing: border-box;
 }
+
+/* Hover específico para btn-danger dentro de contact-card para evitar conflitos */
+.contact-card .service-actions .btn-danger:hover {
+    background: var(--danger) !important; /* Mantém o fundo de perigo */
+    color: #fff !important; /* Mantém o texto branco */
+    border-color: transparent !important; /* Remove qualquer borda indesejada */
+    filter: brightness(1.1) !important; /* Aplica o efeito de brilho padrão */
+    transform: translateY(-1px) !important;
+    box-shadow: none !important; /* Remove qualquer box-shadow de btn-delete-service */
+}
+
 .contact-card .service-actions .btn-delete-service {
     /* Este é o botão de exclusão APENAS para ícones. */
     /* Se você deseja um botão de texto "Excluir", use a classe .btn-danger */
@@ -1165,6 +1184,8 @@ body.dashboard-body {
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
     color: var(--text-faint);
+    padding: 0; /* Garante que não haja padding para o botão de ícone */
+    box-sizing: border-box;
 }
 
 /* ── Formulários do popup: campo label ───────────────────── */

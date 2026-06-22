@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn-action ghost edit-contato-btn" data-id="${contato.id}">
                         <i class="ti ti-edit"></i> Editar
                     </button>
-                    <button class="btn-delete-service delete-contato-btn" data-id="${contato.id}">
+                    <button class="btn-action ghost delete-contato-btn" data-id="${contato.id}">
                         <i class="ti ti-trash"></i> Excluir
                     </button>
                 </div>
@@ -713,7 +713,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const nome = s.nome ?? 'Serviço sem nome';
             const descricao = s.descricao ?? 'Sem descrição.';
             const valorBruto = s.valor ?? s.preco ?? s.valorServico ?? s.valorUnitario ?? s.price;
-            const valor = typeof valorBruto === 'number' ? valorBruto : parseFloat(valorBruto);
             const valorFinal = isNaN(valor) ? 0 : valor;
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
