@@ -705,6 +705,29 @@ body.dashboard-body {
 }
 
 /* ── Pop-up ─────────────────────────────────────────────── */
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.18s ease;
+    padding-block: 20px; /* Adicionado padding vertical para o overlay */
+}
+#popup-overlay.hidden { display: none; }
+
+/* Removido: Ajustes para o overlay quando contém um formulário */
+/* #popup-overlay.popup-overlay-form {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
+} */
+
 /* Aumentando a especificidade para sobrescrever style.css */
 body.dashboard-body #popup-card {
     background: var(--surface);
@@ -712,18 +735,30 @@ body.dashboard-body #popup-card {
     border-radius: var(--radius-lg);
     padding: 1rem 1.8rem; /* Ajustado */
     width: min(500px, 95vw); /* Aumentado */
+    max-width: none !important; /* Sobrescreve o max-width do style.css */
+    height: auto !important; /* Altura sempre baseada no conteúdo */
+    max-height: 90vh !important; /* Só entra em ação se o conteúdo for muito grande */
+    overflow-y: auto !important; /* Scroll apenas quando o conteúdo excede o max-height */
     box-shadow: 0 24px 60px rgba(0,0,0,0.65);
     text-align: center;
     animation: popIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
     position: relative;
-    overflow: hidden;
-    max-height: 98vh; /* Ajustado para dar mais espaço */
+    display: flex !important; /* Adicionado para flexbox */
+    flex-direction: column !important; /* Adicionado para flexbox */
+    margin: auto !important; /* Centraliza verticalmente e horizontalmente */
+    align-self: center !important; /* Não estica mais até a altura do overlay */
+}
+
+/* Scrollbar discreta para quando o conteúdo do popup realmente precisar rolar */
+body.dashboard-body #popup-card::-webkit-scrollbar { width: 5px; }
+body.dashboard-body #popup-card::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.10);
+    border-radius: 8px;
 }
 /* Quando o popup carrega um formulário, dá mais espaço e respiro */
 body.dashboard-body #popup-card.popup-is-form {
     width: min(600px, 95vw); /* Aumentado */
-    max-height: 98vh; /* Ajustado para dar mais espaço */
-    overflow-y: auto;
+    /* max-height e overflow-y já estão definidos na regra acima com !important, não precisam repetir */
 }
 body.dashboard-body #popup-card::before {
     content: "";
@@ -877,6 +912,8 @@ body.dashboard-body #popup-card::before {
 .popup-form {
     text-align: left;
     margin-top: 1.4rem;
+    flex-grow: 1; /* Permite que o formulário ocupe o espaço disponível */
+    overflow-y: auto; /* Adiciona rolagem se o conteúdo do formulário exceder */
 }
 
 .popup-form .field {
@@ -1132,8 +1169,8 @@ body.dashboard-body #popup-card::before {
     height: auto !important; /* Força a altura a se adaptar ao conteúdo */
     min-width: fit-content !important; /* Força o botão a se ajustar ao texto */
     border-radius: var(--radius-sm);
-    white-space: nowrap; /* Evita que o texto quebre linha */
-    box-sizing: border-box; /* Inclui padding na largura/altura */
+    white-space: nowrap;
+    box-sizing: border-box;
 }
 /* Ajustes para botões secundários e de perigo dentro do card de contato */
 .contact-card .service-actions .btn-secondary,
