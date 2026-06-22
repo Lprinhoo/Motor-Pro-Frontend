@@ -3,6 +3,7 @@ let popupTitle;
 let popupMessage;
 let popupIcon;
 let popupCloseBtn;
+let popupCard; // Adicionado para referenciar o popup-card
 
 document.addEventListener('DOMContentLoaded', () => {
     popupOverlay  = document.getElementById('popup-overlay');
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     popupMessage  = document.getElementById('popup-message');
     popupIcon     = document.getElementById('popup-icon');
     popupCloseBtn = document.getElementById('popup-close-btn');
+    popupCard     = document.getElementById('popup-card'); // Obtém a referência ao popup-card
 
     if (popupCloseBtn) {
         popupCloseBtn.addEventListener('click', hidePopup);
@@ -23,13 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // isForm: quando true, esconde o botão OK e exibe o formulário sem conflito visual
 export const showPopup = (title, message, isError = false, isForm = false) => {
-    if (!popupOverlay || !popupTitle || !popupMessage || !popupCloseBtn) {
+    if (!popupOverlay || !popupTitle || !popupMessage || !popupCloseBtn || !popupCard) {
         console.error('Popup elements not found in the DOM.');
         return;
     }
     popupTitle.innerText   = title;
     popupMessage.innerHTML = message;
     popupTitle.style.color = isError ? '#FF5252' : '#00E676';
+
+    // Adiciona ou remove a classe popup-is-form com base no parâmetro isForm
+    if (isForm) {
+        popupCard.classList.add('popup-is-form');
+    } else {
+        popupCard.classList.remove('popup-is-form');
+    }
 
     // Botão OK: oculto quando é formulário
     if (isForm) {
@@ -63,5 +72,7 @@ export const hidePopup = () => {
         popupOverlay.classList.add('hidden');
         // Garante que o botão OK volta a aparecer na próxima vez
         if (popupCloseBtn) popupCloseBtn.style.display = '';
+        // Remove a classe popup-is-form ao fechar o popup
+        if (popupCard) popupCard.classList.remove('popup-is-form');
     }
 };

@@ -722,18 +722,19 @@ body.dashboard-body {
     background: var(--surface);
     border: 1px solid var(--border-2);
     border-radius: var(--radius-lg);
-    padding: 1.9rem 1.8rem;
-    width: min(400px, 90vw);
+    padding: 1rem 1.8rem; /* Ajustado */
+    width: min(500px, 95vw);
     box-shadow: 0 24px 60px rgba(0,0,0,0.65);
     text-align: center;
     animation: popIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
     position: relative;
     overflow: hidden;
+    max-height: 98vh; /* Ajustado para dar mais espaço */
 }
 /* Quando o popup carrega um formulário, dá mais espaço e respiro */
-#popup-card:has(.popup-form) {
-    width: min(480px, 92vw);
-    max-height: 88vh;
+#popup-card.popup-is-form {
+    width: min(600px, 95vw);
+    max-height: 98vh; /* Ajustado para dar mais espaço */
     overflow-y: auto;
 }
 #popup-card::before {
@@ -891,11 +892,9 @@ body.dashboard-body {
 }
 
 .popup-form .field {
-    margin-bottom: 1.1rem;
+    margin-bottom: 0.8rem; /* Ajustado */
 }
 
-/* Linha com dois campos lado a lado (ex: Valor + Tempo) */
-/* Linha com dois campos lado a lado (Valor + Tempo) */
 .popup-form .field-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1008,7 +1007,7 @@ body.dashboard-body {
 .popup-form .form-actions {
     display: flex;
     gap: 10px;
-    margin-top: 1.7rem;
+    margin-top: 1.2rem; /* Ajustado */
 }
 
 .popup-form .btn-primary,

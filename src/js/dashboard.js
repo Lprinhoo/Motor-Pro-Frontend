@@ -395,15 +395,20 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="popup-subtitle">Edite as informações do contato.</p>
             <form id="edit-contact-form" class="popup-form">
                 <div class="field">
-                    <label class="field-label" for="edit-contact-type">Tipo de Contato</label>
-                    <div class="input-wrap">
-                        <select id="edit-contact-type" class="input" required>
-                            <option value="WHATSAPP">WhatsApp</option>
-                            <option value="TELEFONE">Telefone</option>
-                            <option value="EMAIL">E-mail</option>
-                            <option value="INSTAGRAM">Instagram</option>
-                            <option value="FACEBOOK">Facebook</option>
-                        </select>
+                    <label class="field-label" for="edit-contact-type-hidden">Tipo de Contato</label>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select-trigger input" id="edit-contact-type-trigger" tabindex="0">
+                            <span id="edit-contact-type-display"></span>
+                            <i class="ti ti-chevron-down custom-select-arrow"></i>
+                        </div>
+                        <div class="custom-options-container" id="edit-contact-type-options-container">
+                            <div class="custom-option" data-value="WHATSAPP">WhatsApp</div>
+                            <div class="custom-option" data-value="TELEFONE">Telefone</div>
+                            <div class="custom-option" data-value="EMAIL">E-mail</div>
+                            <div class="custom-option" data-value="INSTAGRAM">Instagram</div>
+                            <div class="custom-option" data-value="FACEBOOK">Facebook</div>
+                        </div>
+                        <input type="hidden" id="edit-contact-type-hidden" name="tipo" value="" required>
                     </div>
                 </div>
                 <div class="field">
@@ -423,11 +428,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const editContactForm = document.getElementById('edit-contact-form');
         const cancelBtn = document.getElementById('cancel-edit-contact');
-        const contactTypeField = document.getElementById('edit-contact-type');
         const contactValueField = document.getElementById('edit-contact-value');
 
-        if (contactTypeField && contactValueField) {
-            contactTypeField.value = currentContato.tipo;
+        // --- Lógica para o Custom Select ---
+        const customSelectTrigger = document.getElementById('edit-contact-type-trigger');
+        const customSelectDisplay = document.getElementById('edit-contact-type-display');
+        const customSelectArrow = customSelectTrigger.querySelector('.custom-select-arrow');
+        const customOptionsContainer = document.getElementById('edit-contact-type-options-container');
+        const hiddenInput = document.getElementById('edit-contact-type-hidden');
+        const customOptions = customOptionsContainer.querySelectorAll('.custom-option');
+
+        // Inicializa o valor do hidden input e a exibição com base no currentContato
+        if (currentContato && customSelectDisplay && hiddenInput) {
+            hiddenInput.value = currentContato.tipo;
+            const selectedOption = Array.from(customOptions).find(opt => opt.dataset.value === currentContato.tipo);
+            if (selectedOption) {
+                customSelectDisplay.textContent = selectedOption.textContent;
+                selectedOption.classList.add('selected');
+            } else {
+                customSelectDisplay.textContent = 'Selecione o tipo';
+            }
+        }
+
+        customSelectTrigger.addEventListener('click', () => {
+            customOptionsContainer.classList.toggle('active');
+            customSelectArrow.classList.toggle('rotate');
+        });
+
+        customOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                customOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+
+                customSelectDisplay.textContent = option.textContent;
+                hiddenInput.value = option.dataset.value;
+                customOptionsContainer.classList.remove('active');
+                customSelectArrow.classList.remove('rotate');
+            });
+        });
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!customSelectTrigger.contains(e.target) && !customOptionsContainer.contains(e.target)) {
+                customOptionsContainer.classList.remove('active');
+                customSelectArrow.classList.remove('rotate');
+            }
+        });
+        // --- Fim da Lógica para o Custom Select ---
+
+        if (contactValueField) {
             contactValueField.value = currentContato.valor;
         }
 
@@ -435,8 +484,8 @@ document.addEventListener('DOMContentLoaded', () => {
             editContactForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const tipo = contactTypeField.value;
-                const valor = contactValueField.value.trim();
+                const tipo = hiddenInput.value; // Pega o valor do hidden input
+                const valor = document.getElementById('edit-contact-value').value.trim();
 
                 if (!tipo || !valor) {
                     showPopup('Erro de Validação', 'Por favor, selecione o tipo e preencha o valor do contato.', true);
