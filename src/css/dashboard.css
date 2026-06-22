@@ -648,7 +648,7 @@ body.dashboard-body {
 }
 .time-unit-select:hover,
 .time-unit-select:focus {
-    background-color: rgba(22,188,78,0.08);
+    background-color: rgba(255,255,255,0.08);
     color: var(--brand);
 }
 .time-unit-select option {
@@ -733,32 +733,23 @@ body.dashboard-body #popup-card {
     background: var(--surface);
     border: 1px solid var(--border-2);
     border-radius: var(--radius-lg);
-    padding: 1rem 1.8rem; /* Ajustado */
-    width: min(500px, 95vw); /* Aumentado */
-    max-width: none !important; /* Sobrescreve o max-width do style.css */
-    height: auto !important; /* Altura sempre baseada no conteúdo */
-    max-height: 90vh !important; /* Só entra em ação se o conteúdo for muito grande */
-    overflow-y: auto !important; /* Scroll apenas quando o conteúdo excede o max-height */
+    padding: 1rem 1.8rem;
+    width: min(500px, 95vw);
+    max-width: none; /* Sobrescreve o max-width: 400px do style.css */
+    height: auto; /* Altura sempre baseada no conteúdo */
+    overflow: visible; /* Nunca corta nem mostra scroll, conteúdo dita o tamanho */
     box-shadow: 0 24px 60px rgba(0,0,0,0.65);
     text-align: center;
     animation: popIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
     position: relative;
-    display: flex !important; /* Adicionado para flexbox */
-    flex-direction: column !important; /* Adicionado para flexbox */
-    margin: auto !important; /* Centraliza verticalmente e horizontalmente */
-    align-self: center !important; /* Não estica mais até a altura do overlay */
-}
-
-/* Scrollbar discreta para quando o conteúdo do popup realmente precisar rolar */
-body.dashboard-body #popup-card::-webkit-scrollbar { width: 5px; }
-body.dashboard-body #popup-card::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.10);
-    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
 }
 /* Quando o popup carrega um formulário, dá mais espaço e respiro */
 body.dashboard-body #popup-card.popup-is-form {
     width: min(600px, 95vw); /* Aumentado */
-    /* max-height e overflow-y já estão definidos na regra acima com !important, não precisam repetir */
+    min-height: 655px; /* Mantém o tamanho grande constante, mesmo com o dropdown fechado */
 }
 body.dashboard-body #popup-card::before {
     content: "";
@@ -912,8 +903,9 @@ body.dashboard-body #popup-card::before {
 .popup-form {
     text-align: left;
     margin-top: 1.4rem;
-    flex-grow: 1; /* Permite que o formulário ocupe o espaço disponível */
-    overflow-y: auto; /* Adiciona rolagem se o conteúdo do formulário exceder */
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Ocupa o espaço extra do card, evitando vazio solto no meio */
 }
 
 .popup-form .field {
@@ -1032,7 +1024,9 @@ body.dashboard-body #popup-card::before {
 .popup-form .form-actions {
     display: flex;
     gap: 10px;
-    margin-top: 1.2rem; /* Ajustado */
+    margin-top: auto; /* Empurra os botões para o rodapé do card, preenchendo o espaço vazio */
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border); /* Divisória sutil entre campos e botões */
 }
 
 .popup-form .btn-primary,
@@ -1368,28 +1362,19 @@ select.input option[value=""] {
 }
 
 .custom-options-container {
-    position: absolute;
-    top: 100%; /* Posiciona abaixo do trigger */
-    left: 0;
+    position: static; /* Agora faz parte do fluxo normal, empurrando o card a crescer */
     width: 100%;
     background: var(--surface);
     border: 1px solid var(--border-2);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    z-index: 10;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(10px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
-    max-height: 200px; /* Limita a altura para scroll */
-    overflow-y: auto;
     margin-top: 4px;
+    display: block; /* Ocupa espaço no layout */
+    visibility: hidden; /* Conteúdo invisível por padrão */
 }
 
 .custom-options-container.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    visibility: visible; /* Conteúdo visível quando a classe active é aplicada */
 }
 
 .custom-option {
