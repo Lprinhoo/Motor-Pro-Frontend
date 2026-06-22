@@ -705,25 +705,13 @@ body.dashboard-body {
 }
 
 /* ── Pop-up ─────────────────────────────────────────────── */
-#popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    display: grid;
-    place-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.18s ease;
-}
-#popup-overlay.hidden { display: none; }
-
-#popup-card {
+/* Aumentando a especificidade para sobrescrever style.css */
+body.dashboard-body #popup-card {
     background: var(--surface);
     border: 1px solid var(--border-2);
     border-radius: var(--radius-lg);
     padding: 1rem 1.8rem; /* Ajustado */
-    width: min(500px, 95vw);
+    width: min(500px, 95vw); /* Aumentado */
     box-shadow: 0 24px 60px rgba(0,0,0,0.65);
     text-align: center;
     animation: popIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
@@ -732,12 +720,12 @@ body.dashboard-body {
     max-height: 98vh; /* Ajustado para dar mais espaço */
 }
 /* Quando o popup carrega um formulário, dá mais espaço e respiro */
-#popup-card.popup-is-form {
-    width: min(600px, 95vw);
+body.dashboard-body #popup-card.popup-is-form {
+    width: min(600px, 95vw); /* Aumentado */
     max-height: 98vh; /* Ajustado para dar mais espaço */
     overflow-y: auto;
 }
-#popup-card::before {
+body.dashboard-body #popup-card::before {
     content: "";
     position: absolute;
     top: 0; left: 50%; transform: translateX(-50%);
