@@ -37,6 +37,99 @@ function getContactIcon(tipo) {
     }
 }
 
+// ─── Máscara de telefone: (99) 99999-9999 / (99) 9999-9999 ────────────────
+function applyPhoneMask(value) {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 2) {
+        return digits.replace(/^(\d{0,2})/, digits.length ? '($1' : '');
+    }
+    if (digits.length <= 6) {
+        return digits.replace(/^(\d{2})(\d{0,4})/, '($1) $2');
+    }
+    if (digits.length <= 10) {
+        return digits.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    }
+    return digits.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+}
+
+// ─── Formatação de usuário: garante @ no início, sem espaços ───────────────
+function applyUsernameMask(value) {
+    let v = value.replace(/\s/g, '');
+    if (v && !v.startsWith('@')) v = '@' + v;
+    return v;
+}
+
+// ─── Ajusta placeholder/máscara do campo "Valor" conforme o tipo escolhido ──
+function configureContactValueField(tipo, inputEl) {
+    if (!inputEl) return;
+
+    // Remove handler de máscara anterior, se houver
+    if (inputEl._maskHandler) {
+        inputEl.removeEventListener('input', inputEl._maskHandler);
+        inputEl._maskHandler = null;
+    }
+
+    switch (tipo) {
+        case 'WHATSAPP':
+        case 'TELEFONE':
+            inputEl.placeholder = 'Ex: (99) 99999-9999';
+            inputEl.setAttribute('inputmode', 'numeric');
+            inputEl.maxLength = 15;
+            inputEl._maskHandler = (e) => { e.target.value = applyPhoneMask(e.target.value); };
+            inputEl.addEventListener('input', inputEl._maskHandler);
+            inputEl.value = applyPhoneMask(inputEl.value);
+            break;
+        case 'EMAIL':
+            inputEl.placeholder = 'Ex: contato@suaoficina.com';
+            inputEl.removeAttribute('inputmode');
+            inputEl.removeAttribute('maxlength');
+            break;
+        case 'INSTAGRAM':
+        case 'FACEBOOK':
+            inputEl.placeholder = 'Ex: @suaoficina';
+            inputEl.removeAttribute('inputmode');
+            inputEl.removeAttribute('maxlength');
+            inputEl._maskHandler = (e) => { e.target.value = applyUsernameMask(e.target.value); };
+            inputEl.addEventListener('input', inputEl._maskHandler);
+            inputEl.value = applyUsernameMask(inputEl.value);
+            break;
+        default:
+            inputEl.placeholder = 'Ex: (99) 99999-9999 ou @usuario';
+            inputEl.removeAttribute('inputmode');
+            inputEl.removeAttribute('maxlength');
+    }
+}
+
+// ─── Valida o valor do contato de acordo com o tipo selecionado ────────────
+function validateContactValue(tipo, valor) {
+    switch (tipo) {
+        case 'WHATSAPP':
+        case 'TELEFONE': {
+            const digits = valor.replace(/\D/g, '');
+            if (digits.length < 10 || digits.length > 11) {
+                return { valid: false, message: 'Informe um telefone válido com DDD, ex: (99) 99999-9999.' };
+            }
+            return { valid: true };
+        }
+        case 'EMAIL': {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            if (!emailRegex.test(valor)) {
+                return { valid: false, message: 'Informe um e-mail válido, ex: contato@suaoficina.com.' };
+            }
+            return { valid: true };
+        }
+        case 'INSTAGRAM':
+        case 'FACEBOOK': {
+            if (!/^@[A-Za-z0-9_.]{2,30}$/.test(valor)) {
+                return { valid: false, message: 'Informe um usuário válido, ex: @suaoficina.' };
+            }
+            return { valid: true };
+        }
+        default:
+            return { valid: true };
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn      = document.getElementById('logoutBtn');
     const addServiceBtn  = document.getElementById('addServiceBtn');
@@ -66,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             const page = item.dataset.page;
-            
+
             // Limpa o conteúdo principal antes de renderizar a nova seção
             if (dbContent) dbContent.innerHTML = '';
 
@@ -235,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Lógica para Seleção de Ícones ---
         const contactTypeIconsWrapper = document.getElementById('contact-type-icons-wrapper');
         const hiddenInput = document.getElementById('contact-type-hidden');
+        const contactValueField = document.getElementById('contact-value');
         const iconOptions = contactTypeIconsWrapper.querySelectorAll('.icon-option');
 
         iconOptions.forEach(option => {
@@ -242,6 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 iconOptions.forEach(opt => opt.classList.remove('selected')); // Remove seleção de todos
                 option.classList.add('selected'); // Adiciona seleção ao clicado
                 hiddenInput.value = option.dataset.value; // Atualiza o valor do input hidden
+                contactValueField.value = ''; // Limpa o valor ao trocar o tipo
+                configureContactValueField(option.dataset.value, contactValueField); // Aplica máscara/placeholder do tipo
             });
         });
         // --- Fim da Lógica para Seleção de Ícones ---
@@ -259,6 +355,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (!valor) {
                     showPopup('Erro de Validação', 'Por favor, preencha o valor do contato.', true);
+                    return;
+                }
+
+                const validacao = validateContactValue(tipo, valor);
+                if (!validacao.valid) {
+                    showPopup('Erro de Validação', validacao.message, true);
                     return;
                 }
 
@@ -415,12 +517,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 iconOptions.forEach(opt => opt.classList.remove('selected')); // Remove seleção de todos
                 option.classList.add('selected'); // Adiciona seleção ao clicado
                 hiddenInput.value = option.dataset.value; // Atualiza o valor do input hidden
+                contactValueField.value = ''; // Limpa o valor ao trocar o tipo
+                configureContactValueField(option.dataset.value, contactValueField); // Aplica máscara/placeholder do tipo
             });
         });
         // --- Fim da Lógica para Seleção de Ícones ---
 
         if (contactValueField) {
             contactValueField.value = currentContato.valor;
+            configureContactValueField(hiddenInput.value, contactValueField); // Aplica máscara já no valor existente
         }
 
         if (editContactForm) {
@@ -436,6 +541,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (!valor) {
                     showPopup('Erro de Validação', 'Por favor, preencha o valor do contato.', true);
+                    return;
+                }
+
+                const validacao = validateContactValue(tipo, valor);
+                if (!validacao.valid) {
+                    showPopup('Erro de Validação', validacao.message, true);
                     return;
                 }
 
@@ -546,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="field">
                         <label class="field-label" for="service-time">Tempo Médio</label>
                         <div class="input-wrap time-input-wrap">
-                            <input type="number" id="service-time" min="1" placeholder="60" required>
+                            <input type="text" id="service-time" inputmode="numeric" placeholder="60" required>
                             <select id="service-time-unit" class="time-unit-select">
                                 <option value="min">min</option>
                                 <option value="h">horas</option>
@@ -595,7 +706,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timePreview) timePreview.textContent = fmt ? `≈ ${fmt}` : '';
         }
 
-        if (timeField)  timeField.addEventListener('input',  atualizarPreviewTempo);
+        if (timeField)  {
+            timeField.addEventListener('input', () => {
+                // Remove qualquer caractere que não seja dígito (number input ainda permite e/+/-/.)
+                const cleaned = timeField.value.replace(/\D/g, '');
+                if (timeField.value !== cleaned) timeField.value = cleaned;
+                atualizarPreviewTempo();
+            });
+            timeField.addEventListener('keydown', (e) => {
+                if (['e', 'E', '+', '-', '.', ','].includes(e.key)) e.preventDefault();
+            });
+        }
         if (timeUnit)   timeUnit.addEventListener('change',  atualizarPreviewTempo);
 
         if (valorField) {
@@ -753,12 +874,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const nome = s.nome ?? 'Serviço sem nome';
             const descricao = s.descricao ?? 'Sem descrição.';
             const valorBruto = s.valor ?? s.preco ?? s.valorServico ?? s.valorUnitario ?? s.price;
+            const valor = parseFloat(valorBruto);
             const valorFinal = isNaN(valor) ? 0 : valor;
             const status = s.status ?? 'Disponível';
             const statusClass = status.toLowerCase().replace(/\s+/g, '-');
-            
+
             const tempoBruto = s.tempoMedioEmMinutos ?? s.tempoMedioMinutos ?? s.tempoMedio ?? s.tempoEmMinutos ?? s.tempo ?? s.duration ?? s.estimatedTime ?? s.estimatedMinutes;
-            
+
             const tempoFormatado = formatarTempo(tempoBruto);
 
             const article = document.createElement('article');

@@ -9,6 +9,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleAuthRegister = document.getElementById('toggle-auth-register');
     const forgotPass         = document.getElementById('forgot-pass');
     const cbRemember         = document.getElementById('cb-remember');
+    const loginError         = document.getElementById('login-error');
+    const usernameLoginField = document.getElementById('username-login');
+    const passwordLoginField = document.getElementById('password-login');
+
+    function showLoginError(message) {
+        if (loginError) {
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+        }
+        usernameLoginField?.classList.add('input--error');
+        passwordLoginField?.classList.add('input--error');
+    }
+
+    function clearLoginError() {
+        if (loginError) {
+            loginError.textContent = '';
+            loginError.style.display = 'none';
+        }
+        usernameLoginField?.classList.remove('input--error');
+        passwordLoginField?.classList.remove('input--error');
+    }
+
+    usernameLoginField?.addEventListener('input', clearLoginError);
+    passwordLoginField?.addEventListener('input', clearLoginError);
 
     // ─── Flip ─────────────────────────────────────────────────
     let isFlipping = false;
@@ -76,11 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            clearLoginError();
             const username = document.getElementById('username-login').value.trim();
             const password = document.getElementById('password-login').value;
 
             if (!username || !password) {
-                showPopup('Atenção', 'Preencha usuário e senha.', true);
+                showLoginError('Preencha usuário e senha.');
                 return;
             }
 
@@ -113,13 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
                     }, 400);
                 } else {
-                    let errorMessage = 'Usuário ou senha incorretos.';
-                    try {
-                        const errorText = await response.text();
-                        const errorData = JSON.parse(errorText);
-                        errorMessage = errorData.message || errorText || errorMessage;
-                    } catch { /* mantém padrão */ }
-                    showPopup('Erro de acesso', errorMessage, true);
+                    showLoginError('Usuário ou senha incorretos.');
                 }
             } catch (error) {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
