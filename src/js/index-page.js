@@ -1,13 +1,18 @@
 import { showPopup, hidePopup } from './utils.js';
 import { authFetch, API_BASE_URL, setAuthData, isRemembered, getStoredValue } from './script.js';
+import { bootDone } from './boot.js';
 
 // ─── Login automático: se "Lembrar-me" estava marcado e há um token salvo,
 // pula a tela de login e vai direto pro dashboard ──────────────────────────
 if (isRemembered() && getStoredValue('jwtToken')) {
+    // Sabe o destino imediatamente → redireciona; boot fica até a nova página carregar
     window.location.href = 'dashboard.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Sabemos que vamos exibir a tela de login → aguarda um pouco antes de liberar
+    setTimeout(bootDone, 1800);
+
     const flipper            = document.getElementById('flipper');
     const loginForm          = document.getElementById('login-form');
     const registerForm       = document.getElementById('register-form');

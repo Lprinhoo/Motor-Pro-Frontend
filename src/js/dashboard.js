@@ -1,5 +1,6 @@
 import { authFetch, API_BASE_URL, clearAuthData, getStoredValue } from './script.js';
 import { showPopup, hidePopup } from './utils.js';
+import { bootDone } from './boot.js';
 
 // Converte minutos para string legível (ex: 90 → "1h 30min", 1440 → "1 dia")
 function formatarTempo(minutos) {
@@ -141,13 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
-        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+        // Sem token → redireciona; boot fica até a nova página carregar
+        window.location.href = 'index.html';
         return;
     }
     if (!oficinaId) {
-        setTimeout(() => { window.location.href = 'register-oficina.html'; }, 2000);
+        // Sem oficina → redireciona; boot fica até a nova página carregar
+        window.location.href = 'register-oficina.html';
         return;
     }
+
+    // Auth OK → aguarda um pouco antes de liberar o boot screen
+    setTimeout(bootDone, 1800);
 
     const oficinaNome = localStorage.getItem('oficinaNome') || `Oficina #${escapeHtml(oficinaId)}`;
     document.getElementById('sbOficinaName').innerText = oficinaNome;
