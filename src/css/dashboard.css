@@ -103,12 +103,24 @@ body.dashboard-body {
     background: #fff;
     box-shadow: 0 0 8px rgba(255,255,255,0.7);
 }
+.sb-logo-image {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    flex-shrink: 0;
+}
 .sb-logo h1 {
-    font-size: 12px;
-    letter-spacing: 3.5px;
-    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1px;
+    font-weight: 800;
     color: var(--text);
     margin: 0;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 .sb-logo span { color: var(--brand); }
 
@@ -141,12 +153,16 @@ body.dashboard-body {
     text-transform: uppercase;
 }
 .sb-oficina-name {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text);
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: 0.1px;
 }
 
 /* Nav */
@@ -157,11 +173,13 @@ body.dashboard-body {
 }
 .nav-section {
     padding: 0.9rem 0.8rem 0.4rem;
-    font-size: 9.5px;
-    letter-spacing: 2.5px;
-    color: var(--text-faint);
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
     font-weight: 700;
     text-transform: uppercase;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 .nav-item {
     display: flex;
@@ -1038,6 +1056,117 @@ body.dashboard-body #popup-card::before {
     color: var(--text-mute);
     margin: 0 0 0.3rem;
 }
+
+/* ── Cabeçalho do popup de detalhes do serviço ──────────── */
+.popup-service-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.popup-service-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+    text-align: left;
+    letter-spacing: 0;
+}
+.popup-service-description {
+    font-size: 12.5px;
+    color: var(--text-mute);
+    margin: 0 0 1.1rem;
+    line-height: 1.55;
+    text-align: left;
+}
+.popup-stats-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+}
+.popup-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 16px;
+}
+.popup-stat-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--border);
+}
+.popup-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-mute);
+}
+.popup-stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+}
+
+/* ── Badge de status dentro do popup de serviço ─────────── */
+.service-details-popup .status {
+    font-size: 9px;
+    letter-spacing: 0.8px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.service-details-popup .status::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.service-details-popup .status.disponível,
+.service-details-popup .status.disponivel {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border: 1px solid var(--brand-border);
+}
+.service-details-popup .status.indisponível,
+.service-details-popup .status.indisponivel {
+    background: rgba(255, 77, 77, 0.08);
+    color: #FF4D4D;
+    border: 1px solid rgba(255, 77, 77, 0.2);
+}
+
+/* Botões do popup de detalhes do serviço */
+.service-details-popup .form-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+}
+.service-details-popup .btn-primary,
+.service-details-popup .btn-secondary {
+    flex: 1;
+    padding: 11px 12px;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
 /* ── Ações do card de serviço ───────────────────────────── */
 .service-actions {
     display: flex;
@@ -1305,90 +1434,6 @@ select.input option[value=""] {
     transform: translateY(-1px);
     box-shadow: 0 8px 20px -8px rgba(22,188,78,0.7);
 }
-
-/* ── Custom Select (Dropdown) ───────────────────────────── */
-/*
-.custom-select-wrapper {
-    position: relative;
-    width: 100%;
-    margin-top: 6px;
-}
-
-.custom-select-trigger {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-    padding-right: 14px;
-}
-
-.custom-select-trigger:focus {
-    border-color: rgba(22, 188, 78, 0.45);
-    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
-    background: rgba(22, 188, 78, 0.025);
-}
-
-.custom-select-trigger span {
-    flex: 1;
-    text-align: left;
-    color: var(--text-faint);
-}
-
-.custom-select-trigger.input {
-    background-image: none;
-    padding-right: 14px;
-}
-
-.custom-select-arrow {
-    font-size: 16px;
-    color: var(--text-dim);
-    transition: transform 0.2s ease;
-}
-
-.custom-select-arrow.rotate {
-    transform: rotate(180deg);
-}
-
-.custom-options-container {
-    position: static;
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border-2);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-top: 4px;
-    display: block;
-    visibility: hidden;
-}
-
-.custom-options-container.active {
-    visibility: visible;
-}
-
-.custom-option {
-    padding: 10px 14px;
-    font-size: 13.5px;
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-    text-align: left;
-}
-
-.custom-option:first-child {
-    color: var(--text-faint);
-}
-
-.custom-option:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.custom-option.selected {
-    background: var(--brand-soft);
-    color: var(--brand);
-    font-weight: 600;
-}
-*/
 
 /* ── Seleção de Ícones ───────────────────────────── */
 .icon-selection-wrapper {
