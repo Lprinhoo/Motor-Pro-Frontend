@@ -134,7 +134,6 @@ function validateContactValue(tipo, valor) {
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn      = document.getElementById('logoutBtn');
     const addServiceBtn  = document.getElementById('addServiceBtn');
-    const editServicesBtn = document.getElementById('editServicesBtn');
     const metricServicosEl = document.getElementById('metricServicos');
     const dbContent = document.querySelector('.db-content'); // Adicionado para acesso ao conteúdo principal
 
@@ -238,9 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="panel-hint">Catálogo de serviços que sua oficina oferece.</div>
                     </div>
                     <div class="panel-actions">
-                        <button class="btn-action ghost" id="editServicesBtn">
-                            <i class="ti ti-edit"></i> Editar
-                        </button>
                         <button class="btn-action primary" id="addServiceBtn">
                             <i class="ti ti-plus"></i> Novo Serviço
                         </button>
@@ -254,12 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Re-obter referências aos botões e elementos após re-renderizar o HTML
         const newAddServiceBtn = document.getElementById('addServiceBtn');
         if (newAddServiceBtn) newAddServiceBtn.addEventListener('click', handleAddService);
-        const newEditServicesBtn = document.getElementById('editServicesBtn');
-        if (newEditServicesBtn) {
-            newEditServicesBtn.addEventListener('click', () => {
-                showPopup('Funcionalidade em Desenvolvimento', 'A tela de edição de serviços está em construção.');
-            });
-        }
     }
 
     // ─── Seção de Contatos ────────────────────────────────────────────────────
@@ -820,15 +810,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (addServiceBtn) addServiceBtn.addEventListener('click', handleAddService);
-    if (editServicesBtn) {
-        editServicesBtn.addEventListener('click', () => {
-            showPopup('Funcionalidade em Desenvolvimento', 'A tela de edição de serviços está em construção.');
-        });
-    }
 
     // Inicializa o dashboard com o conteúdo padrão
     renderDashboardContent();
     carregarDados();
+
+    // ─── Visualizar Detalhes do Serviço (Popup) ───────────────────────────────
+    function handleViewServiceDetails(service) {
+        // Usar a mesma lógica de extração de valor que em renderizarPaineisServicos
+        let valorBruto = service.valor ?? service.preco ?? service.valorServico ?? service.valorUnitario ?? service.price;
+        
+        // Limpar e converter para float
+        if (typeof valorBruto === 'string') {
+            valorBruto = valorBruto.replace(/\./g, '').replace(',', '.'); // Remove separadores de milhar e troca vírgula por ponto
+        }
+        const valorNumerico = parseFloat(valorBruto);
+        const valorFinalFormatado = isNaN(valorNumerico) ? '0,00' : valorNumerico.toFixed(2).replace('.', ',');
+
+        const tempoFormatado = formatarTempo(service.tempoMedioEmMinutos);
+
+        const detailsHtml = `
+            <div class="service-details-popup">
+                <p class="popup-subtitle">Detalhes completos do serviço.</p>
+                <h3 class="popup-service-title">${escapeHtml(service.nome)}</h3>
+                <p class="popup-service-description">${escapeHtml(service.descricao)}</p>
+                <div class="popup-info-grid">
+                    <div class="popup-info-item">
+                        <strong>Valor:</strong> R$ ${valorFinalFormatado}
+                    </div>
+                    <div class="popup-info-item">
+                        <strong>Tempo Médio:</strong> ${tempoFormatado || 'Não informado'}
+                    </div>
+                    <div class="popup-info-item">
+                        <strong>Status:</strong> ${escapeHtml(service.status || 'Disponível')}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="popupCloseServiceDetailsBtn">Fechar</button>
+                    <button type="button" class="btn-primary" id="popupAddServiceToOs">
+                        <i class="ti ti-plus"></i> Adicionar à OS
+                    </button>
+                </div>
+            </div>
+        `;
+        showPopup(`Detalhes do Serviço`, detailsHtml, false, true);
+
+        // Adicionar event listener para o botão "Fechar" do popup
+        document.getElementById('popupCloseServiceDetailsBtn')?.addEventListener('click', hidePopup);
+
+        // Adicionar event listener para o botão "Adicionar à OS" no popup
+        document.getElementById('popupAddServiceToOs')?.addEventListener('click', () => {
+            showPopup('Funcionalidade em Desenvolvimento', 'Adicionar serviço à OS está em construção.');
+        });
+    }
 
     async function carregarDados() {
         try {
@@ -932,9 +966,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             el.appendChild(article);
 
+            // Adiciona o event listener para abrir o popup de detalhes
+            article.addEventListener('click', (event) => {
+                // Evita que o clique nos botões de ação (excluir/adicionar à OS) também abra o popup de detalhes
+                if (event.target.closest('.btn-delete-service') || event.target.closest('.btn-add-service')) {
+                    return;
+                }
+                handleViewServiceDetails(s);
+            });
+
             // Evento de deletar
-            article.querySelector('.btn-delete-service')?.addEventListener('click', () => {
+            article.querySelector('.btn-delete-service')?.addEventListener('click', (event) => {
+                event.stopPropagation(); // Impede que o clique no botão de delete propague para o card
                 confirmarDelecao(s.id, nome);
+            });
+            // Evento de adicionar à OS (se houver um botão específico no card)
+            article.querySelector('.btn-add-service')?.addEventListener('click', (event) => {
+                event.stopPropagation(); // Impede que o clique no botão de adicionar à OS propague para o card
+                showPopup('Funcionalidade em Desenvolvimento', 'Adicionar serviço à OS diretamente do card está em construção.');
             });
         });
     }

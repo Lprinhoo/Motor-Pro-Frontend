@@ -798,7 +798,7 @@ body {
     border-radius: var(--radius-lg);
     background: var(--surface);
     border: 1px solid var(--border);
-    overflow: hidden;
+    /* REMOVIDO: overflow: hidden; */
     min-height: 280px; /* Altura para o efeito "carta" */
     padding-bottom: 3rem; /* Garante espaço para o conteúdo acima do ícone de fundo */
     transition: all 0.2s ease;
@@ -885,6 +885,78 @@ body {
     padding: 1.5rem 0;
 }
 
+/* ── Estilos para o Popup de Detalhes do Serviço ── */
+.service-details-popup {
+    text-align: left; /* Alinha o texto à esquerda dentro do popup */
+}
+
+.popup-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-mute);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.popup-service-title {
+    font-family: 'Ardela', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.popup-service-description {
+    font-size: 1rem;
+    color: var(--text-mute);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    white-space: pre-wrap; /* Preserva quebras de linha e espaços */
+}
+
+.popup-info-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Uma coluna por padrão */
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+.popup-info-item {
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.popup-info-item strong {
+    color: var(--brand);
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+/* Ajustes para o layout dos botões no popup */
+.service-details-popup .form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.service-details-popup .btn-secondary,
+.service-details-popup .btn-primary {
+    flex: 1; /* Faz com que os botões ocupem o mesmo espaço */
+    width: auto; /* Reseta a largura total */
+}
+
+
+@media (min-width: 600px) {
+    .popup-info-grid {
+        grid-template-columns: repeat(2, 1fr); /* Duas colunas em telas maiores */
+    }
+}
+
 @media (max-width: 768px) {
     .service-panels-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -913,5 +985,8 @@ body {
         font-size: 8rem;
         bottom: -15px;
         right: -15px;
+    }
+    .service-details-popup .form-actions {
+        flex-direction: column; /* Botões empilhados em telas muito pequenas */
     }
 }
