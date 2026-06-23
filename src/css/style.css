@@ -223,10 +223,11 @@ body {
 }
 
 /* ── Títulos do card ────────────────────────────────────── */
-.card-title {
-    font-family: 'Ardela', sans-serif;
+.card-title, .page-title, .popup-service-title,
+.sb-logo h1, .boot-logo-text {
+    font-family: 'Ardela', sans-serif !important;
     font-size: 22px;
-    font-weight: 300;
+    font-weight: normal; /* Alterado de 300 para normal (400) */
     letter-spacing: 1px;
     color: var(--text);
     margin: 0 0 4px;
@@ -385,7 +386,7 @@ body {
     border-radius: var(--radius);
     padding: 13px;
     font-family: 'Sora', sans-serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -504,11 +505,11 @@ body {
 }
 
 #popup-title {
-    font-family: 'Ardela', sans-serif;
+    font-family: 'Ardela', sans-serif !important; /* Adicionado !important */
     font-size: 1.5rem;
     letter-spacing: 3px;
+    font-weight: normal; /* Alterado de 300 para normal */
     margin-bottom: 0.8rem;
-    font-weight: 300;
 }
 #popup-message {
     font-size: 13px;
@@ -668,6 +669,8 @@ body {
 .boot-dots {
     display: flex;
     gap: 5px;
+    animation: bootDot 1.4s ease-in-out infinite;
+    will-change: opacity, transform;
 }
 
 .boot-dots span {
@@ -732,7 +735,7 @@ body {
     transform: none; /* Reseta transform */
     font-size: 12rem; /* Ícone ainda maior */
     color: var(--brand);
-    opacity: 0.03; /* Opacidade mais baixa */
+    opacity: 0.03; /* Baixa opacidade */
     pointer-events: none;
     line-height: 1;
     z-index: 0;
@@ -765,6 +768,7 @@ body {
     color: var(--text);
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: 0.5rem; /* Adicionado para espaçamento */
 }
 
 .contact-value {
@@ -897,8 +901,16 @@ body {
     text-align: center;
 }
 
+#popup-title {
+    font-family: 'Ardela', sans-serif !important; /* Adicionado !important */
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    font-weight: normal; /* Alterado de 300 para normal */
+    margin-bottom: 0.8rem;
+}
+
 .popup-service-title {
-    font-family: 'Ardela', sans-serif;
+    font-family: 'Ardela', sans-serif !important; /* Adicionado !important */
     font-size: 1.8rem;
     letter-spacing: 1px;
     color: var(--text);
