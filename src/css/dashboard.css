@@ -1,16 +1,5 @@
-/* ── Fontes Locais ──────────────────────────────────────── */
-@font-face {
-    font-family: 'Sora';
-    src: url('../fonts/Sora.ttf') format('truetype');
-    font-weight: normal;
-    font-display: swap;
-}
-@font-face {
-    font-family: 'Ardela';
-    src: url('../fonts/Ardela.ttf') format('truetype');
-    font-weight: normal;
-    font-display: swap;
-}
+/* As fontes 'Sora' e 'Ardela' já são registradas via @font-face em style.css,
+   que é carregado antes deste arquivo em todas as páginas. */
 
 /* ── Design Tokens ──────────────────────────────────────── */
 :root {
@@ -535,7 +524,7 @@ body.dashboard-body {
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
-    margin-bottom: 0; /* Removido o margin-bottom para o time-chip ficar mais próximo */
+    margin-bottom: 0;
     margin-top: auto;
     padding-top: 12px;
     border-top: 1px dashed var(--border-2);
@@ -578,23 +567,23 @@ body.dashboard-body {
 
 /* ── Chip de tempo médio no card ────────────────────────── */
 .time-chip {
-    display: flex; /* Alterado para flex para alinhar o SVG e o texto */
+    display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 12px; /* Aumentado */
-    font-weight: 600; /* Aumentado */
+    font-size: 12px;
+    font-weight: 600;
     letter-spacing: 0.3px;
-    color: var(--text-mute); /* Cor mais suave */
-    background: transparent; /* Removido */
-    border: none; /* Removido */
-    border-radius: 0; /* Removido */
-    padding: 0; /* Removido */
-    margin-top: 4px; /* Ajustado para ficar abaixo do valor */
-    margin-bottom: 12px; /* Espaçamento antes do botão */
+    color: var(--text-mute);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 4px;
+    margin-bottom: 12px;
 }
 .time-chip svg {
-    width: 13px; /* Aumentado */
-    height: 13px; /* Aumentado */
+    width: 13px;
+    height: 13px;
     stroke: var(--text-dim);
     flex-shrink: 0;
 }
@@ -719,16 +708,7 @@ body.dashboard-body {
 }
 #popup-overlay.hidden { display: none; }
 
-/* Removido: Ajustes para o overlay quando contém um formulário */
-/* #popup-overlay.popup-overlay-form {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 20px;
-    padding-bottom: 20px;
-} */
-
-/* Aumentando a especificidade para sobrescrever style.css */
+/* Especificidade aumentada para sobrescrever style.css */
 body.dashboard-body #popup-card {
     background: var(--surface);
     border: 1px solid var(--border-2);
@@ -748,8 +728,7 @@ body.dashboard-body #popup-card {
 }
 /* Quando o popup carrega um formulário, dá mais espaço e respiro */
 body.dashboard-body #popup-card.popup-is-form {
-    width: min(600px, 95vw); /* Aumentado */
-    /* min-height: 655px; Removido para que a altura seja ditada pelo conteúdo */
+    width: min(600px, 95vw);
 }
 body.dashboard-body #popup-card::before {
     content: "";
@@ -839,6 +818,15 @@ body.dashboard-body #popup-card::before {
     .search-box    { width: 100%; }
     .metrics-grid  { grid-template-columns: 1fr 1fr; }
     .panel-title-group { flex-direction: column; align-items: stretch; }
+}
+
+@media (max-width: 480px) {
+    .metrics-grid  { grid-template-columns: 1fr; }
+    .page-title    { font-size: 22px; }
+    .service-panels-grid { padding: 0.9rem; gap: 10px; }
+    .service-panel { padding: 14px; }
+    body.dashboard-body #popup-card { padding: 1rem 1.2rem; }
+    .popup-form .field-row { grid-template-columns: 1fr; }
 }
 
 /* ── Botões genéricos de popup (usados fora e dentro de formulários) ── */
@@ -1405,17 +1393,16 @@ select.input option[value=""] {
 /* ── Seleção de Ícones ───────────────────────────── */
 .icon-selection-wrapper {
     display: flex;
-    gap: 16px; /* Aumentado o espaçamento */
-    margin-top: 12px; /* Espaçamento superior */
-    margin-bottom: 16px; /* Espaçamento inferior para empurrar o campo de valor */
-    justify-content: center; /* Centraliza os ícones */
-    flex-wrap: wrap; /* Permite que os ícones quebrem a linha em telas menores */
-    /* Removidos background, border e padding */
+    gap: 16px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .icon-option {
-    width: 48px; /* Aumentado */
-    height: 48px; /* Aumentado */
+    width: 48px;
+    height: 48px;
     display: grid;
     place-items: center;
     border-radius: var(--radius-sm);

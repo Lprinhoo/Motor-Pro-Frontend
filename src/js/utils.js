@@ -36,10 +36,8 @@ export const showPopup = (title, message, isError = false, isForm = false) => {
     // Adiciona ou remove a classe popup-is-form no popupCard
     if (isForm) {
         popupCard.classList.add('popup-is-form');
-        // Removido: popupOverlay.classList.add('popup-overlay-form');
     } else {
         popupCard.classList.remove('popup-is-form');
-        // Removido: popupOverlay.classList.remove('popup-overlay-form');
     }
 
     // Botão OK: oculto quando é formulário
@@ -76,6 +74,5 @@ export const hidePopup = () => {
         if (popupCloseBtn) popupCloseBtn.style.display = '';
         // Remove a classe popup-is-form ao fechar o popup
         if (popupCard) popupCard.classList.remove('popup-is-form');
-        // Removido: if (popupOverlay) popupOverlay.classList.remove('popup-overlay-form');
     }
 };

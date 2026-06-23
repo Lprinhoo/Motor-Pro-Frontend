@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <header class="top-bar">
                 <div>
                     <div class="page-eyebrow">VISÃO GERAL</div>
-                    <h2 class="page-title">Dashboard</h2>
+                    <h2 class="page-title">Serviços</h2>
                     <div class="page-subtitle">Resumo de atividades e serviços da oficina.</div>
                 </div>
                 <div class="top-bar-actions">
@@ -829,20 +829,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const tempoFormatado = formatarTempo(service.tempoMedioEmMinutos);
 
+        const statusTexto = service.status || 'Disponível';
+        const statusClasse = statusTexto.toLowerCase().replace(/\s+/g, '-');
+
         const detailsHtml = `
             <div class="service-details-popup">
                 <p class="popup-subtitle">Detalhes completos do serviço.</p>
-                <h3 class="popup-service-title">${escapeHtml(service.nome)}</h3>
+                <div class="popup-service-header">
+                    <h3 class="popup-service-title">${escapeHtml(service.nome)}</h3>
+                    <span class="status ${statusClasse}">${escapeHtml(statusTexto)}</span>
+                </div>
                 <p class="popup-service-description">${escapeHtml(service.descricao)}</p>
-                <div class="popup-info-grid">
-                    <div class="popup-info-item">
-                        <strong>Valor:</strong> R$ ${valorFinalFormatado}
+                <div class="popup-stats-row">
+                    <div class="popup-stat">
+                        <span class="popup-stat-label">Valor</span>
+                        <span class="popup-stat-value">R$ ${valorFinalFormatado}</span>
                     </div>
-                    <div class="popup-info-item">
-                        <strong>Tempo Médio:</strong> ${tempoFormatado || 'Não informado'}
-                    </div>
-                    <div class="popup-info-item">
-                        <strong>Status:</strong> ${escapeHtml(service.status || 'Disponível')}
+                    <div class="popup-stat-divider"></div>
+                    <div class="popup-stat">
+                        <span class="popup-stat-label">Tempo Médio</span>
+                        <span class="popup-stat-value">${tempoFormatado || 'Não informado'}</span>
                     </div>
                 </div>
                 <div class="form-actions">
