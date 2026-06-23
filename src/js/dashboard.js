@@ -446,12 +446,17 @@ document.addEventListener('DOMContentLoaded', () => {
         contatos.forEach(contato => {
             const contatoElement = document.createElement('div');
             contatoElement.className = 'service-panel contact-card'; // Adiciona uma nova classe para estilização específica
+            const contactIconHtml = getContactIcon(contato.tipo); // Pega o HTML do ícone
+
             contatoElement.innerHTML = `
-                <div class="contact-card-header">
-                    <div class="contact-icon">${getContactIcon(contato.tipo)}</div>
-                    <h3 class="contact-type">${escapeHtml(contato.tipo)}</h3>
+                <div class="contact-card-bg-icon">${contactIconHtml}</div>
+                <div class="contact-card-content">
+                    <div class="contact-card-header">
+                        <div class="contact-icon">${contactIconHtml}</div>
+                        <h3 class="contact-type">${escapeHtml(contato.tipo)}</h3>
+                    </div>
+                    <p class="contact-value">${escapeHtml(contato.valor)}</p>
                 </div>
-                <p class="contact-value">${escapeHtml(contato.valor)}</p>
                 <div class="service-actions">
                     <button class="btn-action ghost edit-contato-btn" data-id="${contato.id}">
                         <i class="ti ti-edit"></i> Editar
@@ -892,69 +897,43 @@ document.addEventListener('DOMContentLoaded', () => {
             article.className = 'service-panel';
             article.dataset.id = s.id;
 
-            // Cabeçalho
-            const head = document.createElement('div');
-            head.className = 'service-panel-head';
-            head.innerHTML = `
-                <div class="service-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                    </svg>
-                </div>
-                <div class="service-actions">
-                    <button class="btn-delete-service" type="button" title="Excluir serviço">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6l-1 14H6L5 6"/>
-                            <path d="M10 11v6M14 11v6"/>
-                            <path d="M9 6V4h6v2"/>
-                        </svg>
-                    </button>
+            article.innerHTML = `
+                <div class="service-card-bg-icon"><i class="ti ti-tool"></i></div>
+                <div class="service-card-content">
+                    <div class="service-panel-head">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                            </svg>
+                        </div>
+                        <div class="service-actions">
+                            <button class="btn-delete-service" type="button" title="Excluir serviço">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6l-1 14H6L5 6"/>
+                                    <path d="M10 11v6M14 11v6"/>
+                                    <path d="M9 6V4h6v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <h3>${escapeHtml(nome)}</h3>
+                    <p>${escapeHtml(descricao)}</p>
+                    <div class="service-details">
+                        <span class="price"><small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}</span>
+                        <span class="status ${statusClass}">${escapeHtml(status)}</span>
+                    </div>
+                    <span class="time-chip">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${tempoFormatado ? escapeHtml(tempoFormatado) : 'Não informado'}
+                    </span>
+                    <button class="btn-add-service" type="button"><i class="ti ti-plus"></i> Adicionar à OS</button>
                 </div>
             `;
-            article.appendChild(head);
-
-            // Título e descrição via textContent (seguro contra XSS)
-            const h3 = document.createElement('h3');
-            h3.textContent = nome;
-            article.appendChild(h3);
-
-            const p = document.createElement('p');
-            p.textContent = descricao;
-            article.appendChild(p);
-
-            // Detalhes (agora sem o timeChip)
-            const details = document.createElement('div');
-            details.className = 'service-details';
-            const priceSpan = document.createElement('span');
-            priceSpan.className = 'price';
-            priceSpan.innerHTML = `<small>R$</small>${valorFinal.toFixed(2).replace('.', ',')}`;
-            details.appendChild(priceSpan);
-
-            const statusSpan = document.createElement('span');
-            statusSpan.className = `status ${statusClass}`;
-            statusSpan.textContent = status;
-            details.appendChild(statusSpan);
-            article.appendChild(details); // Adiciona o div de detalhes ao article
-
-            // Chip de tempo médio (agora um elemento separado, após os detalhes)
-            const timeChip = document.createElement('span');
-            timeChip.className = 'time-chip';
-            const displayTempo = tempoFormatado ? tempoFormatado : 'Não informado';
-            timeChip.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${displayTempo}`;
-            article.appendChild(timeChip); // Adiciona o timeChip diretamente ao article
-
-            // Botão OS
-            const btnOs = document.createElement('button');
-            btnOs.className = 'btn-add-service';
-            btnOs.type = 'button';
-            btnOs.innerHTML = '<i class="ti ti-plus"></i> Adicionar à OS';
-            article.appendChild(btnOs);
 
             el.appendChild(article);
 
             // Evento de deletar
-            head.querySelector('.btn-delete-service').addEventListener('click', () => {
+            article.querySelector('.btn-delete-service')?.addEventListener('click', () => {
                 confirmarDelecao(s.id, nome);
             });
         });

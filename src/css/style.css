@@ -352,7 +352,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     flex-shrink: 0;
     transition: background 0.2s, border-color 0.2s;
     font-size: 9px;
@@ -699,5 +698,220 @@ body {
 @media (max-width: 480px) {
     .boot-logo-text {
         font-size: clamp(0.95rem, 5vw, 1.2rem);
+    }
+}
+
+/* ── Estilos para Contact Card ──────────────────── */
+.contact-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 280px; /* Aumenta a altura para o efeito "carta" */
+    padding-bottom: 3rem; /* Garante espaço para o conteúdo acima do ícone de fundo */
+    transition: all 0.2s ease;
+}
+
+.contact-card:hover {
+    border-color: var(--brand-border);
+    box-shadow: 0 0 0 4px var(--brand-glow);
+    transform: translateY(-2px);
+}
+
+.contact-card-bg-icon {
+    position: absolute;
+    bottom: -30px; /* Move para a parte inferior */
+    right: -30px;  /* Move para a parte direita */
+    top: auto;     /* Reseta top */
+    left: auto;    /* Reseta left */
+    transform: none; /* Reseta transform */
+    font-size: 12rem; /* Ícone ainda maior */
+    color: var(--brand);
+    opacity: 0.03; /* Opacidade mais baixa */
+    pointer-events: none;
+    line-height: 1;
+    z-index: 0;
+}
+
+.contact-card-content {
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.contact-icon {
+    font-size: 1.8rem;
+    color: var(--brand);
+    line-height: 1;
+}
+
+.contact-type {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.contact-value {
+    font-size: 1.1rem;
+    color: var(--text-mute);
+    word-break: break-all;
+    margin-bottom: 1.5rem;
+}
+
+.contact-card .service-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.contact-card .btn-action {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+/* ── Estilos para Service Card (similar ao Contact Card) ── */
+.service-panel { /* Já existe, mas vamos ajustar */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    min-height: 280px; /* Altura para o efeito "carta" */
+    padding-bottom: 3rem; /* Garante espaço para o conteúdo acima do ícone de fundo */
+    transition: all 0.2s ease;
+}
+
+.service-panel:hover {
+    border-color: var(--brand-border);
+    box-shadow: 0 0 0 4px var(--brand-glow);
+    transform: translateY(-2px);
+}
+
+.service-card-bg-icon {
+    position: absolute;
+    bottom: -30px; /* Move para a parte inferior */
+    right: -30px;  /* Move para a parte direita */
+    top: auto;     /* Reseta top */
+    left: auto;    /* Reseta left */
+    transform: none; /* Reseta transform */
+    font-size: 12rem; /* Ícone grande */
+    color: var(--brand);
+    opacity: 0.03; /* Baixa opacidade */
+    pointer-events: none;
+    line-height: 1;
+    z-index: 0;
+}
+
+.service-card-content {
+    position: relative;
+    z-index: 1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-panel-head { /* Mantém o estilo existente, mas garante z-index */
+    position: relative;
+    z-index: 1;
+}
+
+.service-panel h3 {
+    position: relative;
+    z-index: 1;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.service-panel p {
+    position: relative;
+    z-index: 1;
+    font-size: 1.1rem;
+    color: var(--text-mute);
+    word-break: break-all;
+    margin-bottom: 1.5rem;
+}
+
+.service-panel .service-details {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+}
+
+.service-panel .time-chip {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1.5rem;
+}
+
+.service-panel .btn-add-service {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+}
+
+
+/* Ajustes para o grid de painéis para acomodar cards maiores */
+.service-panels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .service-panels-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    .contact-card, .service-panel {
+        min-height: 240px; /* Ajuste para telas menores */
+        padding-bottom: 2.5rem;
+    }
+    .contact-card-bg-icon, .service-card-bg-icon {
+        font-size: 10rem;
+        bottom: -20px;
+        right: -20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .service-panels-grid {
+        grid-template-columns: 1fr;
+    }
+    .contact-card, .service-panel {
+        min-height: 200px; /* Ajuste para telas muito pequenas */
+        padding: 1.5rem;
+        padding-bottom: 2rem;
+    }
+    .contact-card-bg-icon, .service-card-bg-icon {
+        font-size: 8rem;
+        bottom: -15px;
+        right: -15px;
     }
 }
