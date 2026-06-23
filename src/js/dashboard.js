@@ -158,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const oficinaNome = localStorage.getItem('oficinaNome') || `Oficina #${escapeHtml(oficinaId)}`;
     document.getElementById('sbOficinaName').innerText = oficinaNome;
     const avatarEl = document.getElementById('sbOficinaAvatar');
-    if (avatarEl) avatarEl.innerText = (oficinaNome.trim()[0] || 'O').toUpperCase();
 
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
