@@ -2,6 +2,42 @@ import { showPopup, hidePopup } from './utils.js';
 
 const API_BASE_URL = 'http://76.13.173.156:8080/api';
 
+// ─── Helpers de armazenamento (Lembrar-me) ─────────────────────────────────
+// Se "Lembrar-me" foi marcado no login, usamos localStorage (sobrevive a fechar
+// o app/navegador). Caso contrário, usamos sessionStorage (some ao fechar).
+function isRemembered() {
+    return localStorage.getItem('rememberMe') === 'true';
+}
+
+function getAuthStorage() {
+    return isRemembered() ? localStorage : sessionStorage;
+}
+
+// Busca um valor em qualquer um dos dois storages (cobre os dois cenários)
+function getStoredValue(key) {
+    return localStorage.getItem(key) || sessionStorage.getItem(key);
+}
+
+// Salva os dados de autenticação no storage correto e limpa o outro
+// (evita tokens "fantasma" duplicados entre localStorage/sessionStorage)
+function setAuthData({ accessToken, refreshToken } = {}, remember = isRemembered()) {
+    const storage = remember ? localStorage : sessionStorage;
+    const other   = remember ? sessionStorage : localStorage;
+
+    localStorage.setItem('rememberMe', remember ? 'true' : 'false');
+
+    if (accessToken !== undefined)  storage.setItem('jwtToken', accessToken);
+    if (refreshToken !== undefined) storage.setItem('refreshToken', refreshToken || '');
+
+    other.removeItem('jwtToken');
+    other.removeItem('refreshToken');
+}
+
+function clearAuthData() {
+    localStorage.clear();
+    sessionStorage.clear();
+}
+
 // Variáveis globais para controle de refresh de token
 let isRefreshing = false;
 let failedQueue = [];
@@ -20,8 +56,8 @@ const processQueue = (error, token = null) => {
 
 // Função utilitária para requisições autenticadas com refresh de token
 async function authFetch(url, options = {}) {
-    let accessToken = localStorage.getItem('jwtToken');
-    const refreshToken = localStorage.getItem('refreshToken');
+    let accessToken = getStoredValue('jwtToken');
+    const refreshToken = getStoredValue('refreshToken');
 
     if (accessToken) {
         options.headers = {
@@ -57,10 +93,7 @@ async function authFetch(url, options = {}) {
 
             if (refreshResponse.ok) {
                 const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshResponse.json();
-                localStorage.setItem('jwtToken', newAccessToken);
-                if (newRefreshToken) {
-                    localStorage.setItem('refreshToken', newRefreshToken);
-                }
+                setAuthData({ accessToken: newAccessToken, refreshToken: newRefreshToken });
                 accessToken = newAccessToken;
 
                 processQueue(null, newAccessToken);
@@ -70,13 +103,13 @@ async function authFetch(url, options = {}) {
             } else {
                 const refreshError = new Error('Refresh Token inválido ou expirado');
                 processQueue(refreshError);
-                localStorage.clear();
+                clearAuthData();
                 window.location.href = 'index.html';
                 return Promise.reject(refreshError);
             }
         } catch (error) {
             processQueue(error);
-            localStorage.clear();
+            clearAuthData();
             window.location.href = 'index.html';
             return Promise.reject(error);
         } finally {
@@ -87,4 +120,4 @@ async function authFetch(url, options = {}) {
     return response;
 }
 
-export { authFetch, API_BASE_URL };
+export { authFetch, API_BASE_URL, setAuthData, clearAuthData, isRemembered, getStoredValue };

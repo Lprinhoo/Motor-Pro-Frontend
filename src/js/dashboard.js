@@ -1,4 +1,4 @@
-import { authFetch, API_BASE_URL } from './script.js';
+import { authFetch, API_BASE_URL, clearAuthData, getStoredValue } from './script.js';
 import { showPopup, hidePopup } from './utils.js';
 
 // Converte minutos para string legível (ex: 90 → "1h 30min", 1440 → "1 dia")
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const metricServicosEl = document.getElementById('metricServicos');
     const dbContent = document.querySelector('.db-content'); // Adicionado para acesso ao conteúdo principal
 
-    const token     = localStorage.getItem('jwtToken');
+    const token     = getStoredValue('jwtToken');
     const oficinaId = localStorage.getItem('oficinaId');
 
     if (!token) {
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     logoutBtn.addEventListener('click', () => {
-        localStorage.clear();
+        clearAuthData();
         window.location.href = 'index.html';
     });
 

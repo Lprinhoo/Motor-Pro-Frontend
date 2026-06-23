@@ -1,5 +1,11 @@
 import { showPopup, hidePopup } from './utils.js';
-import { authFetch, API_BASE_URL } from './script.js';
+import { authFetch, API_BASE_URL, setAuthData, isRemembered, getStoredValue } from './script.js';
+
+// ─── Login automático: se "Lembrar-me" estava marcado e há um token salvo,
+// pula a tela de login e vai direto pro dashboard ──────────────────────────
+if (isRemembered() && getStoredValue('jwtToken')) {
+    window.location.href = 'dashboard.html';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const flipper            = document.getElementById('flipper');
@@ -130,8 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    localStorage.setItem('jwtToken',      accessToken);
-                    localStorage.setItem('refreshToken',  refreshToken || '');
+                    const remember = cbRemember?.classList.contains('checked') ?? false;
+                    setAuthData({ accessToken, refreshToken }, remember);
 
                     const temOficina = await buscarOficinaDoUsuario();
                     setTimeout(() => {
@@ -211,8 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         return;
                     }
 
-                    localStorage.setItem('jwtToken',      accessToken);
-                    localStorage.setItem('refreshToken',  refreshToken || '');
+                    // Cadastro recém-feito: mantém o login ativo nesta sessão por padrão
+                    setAuthData({ accessToken, refreshToken }, false);
 
                     const temOficina = await buscarOficinaDoUsuario();
                     setTimeout(() => {
