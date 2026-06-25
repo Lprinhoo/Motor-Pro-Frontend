@@ -1,0 +1,33 @@
+/* ── Fundo decorativo ───────────────────────────────────── */
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+            linear-gradient(var(--brand-glow) 1px, transparent 1px),
+            linear-gradient(90deg, var(--brand-glow) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    z-index: 0;
+}
+
+.bg-glow {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+.bg-glow--tl {
+    top: -160px;
+    left: -160px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(22, 188, 78, 0.13) 0%, transparent 68%);
+}
+.bg-glow--br {
+    bottom: -140px;
+    right: -120px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(22, 188, 78, 0.07) 0%, transparent 68%);
+}

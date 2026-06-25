@@ -1,0 +1,139 @@
+.popup-form {
+    text-align: left;
+    margin-top: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Ocupa o espaço extra do card, evitando vazio solto no meio */
+}
+
+.popup-form .field {
+    margin-bottom: 0.8rem; /* Ajustado */
+}
+
+.popup-form .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.popup-form .field-row .field {
+    min-width: 0;
+}
+.popup-form .field-row .prefix-input,
+.popup-form .field-row .time-input-wrap {
+    width: 100%;
+    box-sizing: border-box;
+    height: auto;
+    margin-top: 6px;
+    min-width: 0; /* Adicionado para garantir que possam encolher */
+}
+
+.popup-form .time-input-wrap {
+    background: rgba(255, 255, 255, 0.035);
+    border-color: var(--border);
+}
+.popup-form .time-input-wrap:focus-within {
+    border-color: rgba(22, 188, 78, 0.45);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+    background: rgba(22, 188, 78, 0.025);
+}
+.popup-form .time-input-wrap input {
+    font-family: 'Sora', sans-serif;
+    font-size: 13.5px;
+    line-height: 1; /* Adicionado */
+}
+
+.popup-form .input-wrap {
+    margin-top: 6px;
+    position: relative;
+}
+
+/* Inputs sem ícone: remove o espaço reservado à esquerda */
+.popup-form .input {
+    padding-left: 14px;
+}
+.popup-form .input-wrap .input-icon {
+    display: none;
+}
+
+.popup-form textarea.input {
+    min-height: 76px;
+    max-height: 76px;
+    resize: none;
+    line-height: 1.5;
+    overflow-y: auto;
+}
+
+.popup-form .field-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 10.5px;
+    color: var(--text-faint);
+    text-align: right;
+    transition: color 0.15s;
+}
+
+.popup-form .prefix-input {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    overflow: hidden;
+}
+.popup-form .prefix-input:focus-within {
+    border-color: rgba(22, 188, 78, 0.45);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+    background: rgba(22, 188, 78, 0.025);
+}
+.popup-form .prefix-input span {
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1; /* Adicionado */
+    color: var(--text-dim);
+    font-weight: 600;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.popup-form .prefix-input input {
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 12px 6px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 13.5px;
+    line-height: 1; /* Adicionado */
+}
+.popup-form .prefix-input input::placeholder { color: var(--text-faint); }
+
+/* Remove as setinhas de incremento/decremento dos inputs numéricos */
+.popup-form input[type="number"]::-webkit-outer-spin-button,
+.popup-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.popup-form input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.popup-form .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto; /* Empurra os botões para o rodapé do card, preenchendo o espaço vazio */
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border); /* Divisória sutil entre campos e botões */
+}
+
+.popup-form .btn-primary,
+.popup-form .btn-secondary {
+    flex: 1;
+    padding: 11px 12px;
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* Ajusta margens do título/mensagem do popup quando tem formulário */

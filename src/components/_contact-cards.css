@@ -1,0 +1,235 @@
+/* ── Card de Contato ────────────────────────────────────── */
+.contact-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+.contact-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(22,188,78,0.25);
+    box-shadow: 0 14px 30px -16px rgba(0,0,0,0.7);
+}
+.contact-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.contact-icon {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: var(--brand-soft);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+.contact-icon i {
+    font-size: 19px;
+}
+.contact-type {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text);
+    margin: 0;
+    line-height: 1.3;
+}
+.contact-value {
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--text-mute);
+    margin: 0;
+    padding-bottom: 14px;
+    border-bottom: 1px dashed var(--border-2);
+    word-break: break-all;
+    flex: 1;
+}
+
+/* Botões do card de contato */
+.contact-card .service-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Espaçamento entre os botões */
+    margin-top: auto;
+}
+.contact-card .service-actions .btn-action {
+    display: inline-flex; /* Garante comportamento flexível para alinhamento */
+    align-items: center;
+    justify-content: center;
+    flex-grow: 0;
+    font-size: 11.5px;
+    padding: 7px 10px !important; /* Força o padding */
+    width: auto !important; /* Força a largura a se adaptar ao conteúdo */
+    height: auto !important; /* Força a altura a se adaptar ao conteúdo */
+    min-width: fit-content !important; /* Força o botão a se ajustar ao texto */
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+/* Ajustes para botões secundários e de perigo dentro do card de contato */
+.contact-card .service-actions .btn-secondary,
+.contact-card .service-actions .btn-danger {
+    display: inline-flex; /* Explicitamente definido para consistência */
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px !important; /* Força o padding */
+    font-size: 11.5px;
+    flex-grow: 0;
+    width: auto !important; /* Força a largura a se adaptar ao conteúdo */
+    height: auto !important; /* Força a altura a se adaptar ao conteúdo */
+    min-width: fit-content !important; /* Força o botão a se ajustar ao texto */
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+/* Hover específico para btn-danger dentro de contact-card para evitar conflitos */
+.contact-card .service-actions .btn-danger:hover {
+    background: var(--danger) !important; /* Mantém o fundo de perigo */
+    color: #fff !important; /* Mantém o texto branco */
+    border-color: transparent !important; /* Remove qualquer borda indesejada */
+    filter: brightness(1.1) !important; /* Aplica o efeito de brilho padrão */
+    transform: translateY(-1px) !important;
+    box-shadow: none !important; /* Remove qualquer box-shadow de btn-delete-service */
+}
+
+/* Novo estilo para o botão Excluir no card de contato (com sombreamento vermelho) */
+.contact-card .service-actions .delete-contato-btn {
+    border-color: rgba(255, 77, 77, 0.22); /* Borda sutilmente vermelha */
+    color: rgba(255, 77, 77, 0.8); /* Cor do texto sutilmente vermelha */
+    box-shadow: 0 2px 8px -4px rgba(255, 77, 77, 0.4); /* Sombreamento vermelho */
+    background: transparent; /* Garante que o fundo seja transparente */
+}
+
+.contact-card .service-actions .delete-contato-btn:hover {
+    background: rgba(255, 77, 77, 0.07); /* Fundo levemente vermelho no hover */
+    border-color: var(--danger); /* Borda mais forte no hover */
+    color: var(--danger); /* Cor do texto mais forte no hover */
+    box-shadow: 0 4px 12px -6px rgba(255, 77, 77, 0.6); /* Sombreamento mais intenso no hover */
+    transform: translateY(-1px); /* Pequeno efeito de elevação */
+}
+
+.contact-card .service-actions .btn-delete-service {
+    /* Este é o botão de exclusão APENAS para ícones. */
+    /* Se você deseja um botão de texto "Excluir", use a classe .btn-danger */
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    color: var(--text-faint);
+    padding: 0; /* Garante que não haja padding para o botão de ícone */
+    box-sizing: border-box;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SISTEMA SOLID — Classes geradas por contatosSection.js
+   O novo módulo usa uma estrutura de lista horizontal em vez de
+   cards empilhados, mais adequada para itens de contato simples.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Container da lista de contatos */
+.contatos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 1rem 1.3rem;
+}
+
+/* Item individual */
+.contato-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.contato-item:hover {
+    border-color: var(--brand-border);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Ícone do tipo de contato */
+.contato-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--brand-soft);
+    border: 1px solid var(--brand-border);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+/* Bloco de texto (tipo + valor) */
+.contato-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+.contato-tipo {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    line-height: 1.2;
+}
+.contato-valor {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Botões de ação (editar / excluir) */
+.contato-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.btn-edit-contato,
+.btn-delete-contato {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-2);
+    background: transparent;
+    color: var(--text-dim);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: color 0.18s, border-color 0.18s, background 0.18s;
+    font-size: 15px;
+}
+.btn-edit-contato:hover {
+    color: var(--brand);
+    border-color: var(--brand-border);
+    background: var(--brand-soft);
+}
+.btn-delete-contato:hover {
+    color: var(--danger);
+    border-color: rgba(255,77,77,0.3);
+    background: var(--danger-soft);
+}

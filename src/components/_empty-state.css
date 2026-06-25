@@ -1,0 +1,9 @@
+/* ── Empty state ────────────────────────────────────────── */
+.empty-state {
+    font-size: 13px;
+    color: var(--text-faint);
+    text-align: center;
+    padding: 3rem 0;
+    grid-column: 1 / -1;
+}
+

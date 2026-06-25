@@ -1,0 +1,123 @@
+/* ── Custom Select (Dropdown) ───────────────────────────── */
+/*
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 6px;
+}
+
+.custom-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    padding-right: 14px;
+}
+
+.custom-select-trigger:focus {
+    border-color: rgba(22, 188, 78, 0.45);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+    background: rgba(22, 188, 78, 0.025);
+}
+
+.custom-select-trigger span {
+    flex: 1;
+    text-align: left;
+    color: var(--text-faint);
+}
+
+.custom-select-trigger.input {
+    background-image: none;
+    padding-right: 14px;
+}
+
+.custom-select-arrow {
+    font-size: 16px;
+    color: var(--text-dim);
+    transition: transform 0.2s ease;
+}
+
+.custom-select-arrow.rotate {
+    transform: rotate(180deg);
+}
+
+.custom-options-container {
+    position: static;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-top: 4px;
+    display: block;
+    visibility: hidden;
+}
+
+.custom-options-container.active {
+    visibility: visible;
+}
+
+.custom-option {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    text-align: left;
+}
+
+.custom-option:first-child {
+    color: var(--text-faint);
+}
+
+.custom-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-option.selected {
+    background: var(--brand-soft);
+    color: var(--brand);
+    font-weight: 600;
+}
+*/
+
+/* ── Seleção de Ícones ───────────────────────────── */
+.icon-selection-wrapper {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    margin-bottom: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.icon-option {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-dim); /* Cor padrão mais suave */
+    font-size: 22px; /* Aumentado */
+    background: var(--surface-2); /* Fundo individual */
+    border: 1px solid var(--border); /* Borda individual */
+    box-shadow: var(--shadow-sm); /* Sombra individual */
+}
+
+.icon-option:hover {
+    background: var(--surface); /* Fundo no hover */
+    color: var(--text); /* Cor no hover */
+    border-color: var(--border-2); /* Borda no hover */
+    transform: translateY(-2px); /* Efeito de elevação */
+    box-shadow: var(--shadow); /* Sombra mais pronunciada no hover */
+}
+
+.icon-option.selected {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border-color: var(--brand-border);
+    box-shadow: 0 0 0 2px var(--brand-soft), var(--shadow-sm); /* Sombra e glow no selecionado */
+}

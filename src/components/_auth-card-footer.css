@@ -1,0 +1,31 @@
+/* ── Rodapé do card ─────────────────────────────────────── */
+.card-footer {
+    margin-top: 1.2rem;
+    font-size: 12.5px;
+    color: var(--text-mute);
+}
+.card-footer p {
+    margin-bottom: 5px;
+}
+.flip-link {
+    color: var(--brand);
+    cursor: pointer;
+    font-weight: 700;
+    transition: opacity 0.2s;
+}
+.flip-link:hover {
+    opacity: 0.75;
+}
+.footer-hint {
+    font-size: 11px;
+    color: var(--text-faint);
+}
+
+/* ── Label opcional ─────────────────────────────────────── */
+.optional {
+    font-size: 10px;
+    color: var(--text-faint);
+    letter-spacing: 1px;
+    text-transform: none;
+    font-weight: 400;
+}

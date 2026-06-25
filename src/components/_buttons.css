@@ -1,0 +1,147 @@
+/* ── Botão Primário (base) ───────────────────────────────────
+   Usado em index.html e register-oficina.html (telas sem
+   .dashboard-body). O dashboard sobrescreve abaixo, com maior
+   especificidade — não depende mais da ordem de import. */
+/* ── Botão principal ────────────────────────────────────── */
+.btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+    color: #042B12;
+    border: none;
+    border-radius: var(--radius);
+    padding: 13px;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    transition: filter 0.2s ease, transform 0.15s ease;
+}
+/* Brilho interno */
+.btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.13) 0%, transparent 55%);
+    pointer-events: none;
+}
+.btn-primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+.btn-primary:active {
+    transform: translateY(0);
+    filter: brightness(0.97);
+}
+
+
+/* ── Botão Primário (override dashboard) ────────────────────
+   Mesmos valores que hoje vêm de dashboard.css (cor de texto,
+   padding, letter-spacing e box-shadow diferem intencionalmente
+   do login). Escopado em .dashboard-body em vez de depender da
+   ordem dos <link>. */
+.dashboard-body .btn-primary {
+    background: var(--gradient-brand);
+    color: #061B0C;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 15px;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px -6px rgba(22,188,78,0.5);
+}
+.dashboard-body .btn-primary:hover {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -8px rgba(22,188,78,0.7);
+}
+
+
+/* ── Botão Secundário / Perigo (dashboard) ──────────────── */
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border-2);
+    color: var(--text-mute);
+    border-radius: var(--radius);
+    padding: 11px 15px;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 11px 15px;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s;
+}
+.btn-danger:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* ── Botão de Ação (ícone, dashboard) ────────────────────── */
+/* ── Botões de ação ─────────────────────────────────────── */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border-2);
+    letter-spacing: 0.3px;
+}
+.btn-action i { font-size: 14px; }
+.btn-action.ghost {
+    background: transparent;
+    color: var(--text-mute);
+}
+.btn-action.ghost:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.18);
+}
+.btn-action.primary {
+    background: var(--gradient-brand);
+    color: #061B0C;
+    border-color: transparent;
+    box-shadow: 0 4px 14px -6px rgba(22,188,78,0.55);
+}
+.btn-action.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -8px rgba(22,188,78,0.7);
+    filter: brightness(1.06);
+}
+

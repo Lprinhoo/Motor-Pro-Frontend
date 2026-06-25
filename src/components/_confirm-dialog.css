@@ -1,0 +1,20 @@
+/* ── Diálogo de confirmação (ex: excluir serviço/contato) ── */
+/* Diálogo de confirmação (ex: excluir serviço) */
+.confirm-text {
+    margin-bottom: 1.3rem;
+    color: var(--text-mute);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.confirm-text strong { color: var(--text); }
+.confirm-warning {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--danger);
+    font-size: 11.5px;
+}
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+}
+.confirm-actions button { flex: 1; }

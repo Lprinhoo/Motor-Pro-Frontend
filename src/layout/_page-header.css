@@ -1,0 +1,44 @@
+/* ── Layout ─────────────────────────────────────────────── */
+.page-wrap {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+/* ── Header / Logo ──────────────────────────────────────── */
+.site-header {
+    margin-bottom: 2.2rem;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.logo-image {
+    width: 32px;
+    height: 32px;
+    object-fit: contain; /* Garante que a imagem se ajuste sem cortar */
+}
+.sb-logo-image {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.logo h1 {
+    font-family: 'Ardela', sans-serif;
+    font-size: 14px;
+    letter-spacing: 4px;
+    font-weight: 300;
+    color: var(--text);
+    text-transform: uppercase;
+}
+.logo h1 span {
+    color: var(--brand);
+}
+

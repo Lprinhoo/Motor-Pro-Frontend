@@ -1,0 +1,41 @@
+
+:root {
+    /* ── Marca ──────────────────────────────────────────── */
+    --brand:        #16BC4E;
+    --brand-dark:   #0E9940;
+    --brand-soft:   rgba(22, 188, 78, 0.10);
+    --brand-border: rgba(22, 188, 78, 0.22);
+    --brand-glow:   rgba(22, 188, 78, 0.12);
+
+    /* ── Fundos ─────────────────────────────────────────── */
+    --bg:           #08090B;
+    --surface:      rgba(14, 15, 18, 0.92);
+
+    /* ── Texto ──────────────────────────────────────────── */
+    --text:         #F5F6FC;
+    --text-mute:    rgba(245, 246, 252, 0.45);
+    --text-dim:     rgba(245, 246, 252, 0.25);
+    --text-faint:   rgba(245, 246, 252, 0.14);
+
+    /* ── Bordas ─────────────────────────────────────────── */
+    --border:       rgba(255, 255, 255, 0.07);
+    --border-2:     rgba(255, 255, 255, 0.12);
+
+    /* ── Feedback ───────────────────────────────────────── */
+    --danger:       #FF4D4D;
+    --danger-soft:  rgba(255, 77, 77, 0.10);
+    --warning:      #FFC107;
+
+    /* ── Gradientes compartilhados ──────────────────────── */
+    --gradient-brand:   linear-gradient(135deg, #16BC4E, #0E9940);
+    --gradient-surface: linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(255,255,255,0) 100%);
+
+    /* ── Raios ──────────────────────────────────────────── */
+    --radius-sm:    8px;
+    --radius:       12px;
+    --radius-lg:    20px;
+
+    /* ── Sombras ────────────────────────────────────────── */
+    --shadow-sm:    0 1px 3px rgba(0,0,0,0.4);
+    --shadow:       0 8px 24px -12px rgba(0,0,0,0.6);
+}

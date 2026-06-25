@@ -1,0 +1,9 @@
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Sora', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow: hidden; /* remove scroll vertical e horizontal */
+    -webkit-font-smoothing: antialiased;

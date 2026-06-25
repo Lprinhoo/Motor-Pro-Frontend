@@ -1,0 +1,59 @@
+/* ── Tokens específicos do Dashboard ─────────────────────────
+   Re-definem, escopados em body.dashboard-body, alguns valores
+   de base/_variables.css especificamente para o dashboard —
+   reproduzindo de forma EXPLÍCITA o que hoje acontece "por
+   acidente" via ordem de carregamento (style.css → dashboard.css).
+   Visual idêntico ao atual; só a forma de expressar a regra
+   ficou clara em vez de implícita na ordem dos <link>.
+   
+   NOTA: --warning, --gradient-brand, --gradient-surface, --radius-sm,
+   --shadow e --shadow-sm foram movidos para base/_variables.css para
+   ficarem disponíveis em TODAS as páginas (login, cadastro, dashboard). */
+body.dashboard-body {
+    --bg-0:          #08090B;
+    --bg-1:          #0A0B0E;
+    --bg-2:          #0E0F12;
+    --surface:       #13141A;
+    --surface-2:     #17181E;
+
+    --border:        rgba(255, 255, 255, 0.06);
+    --border-2:      rgba(255, 255, 255, 0.10);
+
+    --text:          #F5F6FC;
+    --text-mute:     rgba(245, 246, 252, 0.55);
+    --text-dim:      rgba(245, 246, 252, 0.32);
+    --text-faint:    rgba(245, 246, 252, 0.18);
+
+    --brand:         #16BC4E;
+    --brand-dark:    #0E9940;
+    --brand-soft:    rgba(22, 188, 78, 0.10);
+    --brand-border:  rgba(22, 188, 78, 0.22);
+    --brand-glow:    rgba(22, 188, 78, 0.06);
+
+    --danger:        #FF4D4D;
+
+    /* Raios levemente menores no dashboard (override de _variables.css) */
+    --radius:     10px;
+    --radius-lg:  14px;
+}
+
+/* ── Base do body do dashboard ──────────────────────────────── */
+
+body.dashboard-body {
+    overflow: hidden;
+    background:
+            radial-gradient(1100px 550px at 78% -8%,  rgba(22,188,78,0.07) 0%, transparent 60%),
+            radial-gradient(800px  450px at -8% 105%, rgba(22,188,78,0.05) 0%, transparent 60%),
+            var(--bg-0);
+    color: var(--text);
+    font-family: 'Sora', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* ── Layout principal (sidebar + conteúdo) ───────────────────── */
+.db-layout {
+    display: flex;
+    height: 100vh;
+}

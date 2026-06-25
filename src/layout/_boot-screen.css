@@ -1,0 +1,160 @@
+/* ── Boot / Splash Screen ───────────────────────────────── */
+#boot-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: var(--bg);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Grid idêntico ao bg da tela de login */
+#boot-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(var(--brand-glow) 1px, transparent 1px),
+        linear-gradient(90deg, var(--brand-glow) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    z-index: 0;
+}
+
+/* Glow topo-esquerda */
+#boot-screen::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: clamp(280px, 45vw, 520px);
+    height: clamp(280px, 45vw, 520px);
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(22, 188, 78, 0.14) 0%, transparent 68%);
+    z-index: 0;
+}
+
+/* Glow baixo-direita */
+.boot-glow-br {
+    position: absolute;
+    bottom: -15%;
+    right: -8%;
+    width: clamp(220px, 35vw, 420px);
+    height: clamp(220px, 35vw, 420px);
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(22, 188, 78, 0.08) 0%, transparent 68%);
+    z-index: 0;
+}
+
+#boot-screen.boot--out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ── Conteúdo central ───────────────────────────── */
+.boot-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 1.75rem);
+}
+
+.boot-logo-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.65rem, 2vw, 1rem);
+    animation: bootPulse 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    /* Usa will-change pra garantir layer separada e evitar repaint/glitch */
+    will-change: transform, opacity;
+}
+
+.boot-logo-img {
+    /* clamp: nunca menor que 64px, cresce com viewport, max 104px */
+    width:  clamp(64px, 12vmin, 104px);
+    height: clamp(64px, 12vmin, 104px);
+    object-fit: contain;
+    /* suaviza aliasing de escala */
+    image-rendering: auto;
+}
+
+.boot-logo-text {
+    font-family: 'Ardela', 'Sora', sans-serif;
+    font-size: clamp(1.1rem, 3.5vw, 1.7rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    line-height: 1.2;
+    user-select: none;
+    text-align: center;
+    /* evita quebra de linha inesperada */
+    white-space: nowrap;
+}
+
+.boot-logo-text span {
+    color: var(--brand);
+}
+
+/* ── Divisor com linha + dots ───────────────────── */
+.boot-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: clamp(120px, 28vw, 200px);
+}
+
+.boot-divider::before,
+.boot-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--brand-border), transparent);
+}
+
+.boot-dots {
+    display: flex;
+    gap: 5px;
+    animation: bootDot 1.4s ease-in-out infinite;
+    will-change: opacity, transform;
+}
+
+.boot-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--brand);
+    opacity: 0.3;
+    animation: bootDot 1.4s ease-in-out infinite;
+    will-change: opacity, transform;
+}
+
+.boot-dots span:nth-child(1) { animation-delay: 0s;   }
+.boot-dots span:nth-child(2) { animation-delay: 0.22s; }
+.boot-dots span:nth-child(3) { animation-delay: 0.44s; }
+
+@keyframes bootPulse {
+    0%, 100% { transform: scale(1);     opacity: 1;    }
+    50%       { transform: scale(1.055); opacity: 0.82; }
+}
+
+@keyframes bootDot {
+    0%, 70%, 100% { opacity: 0.2; transform: scale(0.75); }
+    35%            { opacity: 1;   transform: scale(1.15); }
+}
+
+/* ── Versão mobile ──────────────────────────────── */
+@media (max-width: 480px) {
+    .boot-logo-text {
+        font-size: clamp(0.95rem, 5vw, 1.2rem);
+    }
+}
+

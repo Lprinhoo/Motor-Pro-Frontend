@@ -1,0 +1,192 @@
+/* ── Popup (base) ─────────────────────────────────────────────
+   Usado em index.html e register-oficina.html. */
+/* ── Pop-up ─────────────────────────────────────────────── */
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+#popup-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#popup-card {
+    background: rgba(18, 20, 24, 0.98);
+    border: 1px solid var(--border-2);
+    padding: 2.4rem 2rem;
+    border-radius: var(--radius-lg);
+    max-width: 400px;
+    width: 90%;
+    height: auto;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    transform: translateY(0) scale(1);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    position: relative;
+}
+#popup-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(22, 188, 78, 0.5), transparent);
+}
+#popup-overlay.hidden #popup-card {
+    transform: translateY(-16px) scale(0.97);
+    opacity: 0;
+}
+
+.popup-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    margin: 0 auto 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+#popup-title {
+    font-family: 'Ardela', sans-serif !important; /* Adicionado !important */
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    font-weight: normal; /* Alterado de 300 para normal */
+    margin-bottom: 0.8rem;
+}
+#popup-message {
+    font-size: 13px;
+    color: var(--text-mute);
+    margin-bottom: 1.8rem;
+    line-height: 1.6;
+}
+#popup-close-btn {
+    background: var(--brand);
+    color: #042B12;
+    padding: 11px 28px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    transition: filter 0.2s, transform 0.15s;
+    width: auto;
+}
+#popup-close-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+
+/* ── Popup (override dashboard) ───────────────────────────────
+   Especificidade aumentada (body.dashboard-body) no próprio
+   código original para sobrescrever a versão base — mantido
+   aqui de forma explícita. */
+/* ── Pop-up ─────────────────────────────────────────────── */
+#popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: grid;
+    place-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.18s ease;
+    padding-block: 20px; /* Adicionado padding vertical para o overlay */
+}
+#popup-overlay.hidden { display: none; }
+
+/* Especificidade aumentada para sobrescrever style.css */
+body.dashboard-body #popup-card {
+    background: var(--surface);
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.8rem;
+    width: min(500px, 95vw);
+    max-width: none; /* Sobrescreve o max-width: 400px do style.css */
+    height: auto; /* Altura sempre baseada no conteúdo */
+    overflow: visible; /* Nunca corta nem mostra scroll, conteúdo dita o tamanho */
+    box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+    text-align: center;
+    animation: popIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.15);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+/* Quando o popup carrega um formulário, dá mais espaço e respiro */
+body.dashboard-body #popup-card.popup-is-form {
+    width: min(600px, 95vw);
+}
+body.dashboard-body #popup-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(22,188,78,0.5), transparent);
+}
+
+.popup-icon {
+    width: 46px; height: 46px;
+    border-radius: 13px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#popup-title {
+    font-family: 'Ardela', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    margin: 0 0 0.6rem;
+    font-weight: 300;
+}
+#popup-message {
+    font-size: 13px;
+    color: var(--text-mute);
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+}
+#popup-close-btn {
+    background: var(--brand);
+    color: #042B12;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 24px;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.2s, transform 0.15s;
+    width: auto;
+}
+#popup-close-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+#popup-card #popup-message {
+    margin-bottom: 0;
+}
+#popup-card #popup-title {
+    margin-bottom: 0.3rem;
+}
+#popup-card .popup-subtitle {
+    font-size: 12px;
+    color: var(--text-mute);
+    margin: 0 0 0.3rem;
+}
+
