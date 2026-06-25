@@ -37,7 +37,7 @@ export class ContatosSection {
                         <div class="panel-hint">Telefone, WhatsApp, e-mail e redes sociais da oficina.</div>
                     </div>
                 </div>
-                <div id="contatosListContainer" class="contatos-list">
+                <div id="contatosListContainer" class="service-panels-grid">
                     <!-- Renderizado pelo ContatosSection -->
                 </div>
             </section>
@@ -81,16 +81,24 @@ export class ContatosSection {
         container.innerHTML = '';
         contatos.forEach(c => {
             const item = document.createElement('div');
-            item.className = 'contato-item';
+            item.className = 'service-panel contact-card';
+            const contactIconHtml = getContactIcon(c.tipo);
             item.innerHTML = `
-                <div class="contato-icon">${getContactIcon(c.tipo)}</div>
-                <div class="contato-info">
-                    <span class="contato-tipo">${escapeHtml(c.tipo)}</span>
-                    <span class="contato-valor">${escapeHtml(c.valor)}</span>
+                <div class="contact-card-bg-icon">${contactIconHtml}</div>
+                <div class="contact-card-content">
+                    <div class="contact-card-header">
+                        <div class="contact-icon">${contactIconHtml}</div>
+                        <h3 class="contact-type">${escapeHtml(c.tipo)}</h3>
+                    </div>
+                    <p class="contact-value">${escapeHtml(c.valor)}</p>
                 </div>
-                <div class="contato-actions">
-                    <button class="btn-action ghost btn-edit-contato" type="button"><i class="ti ti-edit"></i></button>
-                    <button class="btn-action ghost btn-delete-contato" type="button"><i class="ti ti-trash"></i></button>
+                <div class="service-actions">
+                    <button class="btn-action ghost btn-edit-contato" type="button">
+                        <i class="ti ti-edit"></i> Editar
+                    </button>
+                    <button class="btn-action ghost btn-delete-contato" type="button">
+                        <i class="ti ti-trash"></i> Excluir
+                    </button>
                 </div>
             `;
             item.querySelector('.btn-edit-contato')?.addEventListener('click', () => this.handleEditContato(c));
