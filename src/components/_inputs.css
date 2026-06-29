@@ -1,6 +1,7 @@
 /* ── Campos ─────────────────────────────────────────────── */
 .field {
     margin-bottom: 1rem;
+    text-align: center; /* Centraliza o conteúdo do campo, incluindo o label */
 }
 .field-error {
     display: block;
@@ -97,7 +98,7 @@
     text-transform: uppercase;
     color: var(--text-dim);
     margin-bottom: 6px;
-    text-align: left; /* Centraliza o texto */
+    text-align: center; /* Alterado de 'left' para 'center' */
 }
 
 /* ── Input e Select genéricos ────────────────────────────── */
@@ -106,7 +107,7 @@
     background: rgba(255, 255, 255, 0.035);
     border: 1px solid var(--border-2);
     border-radius: var(--radius);
-    padding: 12px 14px 12px 34px; /* Alterado de 12px 14px para 12px 14px 12px 64px */
+    padding: 12px 14px 12px 64px; /* Alterado de 12px 14px para 12px 14px 12px 64px */
     color: var(--text);
     font-family: 'Sora', sans-serif;
     font-size: 13.5px;

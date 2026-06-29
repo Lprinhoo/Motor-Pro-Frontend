@@ -107,21 +107,35 @@ export class ContatosSection {
         });
     }
 
+    _generateContactTypeSelectors(prefix = '', selectedType = '') {
+        const types = [
+            { value: 'WHATSAPP', icon: 'ti ti-brand-whatsapp', label: 'WhatsApp' },
+            { value: 'TELEFONE', icon: 'ti ti-phone', label: 'Telefone' },
+            { value: 'EMAIL', icon: 'ti ti-mail', label: 'E-mail' },
+            { value: 'INSTAGRAM', icon: 'ti ti-brand-instagram', label: 'Instagram' },
+            { value: 'FACEBOOK', icon: 'ti ti-brand-facebook', label: 'Facebook' },
+        ];
+        let html = `<div class="contact-type-options" id="${prefix}contato-tipo-options">`;
+        types.forEach(type => {
+            const isSelected = type.value === selectedType ? ' selected' : '';
+            html += `
+                <div class="contact-type-selector${isSelected}" data-type="${type.value}">
+                    <i class="${type.icon}"></i>
+                    <span>${type.label}</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+        return html;
+    }
+
     handleAddContato() {
         const formHtml = `
             <p class="popup-subtitle">Adicione uma nova forma de contato para seus clientes.</p>
             <form id="add-contato-form" class="popup-form">
                 <div class="field">
-                    <label class="field-label" for="contato-tipo">Tipo</label>
-                    <div class="input-wrap">
-                        <select id="contato-tipo" class="input" required>
-                            <option value="WHATSAPP">WhatsApp</option>
-                            <option value="TELEFONE">Telefone</option>
-                            <option value="EMAIL">E-mail</option>
-                            <option value="INSTAGRAM">Instagram</option>
-                            <option value="FACEBOOK">Facebook</option>
-                        </select>
-                    </div>
+                    <label class="field-label" for="contato-tipo-options">Tipo</label>
+                    ${this._generateContactTypeSelectors('', 'WHATSAPP')} <!-- Define WhatsApp como padrão selecionado -->
                 </div>
                 <div class="field">
                     <label class="field-label" for="contato-valor">Valor</label>
@@ -144,16 +158,8 @@ export class ContatosSection {
             <p class="popup-subtitle">Atualize as informações deste contato.</p>
             <form id="edit-contato-form" class="popup-form">
                 <div class="field">
-                    <label class="field-label" for="edit-contato-tipo">Tipo</label>
-                    <div class="input-wrap">
-                        <select id="edit-contato-tipo" class="input" required>
-                            <option value="WHATSAPP">WhatsApp</option>
-                            <option value="TELEFONE">Telefone</option>
-                            <option value="EMAIL">E-mail</option>
-                            <option value="INSTAGRAM">Instagram</option>
-                            <option value="FACEBOOK">Facebook</option>
-                        </select>
-                    </div>
+                    <label class="field-label" for="edit-contato-tipo-options">Tipo</label>
+                    ${this._generateContactTypeSelectors('edit-', contato.tipo)}
                 </div>
                 <div class="field">
                     <label class="field-label" for="edit-contato-valor">Valor</label>
@@ -168,25 +174,36 @@ export class ContatosSection {
             </form>
         `;
         showPopup('Editar Contato', formHtml, false, true);
-        const select = document.getElementById('edit-contato-tipo');
-        if (select) select.value = contato.tipo;
         this._wireContatoForm({ formId: 'edit-contato-form', cancelId: 'cancel-edit-contato', isEdit: true, contato });
     }
 
     _wireContatoForm({ formId, cancelId, isEdit, contato }) {
         const prefix = isEdit ? 'edit-' : '';
         const form = document.getElementById(formId);
-        const tipoField = document.getElementById(`${prefix}contato-tipo`);
+        const tipoOptionsContainer = document.getElementById(`${prefix}contato-tipo-options`);
         const valorField = document.getElementById(`${prefix}contato-valor`);
 
-        configureContactValueField(tipoField?.value, valorField, masks);
-        tipoField?.addEventListener('change', () => configureContactValueField(tipoField.value, valorField, masks));
+        let selectedTipo = tipoOptionsContainer?.querySelector('.contact-type-selector.selected')?.dataset.type || '';
+
+        // Configuração inicial para valorField com base no tipo selecionado
+        configureContactValueField(selectedTipo, valorField, masks);
+
+        tipoOptionsContainer?.querySelectorAll('.contact-type-selector').forEach(selector => {
+            selector.addEventListener('click', () => {
+                // Remove 'selected' de todos
+                tipoOptionsContainer.querySelectorAll('.contact-type-selector').forEach(s => s.classList.remove('selected'));
+                // Adiciona 'selected' ao clicado
+                selector.classList.add('selected');
+                selectedTipo = selector.dataset.type;
+                configureContactValueField(selectedTipo, valorField, masks);
+            });
+        });
 
         document.getElementById(cancelId)?.addEventListener('click', hidePopup);
 
         form?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const tipo = tipoField.value;
+            const tipo = selectedTipo; // Obtém o tipo atualmente selecionado
             const valor = valorField.value.trim();
 
             const validation = validateContactValue(tipo, valor);

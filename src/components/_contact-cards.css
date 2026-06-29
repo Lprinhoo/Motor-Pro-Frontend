@@ -171,3 +171,50 @@
 #contatosListContainer.service-panels-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
+
+/* ── Seletores de Tipo de Contato (Quadrados com Ícones) ── */
+.contact-type-options {
+    display: flex;
+    gap: 10px; /* Espaçamento entre os quadrados */
+    flex-wrap: wrap; /* Para quebrar linha se houver muitos */
+    margin-bottom: 15px; /* Espaçamento abaixo dos seletores */
+    justify-content: center; /* Centraliza os itens horizontalmente */
+}
+
+.contact-type-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px; /* Largura do quadrado */
+    height: 80px; /* Altura do quadrado */
+    border: 1px solid var(--border-2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: var(--surface-2);
+    color: var(--text-mute);
+}
+
+.contact-type-selector:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.contact-type-selector.selected {
+    border-color: var(--brand);
+    background-color: var(--brand-soft);
+    color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(22, 188, 78, 0.09);
+}
+
+.contact-type-selector i {
+    font-size: 28px; /* Tamanho do ícone */
+    margin-bottom: 5px;
+}
+
+.contact-type-selector span {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
