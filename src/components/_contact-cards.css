@@ -1,5 +1,8 @@
 /* ── Card de Contato ────────────────────────────────────── */
 /* Estrutura: usa .service-panel como base + .contact-card para overrides */
+.contact-card {
+    min-height: 200px; /* Altura mínima padrão para o card de contato */
+}
 
 /* ── Ícone decorativo de fundo ──────────────────────────── */
 .contact-card-bg-icon {
@@ -57,12 +60,13 @@
 }
 
 /* ── Valor do contato ────────────────────────────────────── */
-.contact-value {
-    font-size: 13.5px;
+.contact-card .contact-value { /* Alterado o seletor para maior especificidade */
+    font-size: 15px; /* Alterado de 13px para 30px */
     font-weight: 500;
     line-height: 1.55;
     color: var(--text-mute);
     margin: 0;
+    margin-top: 15px; /* Adicionado para mover o texto para baixo */
     padding-bottom: 14px;
     border-bottom: 1px dashed var(--border-2);
     word-break: break-all;
@@ -161,4 +165,9 @@
     transform: translateY(-3px);
     border-color: rgba(22,188,78,0.25);
     box-shadow: 0 14px 30px -16px rgba(0,0,0,0.7);
+}
+
+/* Regra específica para a largura dos cards de contato */
+#contatosListContainer.service-panels-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
