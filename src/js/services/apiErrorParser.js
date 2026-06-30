@@ -7,21 +7,33 @@
 // Não faz nenhuma chamada de rede própria — apenas interpreta uma Response
 // já recebida, então não tem nenhum impacto na comunicação com a API.
 export async function parseApiError(response, fallbackMessage = 'Ocorreu um erro. Tente novamente.') {
-    let errorMessage = fallbackMessage;
+    let generalMessage = fallbackMessage;
+    const fieldErrors = {};
+
     try {
         const errorText = await response.text();
         try {
             const errorData = JSON.parse(errorText);
             if (errorData?.errors && typeof errorData.errors === 'object') {
-                errorMessage = Object.values(errorData.errors).join(' ');
+                // Se a API retornar erros específicos por campo (ex: { "errors": { "campo": "mensagem" } })
+                for (const key in errorData.errors) {
+                    if (Object.prototype.hasOwnProperty.call(errorData.errors, key)) {
+                        const errorValue = errorData.errors[key];
+                        fieldErrors[key] = Array.isArray(errorValue) ? errorValue.join(' ') : errorValue;
+                    }
+                }
+                // Tenta obter uma mensagem geral, ou combina as mensagens de erro de campo
+                generalMessage = errorData?.message || Object.values(fieldErrors).join(' ') || fallbackMessage;
             } else {
-                errorMessage = errorData?.message || errorText || fallbackMessage;
+                // Se não houver erros de campo específicos, usa a mensagem geral
+                generalMessage = errorData?.error || errorData?.message || errorText || fallbackMessage;
             }
         } catch {
-            errorMessage = errorText || fallbackMessage;
+            // Se o texto não for um JSON válido, usa o texto como mensagem geral
+            generalMessage = errorText || fallbackMessage;
         }
     } catch {
-        // resposta sem corpo legível — mantém fallback
+        // Se não for possível ler o corpo da resposta, mantém a mensagem de fallback
     }
-    return errorMessage;
+    return { generalMessage, fieldErrors };
 }

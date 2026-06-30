@@ -60,7 +60,7 @@ export function validateContactValue(tipo, valor) {
         case 'TELEFONE': {
             const digits = valor.replace(/\D/g, '');
             if (digits.length < 10 || digits.length > 11) {
-                return { valid: false, message: 'Informe um telefone válido com DDD, ex: (99) 99999-9999.' };
+                return { valid: false, message: 'Quantidade de dígitos inválida.' }; // Alterado aqui
             }
             return { valid: true };
         }

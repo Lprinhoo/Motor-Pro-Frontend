@@ -145,3 +145,38 @@
     filter: brightness(1.06);
 }
 
+/* ── Botão Google (Login) ───────────────────────────────── */
+.btn-google {
+    max-width: 300px; /* Limita a largura do botão */
+    margin: 15px auto 0 auto; /* Centraliza horizontalmente e adiciona margem superior */
+    background-color: #FFFFFF;
+    color: #4285F4; /* Cor do texto do Google */
+    border: 1px solid #DADCE0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    display: flex; /* Garante que o ícone e o texto fiquem lado a lado */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaçamento entre o ícone e o texto */
+}
+
+.btn-google:hover {
+    background-color: #F0F0F0;
+    border-color: #C6C6C6;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    transform: translateY(-1px); /* Pequeno efeito de elevação */
+    color: #4285F4; /* Garante que a cor do texto permaneça azul no hover */
+}
+
+.btn-google:active,
+.btn-google:focus {
+    color: #4285F4; /* Garante que a cor do texto permaneça azul */
+    background-color: #E6E6E6; /* Um tom um pouco mais escuro para o estado ativo/foco */
+    border-color: #B0B0B0;
+}
+
+.btn-google svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}

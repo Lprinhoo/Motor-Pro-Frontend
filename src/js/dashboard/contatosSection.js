@@ -60,7 +60,8 @@ export class ContatosSection {
             } else if (response.status === 204) {
                 this._renderizarContatos([]);
             } else {
-                showPopup('Erro', escapeHtml(await parseApiError(response, 'Erro ao carregar contatos.')), true);
+                const { generalMessage } = await parseApiError(response, 'Erro ao carregar contatos.');
+                showPopup('Erro', escapeHtml(generalMessage), true);
                 this._renderizarContatos([]);
             }
         } catch {
@@ -83,6 +84,14 @@ export class ContatosSection {
             const item = document.createElement('div');
             item.className = 'service-panel contact-card';
             const contactIconHtml = getContactIcon(c.tipo);
+
+            let displayValue = escapeHtml(c.valor);
+            if (c.tipo === 'WHATSAPP' || c.tipo === 'TELEFONE') {
+                // Remove o +55 antes de aplicar a máscara
+                const valorSemDDI = c.valor.startsWith('+55') ? c.valor.substring(3) : c.valor;
+                displayValue = masks.applyPhoneMask(valorSemDDI);
+            }
+
             item.innerHTML = `
                 <div class="contact-card-bg-icon">${contactIconHtml}</div>
                 <div class="contact-card-content">
@@ -90,7 +99,7 @@ export class ContatosSection {
                         <div class="contact-icon">${contactIconHtml}</div>
                         <h3 class="contact-type">${escapeHtml(c.tipo)}</h3>
                     </div>
-                    <p class="contact-value">${escapeHtml(c.valor)}</p>
+                    <p class="contact-value">${displayValue}</p>
                 </div>
                 <div class="service-actions">
                     <button class="btn-action ghost btn-edit-contato" type="button">
@@ -142,6 +151,7 @@ export class ContatosSection {
                     <div class="input-wrap">
                         <input type="text" id="contato-valor" class="input" placeholder="Ex: (99) 99999-9999" required>
                     </div>
+                    <small id="contato-valor-error" class="field-error" style="display:none;"></small>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" id="cancel-add-contato">Cancelar</button>
@@ -166,6 +176,7 @@ export class ContatosSection {
                     <div class="input-wrap">
                         <input type="text" id="edit-contato-valor" class="input" value="${escapeHtml(contato.valor ?? '')}" required>
                     </div>
+                    <small id="edit-contato-valor-error" class="field-error" style="display:none;"></small>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" id="cancel-edit-contato">Cancelar</button>
@@ -182,11 +193,31 @@ export class ContatosSection {
         const form = document.getElementById(formId);
         const tipoOptionsContainer = document.getElementById(`${prefix}contato-tipo-options`);
         const valorField = document.getElementById(`${prefix}contato-valor`);
+        const valorErrorField = document.getElementById(`${prefix}contato-valor-error`);
 
         let selectedTipo = tipoOptionsContainer?.querySelector('.contact-type-selector.selected')?.dataset.type || '';
 
+        const showFieldError = (message) => {
+            if (valorErrorField && valorField) {
+                valorErrorField.textContent = message;
+                valorErrorField.style.display = 'block';
+                valorField.classList.add('input--error');
+            }
+        };
+
+        const clearFieldError = () => {
+            if (valorErrorField && valorField) {
+                valorErrorField.textContent = '';
+                valorErrorField.style.display = 'none';
+                valorField.classList.remove('input--error');
+            }
+        };
+
         // Configuração inicial para valorField com base no tipo selecionado
         configureContactValueField(selectedTipo, valorField, masks);
+        clearFieldError(); // Limpa qualquer erro ao abrir o formulário
+
+        valorField?.addEventListener('input', clearFieldError); // Limpa o erro ao digitar
 
         tipoOptionsContainer?.querySelectorAll('.contact-type-selector').forEach(selector => {
             selector.addEventListener('click', () => {
@@ -196,6 +227,7 @@ export class ContatosSection {
                 selector.classList.add('selected');
                 selectedTipo = selector.dataset.type;
                 configureContactValueField(selectedTipo, valorField, masks);
+                clearFieldError(); // Limpa o erro ao mudar o tipo
             });
         });
 
@@ -203,12 +235,14 @@ export class ContatosSection {
 
         form?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            clearFieldError(); // Limpa erros anteriores antes de revalidar
+
             const tipo = selectedTipo; // Obtém o tipo atualmente selecionado
             const valor = valorField.value.trim();
 
             const validation = validateContactValue(tipo, valor);
             if (!valor || !validation.valid) {
-                showPopup('Erro de Validação', validation.message || 'Preencha o valor corretamente.', true);
+                showFieldError(validation.message || 'Preencha o valor corretamente.');
                 return;
             }
 
@@ -223,7 +257,36 @@ export class ContatosSection {
                     showPopup('Sucesso', isEdit ? 'Contato atualizado com sucesso!' : 'Contato adicionado com sucesso!');
                     this.carregarContatos();
                 } else {
-                    showPopup('Erro de Validação', escapeHtml(await parseApiError(response, isEdit ? 'Erro ao atualizar contato.' : 'Erro ao adicionar contato.')), true);
+                    const { generalMessage, fieldErrors } = await parseApiError(response, isEdit ? 'Erro ao atualizar contato.' : 'Erro ao adicionar contato.');
+
+                    // Heurística para identificar erros de validação do campo 'valor' vindos da API como generalMessage
+                    let isValorValidationError = false;
+                    let messageToDisplay = generalMessage;
+
+                    if (selectedTipo === 'WHATSAPP' || selectedTipo === 'TELEFONE') {
+                        const lowerCaseMessage = generalMessage.toLowerCase();
+                        if (lowerCaseMessage.includes('número') || lowerCaseMessage.includes('telefone') || lowerCaseMessage.includes('ddd') || lowerCaseMessage.includes('válido') || lowerCaseMessage.includes('formato')) {
+                            isValorValidationError = true;
+                            // Remove a parte sobre "quantidade de dígitos" se presente
+                            messageToDisplay = generalMessage.replace(/e a quantidade de dígitos/i, '').trim();
+                        }
+                    } else if (selectedTipo === 'EMAIL') {
+                        const lowerCaseMessage = generalMessage.toLowerCase();
+                        if (lowerCaseMessage.includes('e-mail') || lowerCaseMessage.includes('email') || lowerCaseMessage.includes('válido') || lowerCaseMessage.includes('formato')) {
+                            isValorValidationError = true;
+                        }
+                    }
+
+
+                    if (fieldErrors.valor) { // Prioriza erro específico de campo se existir
+                        showFieldError(fieldErrors.valor);
+                    } else if (isValorValidationError) { // Usa heurística para erros de valor na mensagem geral
+                        showFieldError(messageToDisplay);
+                    } else if (generalMessage) { // Se não for erro de campo, mas houver uma mensagem geral
+                        showPopup('Erro de Validação', escapeHtml(generalMessage), true);
+                    } else { // Fallback se não houver mensagem específica ou geral
+                        showPopup('Erro de Validação', isEdit ? 'Erro ao atualizar contato.' : 'Erro ao adicionar contato.', true);
+                    }
                 }
             } catch {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);
@@ -254,7 +317,8 @@ export class ContatosSection {
                     showPopup('Sucesso', 'Contato excluído com sucesso!');
                     this.carregarContatos();
                 } else {
-                    showPopup('Erro', escapeHtml(await parseApiError(response, 'Erro ao excluir contato.')), true);
+                    const { generalMessage } = await parseApiError(response, 'Erro ao excluir contato.');
+                    showPopup('Erro', escapeHtml(generalMessage), true);
                 }
             } catch {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);

@@ -1,3 +1,5 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector);
@@ -7,4 +9,10 @@ window.addEventListener('DOMContentLoaded', () => {
   for (const type of ['chrome', 'node', 'electron']) {
     replaceText(`${type}-version`, process.versions[type]);
   }
+});
+
+// Expor funções IPC de forma segura para o processo de renderização
+contextBridge.exposeInMainWorld('api', {
+  googleLogin: () => ipcRenderer.invoke('google-login'),
+  // Você pode adicionar outras funções IPC aqui conforme necessário
 });
