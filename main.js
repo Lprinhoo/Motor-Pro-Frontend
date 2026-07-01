@@ -34,6 +34,8 @@ app.whenReady().then(() => {
         `&scope=${encodeURIComponent('openid email profile')}` +
         `&access_type=online`;
 
+      let authFlowCompleted = false; // <-- Adicione esta flag
+
       // Servidor local temporário para capturar o redirect
       const server = http.createServer(async (req, res) => {
         const code = new URL(req.url, redirectUri).searchParams.get('code');
@@ -42,7 +44,10 @@ app.whenReady().then(() => {
         server.close();
         authWindow.close();
 
-        if (!code) return reject(new Error('Código não encontrado'));
+        if (!code) {
+          authFlowCompleted = true; // Marca como concluído para evitar rejeição dupla
+          return reject(new Error('Código não encontrado'));
+        }
 
         try {
           const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -58,8 +63,10 @@ app.whenReady().then(() => {
           });
           const data = await tokenRes.json();
           console.log('Resposta Google:', JSON.stringify(data));
+          authFlowCompleted = true; // Marca como concluído com sucesso
           resolve(data.id_token);
         } catch (err) {
+          authFlowCompleted = true; // Marca como concluído com erro
           reject(err);
         }
       });
@@ -73,7 +80,12 @@ app.whenReady().then(() => {
       });
 
       authWindow.loadURL(authUrl);
-      authWindow.on('closed', () => { server.close(); reject(new Error('window was closed by user')); });
+      authWindow.on('closed', () => {
+        server.close();
+        if (!authFlowCompleted) { // Só rejeita se o fluxo não foi concluído
+          reject(new Error('window was closed by user'));
+        }
+      });
     });
   });
 
