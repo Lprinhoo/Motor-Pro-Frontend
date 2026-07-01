@@ -1,18 +1,10 @@
 import { showPopup, hidePopup } from './utils.js';
-import { authFetch, API_BASE_URL, setAuthData, isRemembered, getStoredValue } from './script.js';
+import { authFetch, API_BASE_URL, setAuthData, isRemembered, getStoredValue, clearAuthData } from './script.js';
 import { bootDone } from './boot.js';
 
-// ─── Login automático: se "Lembrar-me" estava marcado e há um token salvo,
-// pula a tela de login e vai direto pro dashboard ──────────────────────────
-if (isRemembered() && getStoredValue('jwtToken')) {
-    // Sabe o destino imediatamente → redireciona; boot fica até a nova página carregar
-    window.location.href = 'dashboard.html';
-}
+let autoLoginTimeout;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Sabemos que vamos exibir a tela de login → aguarda um pouco antes de liberar
-    setTimeout(bootDone, 1800);
-
     const flipper            = document.getElementById('flipper');
     const loginForm          = document.getElementById('login-form');
     const registerForm       = document.getElementById('register-form');
@@ -23,7 +15,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginError         = document.getElementById('login-error');
     const usernameLoginField = document.getElementById('username-login');
     const passwordLoginField = document.getElementById('password-login');
-    const googleLoginBtn     = document.querySelector('.btn-google'); // Seleciona o botão do Google
+    const googleLoginBtn     = document.querySelector('.btn-google');
+    const autoLoginStatus    = document.getElementById('auto-login-status');
+    const switchAccountBtn   = document.getElementById('switch-account-btn');
+
+    // ─── Login automático: se "Lembrar-me" estava marcado e há um token salvo,
+    // mostra a tela de auto-login com opção de trocar de conta.
+    if (isRemembered() && getStoredValue('jwtToken')) {
+        if (flipper) flipper.style.display = 'none';
+        if (autoLoginStatus) autoLoginStatus.style.display = 'block';
+
+        bootDone(); // Libera a tela de boot mais cedo para mostrar o status de auto-login
+
+        autoLoginTimeout = setTimeout(async () => {
+            // Tenta buscar a oficina para redirecionar corretamente
+            const temOficina = await buscarOficinaDoUsuario();
+            window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+        }, 3000); // Redireciona automaticamente após 3 segundos
+
+        if (switchAccountBtn) {
+            switchAccountBtn.addEventListener('click', () => {
+                clearTimeout(autoLoginTimeout); // Cancela o redirecionamento automático
+                clearAuthData(); // Limpa os dados de autenticação
+                localStorage.removeItem('googleRefreshToken'); // Garante que o refresh token do Google seja limpo
+                if (autoLoginStatus) autoLoginStatus.style.display = 'none';
+                if (flipper) flipper.style.display = 'block';
+                // Não chama bootDone novamente, pois já foi chamado
+            });
+        }
+    } else {
+        // Se não há auto-login, mostra o flipper normalmente
+        if (flipper) flipper.style.display = 'block';
+        setTimeout(bootDone, 1800);
+    }
 
     function showLoginError(message) {
         if (loginError) {
