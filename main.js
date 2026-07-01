@@ -1,7 +1,7 @@
 const { app, BrowserWindow, session, ipcMain } = require('electron');
 const path = require('path');
-const ElectronOAuth2 = require('electron-oauth2');
-require('dotenv').config(); // Carrega as variáveis de ambiente do .env
+const http = require('http');
+require('dotenv').config();
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -13,45 +13,75 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
-      webSecurity: false  // ← desativa CORS no Electron
+      webSecurity: false
     }
   });
-
   mainWindow.loadFile(path.join(__dirname, 'src/html/index.html'));
 }
 
-// Google OAuth setup
-const googleOauth = new ElectronOAuth2({
-  clientId: process.env.GOOGLE_CLIENT_ID, // Usando variável de ambiente
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Usando variável de ambiente
-  authorizationUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
-  tokenUrl: 'https://oauth2.googleapis.com/token',
-  profileUrl: 'https://www.googleapis.com/oauth2/v3/userinfo',
-  redirectUri: 'http://localhost:8080', // DEVE CORRESPONDER AO CONFIGURADO NO GOOGLE CLOUD CONSOLE
-  scope: 'openid email profile',
-}, {
-  width: 500,
-  height: 600,
-  alwaysOnTop: true,
-  autoHideMenuBar: true,
-  webPreferences: {
-    nodeIntegration: false,
-    contextIsolation: true,
-  }
-});
-
-ipcMain.handle('google-login', async (event) => {
-  try {
-    const token = await googleOauth.getAccessToken();
-    return token.id_token; // Retorna o id_token
-  } catch (error) {
-    console.error('Erro no login com Google:', error);
-    throw error;
-  }
-});
-
-
 app.whenReady().then(() => {
+
+  ipcMain.handle('google-login', async (event) => {
+    return new Promise((resolve, reject) => {
+      const clientId = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+      const redirectUri = 'http://127.0.0.1:8989';
+
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+          `response_type=code` +
+          `&client_id=${encodeURIComponent(clientId)}` +
+          `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+          `&scope=${encodeURIComponent('openid email profile')}` +
+          `&access_type=online`;
+
+      let loginCompleted = false;
+
+      const server = http.createServer(async (req, res) => {
+        const code = new URL(req.url, redirectUri).searchParams.get('code');
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end('<h2>Login realizado! Pode fechar esta janela.</h2>');
+        server.close();
+
+        if (!code) return reject(new Error('Código não encontrado'));
+
+        try {
+          const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              code,
+              client_id: clientId,
+              client_secret: clientSecret,
+              redirect_uri: redirectUri,
+              grant_type: 'authorization_code'
+            })
+          });
+          const data = await tokenRes.json();
+          loginCompleted = true;
+          authWindow.close();
+          resolve(data.id_token);
+        } catch (err) {
+          reject(err);
+        }
+      });
+
+      server.listen(8989, '127.0.0.1');
+
+      const authWindow = new BrowserWindow({
+        width: 500, height: 600,
+        alwaysOnTop: true, autoHideMenuBar: true,
+        webPreferences: { nodeIntegration: false, contextIsolation: true }
+      });
+
+      authWindow.loadURL(authUrl);
+
+      authWindow.on('closed', () => {
+        server.close();
+        if (!loginCompleted) reject(new Error('window was closed by user'));
+      });
+    });
+  });
+
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
