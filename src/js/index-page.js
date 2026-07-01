@@ -251,51 +251,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Lógica de Login com Google ──────────────────────────
     if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', async () => {
-            try {
-                // window.api.googleLogin() é exposto pelo preload.js
-                const idToken = await window.api.googleLogin();
-                console.log('ID Token recebido do Google:', idToken);
+      googleLoginBtn.addEventListener('click', async () => {
+        try {
+          // Passa o refresh_token salvo (se existir)
+          const savedRefreshToken = localStorage.getItem('googleRefreshToken');
+          const { idToken, refreshToken } = await window.api.googleLogin(savedRefreshToken);
 
-                // Envia o idToken para o seu backend Spring Boot
-                const response = await fetch(`${API_BASE_URL}/auth/google`, { // AJUSTE A URL DO SEU BACKEND
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ idToken: idToken }),
-                });
+          // Salva o refresh_token para próximas vezes
+          if (refreshToken) {
+            localStorage.setItem('googleRefreshToken', refreshToken);
+          }
 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Login com Google bem-sucedido no backend:', data);
-                    // TODO: Armazenar o JWT (data.token) e atualizar o estado da UI (ex: redirecionar)
-                    const accessToken  = data.accessToken;
-                    const refreshToken = data.refreshToken;
+          const response = await fetch(`${API_BASE_URL}/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+          });
 
-                    if (!accessToken) {
-                        showPopup('Erro de Login', 'Token de acesso não recebido na resposta do servidor.', true);
-                        return;
-                    }
+          if (response.ok) {
+            const data = await response.json();
+            const accessToken  = data.accessToken;
+            const refreshToken = data.refreshToken;
 
-                    // Assume que o login com Google não usa "Lembrar-me" por padrão, mas pode ser ajustado
-                    setAuthData({ accessToken, refreshToken }, false);
-
-                    const temOficina = await buscarOficinaDoUsuario();
-                    setTimeout(() => {
-                        window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                    }, 400);
-
-                } else {
-                    const errorData = await response.json();
-                    console.error('Erro no login com Google no backend:', errorData);
-                    showPopup('Erro no Login com Google', errorData.message || 'Erro desconhecido no backend.', true);
-                }
-            } catch (error) {
-                console.error('Erro ao iniciar login com Google no frontend:', error);
-                showPopup('Erro no Login com Google', 'Não foi possível iniciar o login com Google.', true);
+            if (!accessToken) {
+              showPopup('Erro de Login', 'Token de acesso não recebido.', true);
+              return;
             }
-        });
+
+            setAuthData({ accessToken, refreshToken }, false);
+
+            const temOficina = await buscarOficinaDoUsuario();
+            setTimeout(() => {
+              window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+            }, 400);
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            showPopup('Erro no Login com Google', errorData.message || 'Erro desconhecido no backend.', true);
+          }
+        } catch (error) {
+          if (error.message === 'Login cancelado pelo usuário') return;
+          console.error('Erro no login com Google:', error);
+          showPopup('Erro no Login com Google', 'Não foi possível iniciar o login com Google.', true);
+        }
+      });
     }
 
     // ─── Esqueceu a senha ─────────────────────────────────────

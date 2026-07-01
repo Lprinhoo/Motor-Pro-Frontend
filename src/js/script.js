@@ -57,7 +57,8 @@ const processQueue = (error, token = null) => {
 // Função utilitária para requisições autenticadas com refresh de token
 async function authFetch(url, options = {}) {
     let accessToken = getStoredValue('jwtToken');
-    const refreshToken = getStoredValue('refreshToken');
+    const refreshToken = getStoredValue('refreshToken'); // Backend refresh token
+    const googleRefreshToken = localStorage.getItem('googleRefreshToken'); // Google refresh token
 
     if (accessToken) {
         options.headers = {
@@ -68,7 +69,7 @@ async function authFetch(url, options = {}) {
 
     let response = await fetch(url, options);
 
-    if ((response.status === 401 || response.status === 403) && refreshToken && url !== `${API_BASE_URL}/auth/refresh`) {
+    if ((response.status === 401 || response.status === 403) && url !== `${API_BASE_URL}/auth/refresh` && url !== `${API_BASE_URL}/auth/google`) {
         if (isRefreshing) {
             return new Promise(function(resolve, reject) {
                 failedQueue.push({ resolve, reject });
@@ -83,33 +84,71 @@ async function authFetch(url, options = {}) {
         isRefreshing = true;
 
         try {
-            const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ refreshToken })
-            });
+            let newAccessToken;
+            let newBackendRefreshToken;
 
-            if (refreshResponse.ok) {
-                const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await refreshResponse.json();
-                setAuthData({ accessToken: newAccessToken, refreshToken: newRefreshToken });
-                accessToken = newAccessToken;
+            if (googleRefreshToken) {
+                // Attempt to refresh Google token
+                const googleRefreshResult = await window.api.refreshGoogleToken(googleRefreshToken);
+                if (googleRefreshResult && googleRefreshResult.idToken) {
+                    // Use the new Google idToken to get new backend tokens
+                    const backendAuthResponse = await fetch(`${API_BASE_URL}/auth/google`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken: googleRefreshResult.idToken }),
+                    });
 
+                    if (backendAuthResponse.ok) {
+                        const backendAuthData = await backendAuthResponse.json();
+                        newAccessToken = backendAuthData.accessToken;
+                        newBackendRefreshToken = backendAuthData.refreshToken;
+                        // Update Google refresh token if a new one was provided
+                        if (googleRefreshResult.refreshToken && googleRefreshResult.refreshToken !== googleRefreshToken) {
+                            localStorage.setItem('googleRefreshToken', googleRefreshResult.refreshToken);
+                        }
+                    } else {
+                        throw new Error('Failed to re-authenticate with backend using new Google ID token.');
+                    }
+                } else {
+                    throw new Error('Failed to refresh Google token.');
+                }
+            } else if (refreshToken) {
+                // Regular backend token refresh
+                const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ refreshToken })
+                });
+
+                if (refreshResponse.ok) {
+                    const data = await refreshResponse.json();
+                    newAccessToken = data.accessToken;
+                    newBackendRefreshToken = data.refreshToken;
+                } else {
+                    throw new Error('Refresh Token inválido ou expirado');
+                }
+            } else {
+                throw new Error('No refresh token available.');
+            }
+
+            // If we got new tokens, update them and retry the original request
+            if (newAccessToken) {
+                setAuthData({ accessToken: newAccessToken, refreshToken: newBackendRefreshToken });
                 processQueue(null, newAccessToken);
 
-                options.headers['Authorization'] = 'Bearer ' + accessToken;
+                options.headers['Authorization'] = 'Bearer ' + newAccessToken;
                 response = await fetch(url, options);
             } else {
-                const refreshError = new Error('Refresh Token inválido ou expirado');
-                processQueue(refreshError);
-                clearAuthData();
-                window.location.href = 'index.html';
-                return Promise.reject(refreshError);
+                throw new Error('Failed to obtain new access token.');
             }
+
         } catch (error) {
+            console.error('Token refresh failed:', error);
             processQueue(error);
             clearAuthData();
+            localStorage.removeItem('googleRefreshToken'); // Clear Google refresh token on failure
             window.location.href = 'index.html';
             return Promise.reject(error);
         } finally {
