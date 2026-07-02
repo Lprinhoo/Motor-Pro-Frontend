@@ -180,3 +180,12 @@
     height: 18px;
     flex-shrink: 0;
 }
+
+/* Estilo para o botão "Trocar Conta Google" */
+#google-switch-account-btn {
+    max-width: 300px; /* Mesma largura do botão Google */
+    margin: 10px auto 0 auto; /* Centraliza e adiciona margem superior */
+    display: flex; /* Usa flexbox para centralizar o conteúdo */
+    align-items: center; /* Alinha verticalmente */
+    justify-content: center; /* Alinha horizontalmente */
+}
