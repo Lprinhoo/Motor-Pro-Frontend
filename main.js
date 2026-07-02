@@ -125,7 +125,14 @@ async function fullGoogleLogin() {
 
 app.whenReady().then(() => {
 
-  ipcMain.handle('google-login', async (event, savedRefreshToken) => {
+  // Modificado: Adicionado o parâmetro forceNewLogin
+  ipcMain.handle('google-login', async (event, savedRefreshToken, forceNewLogin) => {
+    // Se forceNewLogin for true, ignora o refresh token e inicia um novo login completo
+    if (forceNewLogin) {
+      console.log('Forçando novo login completo com Google...');
+      return await fullGoogleLogin();
+    }
+
     // Se já tem refresh_token salvo, usa ele direto (sem popup)
     if (savedRefreshToken) {
       try {
@@ -133,7 +140,7 @@ app.whenReady().then(() => {
         const idToken = await refreshGoogleToken(savedRefreshToken);
         return { idToken, refreshToken: savedRefreshToken };
       } catch (err) {
-        console.warn('Refresh token inválido, iniciando login completo:', err.message);
+        console.warn('Refresh token inválido ou expirado, iniciando login completo:', err.message);
         // Se o refresh falhar, cai no login completo abaixo
       }
     }

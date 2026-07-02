@@ -13,7 +13,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // Expor funções IPC de forma segura para o processo de renderização
 contextBridge.exposeInMainWorld('api', {
-  googleLogin: (refreshToken) => ipcRenderer.invoke('google-login', refreshToken),
+  // Modificado: Adicionado o parâmetro forceNewLogin
+  googleLogin: (refreshToken, forceNewLogin) => ipcRenderer.invoke('google-login', refreshToken, forceNewLogin),
   refreshGoogleToken: (refreshToken) => ipcRenderer.invoke('refresh-google-token', refreshToken),
   // Você pode adicionar outras funções IPC aqui conforme necessário
 });

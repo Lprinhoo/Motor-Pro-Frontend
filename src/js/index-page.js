@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleLoginBtn     = document.querySelector('.btn-google');
     const autoLoginStatus    = document.getElementById('auto-login-status');
     const switchAccountBtn   = document.getElementById('switch-account-btn');
+    // Adicionado: Referência para o novo botão de trocar conta Google
+    const googleSwitchAccountBtn = document.getElementById('google-switch-account-btn');
 
     // ─── Login automático: se "Lembrar-me" estava marcado e há um token salvo,
     // mostra a tela de auto-login com opção de trocar de conta.
@@ -275,11 +277,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Lógica de Login com Google ──────────────────────────
     if (googleLoginBtn) {
-      googleLoginBtn.addEventListener('click', async () => {
+      // Função auxiliar para lidar com o login Google
+      async function handleGoogleLogin(forceNewLogin = false) {
         try {
-          // Passa o refresh_token salvo (se existir)
-          const savedRefreshToken = localStorage.getItem('googleRefreshToken');
-          const { idToken, refreshToken } = await window.api.googleLogin(savedRefreshToken);
+          let savedRefreshToken = null;
+          if (!forceNewLogin) {
+            savedRefreshToken = localStorage.getItem('googleRefreshToken');
+          }
+
+          // A função `googleLogin` em preload.js precisará ser atualizada para aceitar `forceNewLogin`
+          const { idToken, refreshToken } = await window.api.googleLogin(savedRefreshToken, forceNewLogin);
 
           // Salva o refresh_token para próximas vezes
           if (refreshToken) {
@@ -317,7 +324,15 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('Erro no login com Google:', error);
           showPopup('Erro no Login com Google', 'Não foi possível iniciar o login com Google.', true);
         }
-      });
+      }
+
+      // Event listener para o botão de login Google padrão (tenta auto-login primeiro)
+      googleLoginBtn.addEventListener('click', () => handleGoogleLogin(false));
+
+      // Event listener para o novo botão "Trocar Conta Google" (força um novo login interativo)
+      if (googleSwitchAccountBtn) {
+        googleSwitchAccountBtn.addEventListener('click', () => handleGoogleLogin(true));
+      }
     }
 
     // ─── Esqueceu a senha ─────────────────────────────────────
