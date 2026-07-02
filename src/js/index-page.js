@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     } else {
         // Se não há auto-login, mostra o flipper normalmente
-        if (flipper) flipper.style.display = 'block';
+        if (flipper) flipper.style.display = '';
         setTimeout(bootDone, 1800);
     }
 
