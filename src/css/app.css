@@ -15,7 +15,6 @@
 @import url('../layout/_background.css');
 @import url('../layout/_page-header.css');
 @import url('../layout/_boot-screen.css');
-@import url('../layout/_responsive.css');
 
 @import url('../components/_auth-card.css');
 @import url('../components/_auth-card-footer.css');
@@ -25,5 +24,11 @@
 @import url('../components/_popup.css');
 
 /* Redesign premium — escopado em body.login-premium (src/html/index.html).
-   Importado por último para vencer a cascata sem !important. */
+   Importado por último entre os temas para vencer a cascata sem !important. */
 @import url('../pages/_login-premium.css');
+
+/* _responsive.css por último de todos: assim as media queries de ajuste
+   de altura vencem regras não condicionais (.card, .field, .btn-primary
+   etc.) definidas acima, sem precisar de !important — como especificidade
+   é igual, quem vem depois na cascata vence. */
+@import url('../layout/_responsive.css');

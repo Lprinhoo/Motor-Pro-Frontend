@@ -189,3 +189,7 @@
     align-items: center; /* Alinha verticalmente */
     justify-content: center; /* Alinha horizontalmente */
 }
+/* Botao "Trocar de conta" (status de login automatico) */
+.btn-switch-account {
+    margin-top: 20px;
+}

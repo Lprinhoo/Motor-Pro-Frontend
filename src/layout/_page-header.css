@@ -2,12 +2,14 @@
 .page-wrap {
     position: relative;
     z-index: 1;
-    min-height: 100vh;
+    min-height: 100vh;      /* fallback para navegadores sem suporte a dvh */
+    min-height: 100dvh;     /* altura visivel real, sem a UI do navegador (evita scroll fantasma no mobile) */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
+    box-sizing: border-box;
 }
 
 /* ── Header / Logo ──────────────────────────────────────── */

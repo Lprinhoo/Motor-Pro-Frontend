@@ -29,3 +29,8 @@
     text-transform: none;
     font-weight: 400;
 }
+
+/* Ultimo campo antes do botao (gap um pouco maior) */
+.field--tight-gap {
+    margin-bottom: 1.4rem;
+}

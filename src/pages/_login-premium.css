@@ -80,7 +80,7 @@ body.login-premium .bg-glow--br {
 
 /* ── 3. Cabeçalho / logo ──────────────────────────────────── */
 body.login-premium .site-header {
-    margin-bottom: 2.6rem;
+    margin-bottom: clamp(0.5rem, 4vh, 2.6rem);
     animation: lp-fade-down 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 body.login-premium .logo-image {
@@ -104,14 +104,14 @@ body.login-premium .flipper {
 
 body.login-premium .card {
     background:
-        var(--gradient-surface),
-        var(--surface);
+            var(--gradient-surface),
+            var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 2.6rem 2.4rem;
+    padding: clamp(0.7rem, 5vh, 2.6rem) clamp(1.1rem, 6vw, 2.4rem);
     box-shadow:
-        var(--shadow),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            var(--shadow),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(22px) saturate(140%);
     -webkit-backdrop-filter: blur(22px) saturate(140%);
 }
@@ -130,31 +130,31 @@ body.login-premium .card-tag {
     border-color: var(--brand-border);
     padding: 4px 13px;
     letter-spacing: 2.2px;
-    margin-bottom: 1.2rem;
+    margin-bottom: clamp(0.3rem, 2vh, 1.2rem);
 }
 
 /* ── 6. Tipografia do cartão ──────────────────────────────── */
 body.login-premium .card-title {
-    font-size: 25px;
+    font-size: clamp(15px, 3.4vh, 25px);
     letter-spacing: 0.5px;
     margin: 0 0 6px;
 }
 body.login-premium .card-sub {
-    font-size: 13px;
+    font-size: clamp(11px, 1.6vh, 13px);
     color: var(--text-mute);
-    margin-bottom: 2rem;
-    line-height: 1.6;
+    margin-bottom: clamp(0.4rem, 3vh, 2rem);
+    line-height: 1.5;
 }
 
 /* ── 7. Campos e inputs ───────────────────────────────────── */
 body.login-premium .field {
-    margin-bottom: 1.25rem;
+    margin-bottom: clamp(0.35rem, 2.2vh, 1.25rem);
 }
 body.login-premium .field-label {
     font-size: 10.5px;
     letter-spacing: 2.2px;
     color: var(--text-dim);
-    margin-bottom: 8px;
+    margin-bottom: clamp(2px, 1vh, 8px);
 }
 body.login-premium .field-label svg {
     color: rgba(34, 197, 94, 0.65);
@@ -169,7 +169,7 @@ body.login-premium .input {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-2);
     border-radius: 14px;
-    padding: 15px 16px 15px 44px;
+    padding: clamp(6px, 2vh, 15px) 16px clamp(6px, 2vh, 15px) 44px;
     font-size: 14px;
     letter-spacing: 0.1px;
     transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.15s ease;
@@ -219,7 +219,7 @@ body.login-premium .eye-btn:hover {
 
 /* ── 8. Lembrar-me / esqueceu a senha ─────────────────────── */
 body.login-premium .form-row {
-    margin: 0.2rem 0 1.6rem;
+    margin: clamp(0rem, 0.5vh, 0.2rem) 0 clamp(0.4rem, 2.4vh, 1.6rem);
 }
 body.login-premium .remember {
     font-size: 12.5px;
@@ -253,7 +253,7 @@ body.login-premium .forgot-link:hover {
 /* ── 9. Botões ────────────────────────────────────────────── */
 body.login-premium .btn-primary {
     border-radius: 14px;
-    padding: 15px;
+    padding: clamp(6px, 2vh, 15px);
     font-size: 11.5px;
     letter-spacing: 2.6px;
     color: #052E16;
@@ -271,7 +271,7 @@ body.login-premium .btn-primary:active {
 
 body.login-premium .btn-secondary {
     border-radius: 14px;
-    padding: 13px 15px;
+    padding: clamp(6px, 2vh, 13px) 15px;
     font-size: 11px;
     letter-spacing: 1.8px;
     border-color: var(--border-2);
@@ -287,17 +287,22 @@ body.login-premium .btn-secondary:hover {
 
 body.login-premium .btn-google {
     border-radius: 14px;
-    padding: 13px 15px;
+    padding: clamp(6px, 2vh, 13px) 15px;
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.3px;
     text-transform: none;
     border-color: rgba(255, 255, 255, 0.10);
     box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.5);
+    margin-top: clamp(4px, 1.2vh, 15px) !important;
 }
 body.login-premium .btn-google:hover {
     box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.55);
     transform: translateY(-2px);
+}
+body.login-premium .btn-switch-account,
+body.login-premium #google-switch-account-btn {
+    margin-top: clamp(3px, 1vh, 10px) !important;
 }
 
 /* ── 10. Rodapé do cartão ─────────────────────────────────── */
@@ -407,4 +412,114 @@ body.login-premium #boot-screen {
 }
 @media (min-width: 481px) and (max-width: 900px) {
     body.login-premium .scene { max-width: 380px; }
+}
+
+/* --- Ajuste por ALTURA de viewport (evita scroll vertical) ---
+   Independente da largura: notebooks com barra de tarefas, celulares
+   em paisagem, janelas de navegador pequenas, etc. Comprime o
+   espacamento vertical do cartao de login progressivamente conforme
+   a altura disponivel diminui, para que o conteudo sempre caiba na
+   tela sem precisar de scroll. */
+@media (max-height: 800px) {
+    body.login-premium .site-header { margin-bottom: 1.4rem; }
+    body.login-premium .card { padding: 2rem 2.2rem; }
+    body.login-premium .card-sub { margin-bottom: 1.4rem; }
+    body.login-premium .field { margin-bottom: 0.95rem; }
+    body.login-premium .field--tight-gap { margin-bottom: 1.1rem; }
+    body.login-premium .form-row { margin: 0.1rem 0 1.1rem; }
+    body.login-premium .card-footer { margin-top: 1.1rem; }
+    body.login-premium .btn-google { margin-top: 10px; }
+    body.login-premium .btn-switch-account,
+    body.login-premium #google-switch-account-btn { margin-top: 8px; }
+}
+
+@media (max-height: 680px) {
+    body.login-premium .page-wrap { padding: 1rem 1rem; }
+    body.login-premium .site-header { margin-bottom: 0.9rem; }
+    body.login-premium .card-tag { margin-bottom: 0.7rem; }
+    body.login-premium .card { padding: 1.6rem 1.8rem; }
+    body.login-premium .card-title { font-size: 21px; margin-bottom: 3px; }
+    body.login-premium .card-sub { font-size: 12px; margin-bottom: 1rem; line-height: 1.4; }
+    body.login-premium .field { margin-bottom: 0.7rem; }
+    body.login-premium .field--tight-gap { margin-bottom: 0.85rem; }
+    body.login-premium .field-label { margin-bottom: 5px; }
+    body.login-premium .input { padding: 11px 14px 11px 40px; }
+    body.login-premium .form-row { margin: 0.1rem 0 0.85rem; }
+    body.login-premium .btn-primary,
+    body.login-premium .btn-secondary,
+    body.login-premium .btn-google { padding: 11px; }
+    body.login-premium .btn-google { margin-top: 8px; }
+    body.login-premium .btn-switch-account,
+    body.login-premium #google-switch-account-btn { margin-top: 6px; }
+    body.login-premium .card-footer { margin-top: 0.9rem; font-size: 12px; }
+    body.login-premium .footer-hint { margin-top: 2px; }
+}
+
+@media (max-height: 560px) {
+    body.login-premium .site-header { display: none; }
+    body.login-premium .card-tag { display: none; }
+    body.login-premium .card { padding: 1.1rem 1.5rem; }
+    body.login-premium .card-title { font-size: 17px; margin-bottom: 2px; }
+    body.login-premium .card-sub { display: none; }
+    body.login-premium .field { margin-bottom: 0.5rem; }
+    body.login-premium .field--tight-gap { margin-bottom: 0.6rem; }
+    body.login-premium .field-label { margin-bottom: 4px; font-size: 9.5px; }
+    body.login-premium .input { padding: 9px 12px 9px 38px; }
+    body.login-premium .form-row { margin: 0.05rem 0 0.6rem; }
+    body.login-premium .btn-primary,
+    body.login-premium .btn-secondary,
+    body.login-premium .btn-google { padding: 9px; }
+    body.login-premium .btn-google { margin-top: 6px; }
+    body.login-premium .btn-switch-account,
+    body.login-premium #google-switch-account-btn { margin-top: 5px; }
+    body.login-premium .card-footer { margin-top: 0.6rem; font-size: 11px; }
+    body.login-premium .footer-hint { display: none; }
+}
+
+/* Extremos (celular em paisagem, ~280-420px de altura): compacta
+   ao maximo mantendo todas as funcionalidades visiveis. */
+@media (max-height: 430px) {
+    body.login-premium .page-wrap { padding: 0.5rem 1rem; }
+    body.login-premium .card { padding: 0.8rem 1.3rem; }
+    body.login-premium .card-title { font-size: 15px; }
+    body.login-premium .field { margin-bottom: 0.35rem; }
+    body.login-premium .field--tight-gap { margin-bottom: 0.4rem; }
+    body.login-premium .field-label { margin-bottom: 2px; font-size: 9px; }
+    body.login-premium .input { padding: 6px 10px 6px 34px; font-size: 12.5px; }
+    body.login-premium .form-row { margin: 0 0 0.4rem; }
+    body.login-premium .btn-primary,
+    body.login-premium .btn-secondary,
+    body.login-premium .btn-google { padding: 6px; font-size: 10px; }
+    body.login-premium .btn-google { margin-top: 4px; }
+    body.login-premium .btn-switch-account,
+    body.login-premium #google-switch-account-btn { margin-top: 3px; }
+    body.login-premium .card-footer { margin-top: 0.4rem; }
+}
+
+/* Casos extremos de altura (celular deitado bem baixo, ~300px):
+   ultimo nivel de compactacao antes de aceitar rolagem minima. */
+@media (max-height: 340px) {
+    body.login-premium .page-wrap { padding: 0.35rem 1rem; }
+    body.login-premium .card { padding: 0.55rem 1.2rem; }
+    body.login-premium .card-title { font-size: 13px; margin-bottom: 1px; }
+    body.login-premium .field { margin-bottom: 0.22rem; }
+    body.login-premium .field--tight-gap { margin-bottom: 0.28rem; }
+    body.login-premium .field-label { margin-bottom: 1px; font-size: 8.5px; }
+    body.login-premium .input { padding: 4px 8px 4px 30px; font-size: 12px; }
+    body.login-premium .form-row { margin: 0 0 0.28rem; }
+    body.login-premium .btn-primary,
+    body.login-premium .btn-secondary,
+    body.login-premium .btn-google { padding: 4px; font-size: 9.5px; }
+    body.login-premium .btn-google { margin-top: 3px; }
+    body.login-premium .btn-switch-account,
+    body.login-premium #google-switch-account-btn { margin-top: 2px; }
+    body.login-premium .card-footer { margin-top: 0.28rem; font-size: 10px; }
+}
+
+/* Telas muito estreitas (ex.: capa do Galaxy Fold, ~280px) - evita
+   quebra de linha no titulo/tag que aumentaria a altura do cartao. */
+@media (max-width: 320px) {
+    body.login-premium .card { padding: 1.5rem 1.1rem; }
+    body.login-premium .card-title { font-size: 18px; letter-spacing: 0; }
+    body.login-premium .card-tag { padding: 3px 10px; font-size: 9px; letter-spacing: 1.4px; }
 }
