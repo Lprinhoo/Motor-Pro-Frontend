@@ -3,6 +3,10 @@
     width: 100%;
     max-width: 360px;
     perspective: 1100px;
+    /* Isola o layout interno da cena do restante do documento: o navegador
+       nao precisa reconsiderar o overflow do documento com base no que
+       acontece dentro do flip 3D. */
+    contain: layout style;
 }
 
 .flipper {
@@ -11,6 +15,16 @@
     transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
     /* Altura definida pelo lado maior (cadastro), evita scroll */
     display: grid;
+    /* Promove a camada de composicao ANTES da transicao comecar, evitando
+       que o navegador recalcule o overflow do documento a cada frame do
+       rotateY (causa do flash de scrollbar durante o flip). translateZ(0)
+       reforca a promocao em engines mais antigas onde will-change sozinho
+       nao e suficiente (comum em webviews/Electron).
+       IMPORTANTE: backface-visibility NAO entra aqui — isso esconderia o
+       proprio flipper ao girar (ele "vira de costas" para a camera).
+       Essa propriedade fica somente nas faces internas, abaixo. */
+    will-change: transform;
+    transform: translateZ(0);
 }
 .flipper.flipped {
     transform: rotateY(180deg);

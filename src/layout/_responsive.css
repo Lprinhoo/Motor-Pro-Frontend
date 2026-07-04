@@ -17,7 +17,7 @@
    premium, ex.: cadastro de oficina) - evita que o cartao ultrapasse
    a altura visivel e gere scroll indesejado. */
 @media (max-height: 700px) {
-    .page-wrap { padding: 1rem 1rem; align-items: flex-start; }
+    .page-wrap { padding: 1rem 1rem; justify-content: flex-start; }
     .site-header { margin-bottom: 1.2rem; }
     .card { padding: 1.5rem 1.6rem; }
     .card-sub { margin-bottom: 1.2rem; }

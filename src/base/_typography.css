@@ -1,3 +1,7 @@
+html {
+    overflow: hidden; /* garante que o viewport nunca role, mesmo com transforms 3D internos */
+}
+
 body {
     background-color: var(--bg);
     color: var(--text);
