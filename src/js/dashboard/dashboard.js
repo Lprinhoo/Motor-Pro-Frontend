@@ -1,5 +1,5 @@
 import { authService, oficinaApi, servicoApi, tokenStorage } from '../app/container.js';
-import { bootDone } from '../boot.js';
+import { bootDone } from '../pages/boot.js';
 import { ServicosSection } from './servicosSection.js';
 import { ContatosSection } from './contatosSection.js';
 
