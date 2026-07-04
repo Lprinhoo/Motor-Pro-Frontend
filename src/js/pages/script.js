@@ -1,6 +1,6 @@
 import { showPopup, hidePopup } from './utils.js';
 
-const API_BASE_URL = 'http://76.13.173.156:8080/api';
+import { API_BASE_URL } from '../config.js';
 
 // ─── Helpers de armazenamento (Lembrar-me) ─────────────────────────────────
 // Se "Lembrar-me" foi marcado no login, usamos localStorage (sobrevive a fechar
