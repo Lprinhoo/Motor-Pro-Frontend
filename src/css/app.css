@@ -22,13 +22,6 @@
 @import url('../components/_buttons.css');
 @import url('../components/_popup.css');
 
-/* Redesign da tela de login/cadastro — escopado em body.login-premium
-   (src/html/index.html). Importado por último entre os temas para vencer
-   a cascata sem !important. */
 @import url('../pages/_login.css');
 
-/* _responsive.css por último de todos: assim as media queries de ajuste
-   de altura vencem regras não condicionais (.card, .field, .btn-primary
-   etc.) definidas acima, sem precisar de !important — como especificidade
-   é igual, quem vem depois na cascata vence. */
 @import url('../layout/_responsive.css');
