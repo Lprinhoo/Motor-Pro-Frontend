@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Motor Pro CRM — Dashboard</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://api.level2d.tech https://oauth2.googleapis.com https://accounts.google.com; font-src 'self' https://cdn.jsdelivr.net;">
     <link rel="stylesheet" href="../css/app.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
@@ -88,65 +89,7 @@
 
     <!-- Conteúdo principal -->
     <main class="db-content">
-
-        <!-- Top bar -->
-        <header class="top-bar">
-            <div>
-                <div class="page-eyebrow">VISÃO GERAL</div>
-                <h2 class="page-title">Serviços</h2>
-                <div class="page-subtitle">Resumo de atividades e serviços da oficina.</div>
-            </div>
-            <div class="top-bar-actions">
-                <div class="search-box">
-                    <i class="ti ti-search"></i>
-                    <input type="text" placeholder="Buscar serviço...">
-
-                </div>
-            </div>
-        </header>
-
-        <!-- Métricas -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-label">OS Abertas</div>
-                <div class="metric-value"></div>
-                <div class="metric-delta"></div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Faturamento do Mês</div>
-                <div class="metric-value"></div>
-                <div class="metric-delta"></div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Clientes Ativos</div>
-                <div class="metric-value"></div>
-                <div class="metric-delta"></div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Serviços no Catálogo</div>
-                <div class="metric-value" id="metricServicos"></div>
-                <div class="metric-delta"></div>
-            </div>
-        </div>
-
-        <!-- Painel de serviços -->
-        <section class="panel">
-            <div class="panel-title-group">
-                <div>
-                    <div class="panel-title">SERVIÇOS DISPONÍVEIS</div>
-                    <div class="panel-hint">Catálogo de serviços que sua oficina oferece.</div>
-                </div>
-                <div class="panel-actions">
-                    <button class="btn-action primary" id="addServiceBtn">
-                        <i class="ti ti-plus"></i> Novo Serviço
-                    </button>
-                </div>
-            </div>
-            <div id="servicePanelsContainer" class="service-panels-grid">
-                <!-- Renderizado pelo dashboard/dashboard.js (sistema SOLID) -->
-            </div>
-        </section>
-
+        <!-- Conteúdo dinâmico renderizado por JavaScript -->
     </main>
 </div>
 

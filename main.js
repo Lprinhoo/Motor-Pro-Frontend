@@ -12,8 +12,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
-      contextIsolation: true,
-      webSecurity: false
+      contextIsolation: true
     }
   });
   mainWindow.loadFile(path.join(__dirname, 'src/html/index.html'));
@@ -44,7 +43,7 @@ async function refreshGoogleToken(refreshToken) {
 async function fullGoogleLogin() {
   return new Promise((resolve, reject) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const clientSecret = process.env.GOOGLE_CLIENT_ID;
     const redirectUri = 'http://127.0.0.1:8989';
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
@@ -148,29 +147,6 @@ app.whenReady().then(() => {
     // Sem refresh_token ou ele expirou → abre popup do Google
     return await fullGoogleLogin();
   });
-
-  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-        'Access-Control-Allow-Origin': ['*'],
-        'Access-Control-Allow-Methods': ['GET, POST, PUT, DELETE, OPTIONS'],
-        'Access-Control-Allow-Headers': ['*'],
-        'Access-Control-Allow-Credentials': ['true'],
-      }
-    });
-  });
-
-  session.defaultSession.webRequest.onBeforeRequest(
-      { urls: ['*://*/*'] },
-      (details, callback) => {
-        if (details.method === 'OPTIONS') {
-          callback({ cancel: false });
-        } else {
-          callback({});
-        }
-      }
-  );
 
   createWindow();
 

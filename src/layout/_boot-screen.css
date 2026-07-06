@@ -2,7 +2,7 @@
 #boot-screen {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: var(--z-boot);
     background-color: var(--bg);
     display: grid;
     place-items: center;
@@ -157,4 +157,3 @@
         font-size: clamp(0.95rem, 5vw, 1.2rem);
     }
 }
-

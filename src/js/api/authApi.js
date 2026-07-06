@@ -25,6 +25,14 @@ export class AuthApi {
             body: JSON.stringify({ username, email, password }),
         });
     }
+
+    googleAuth(idToken) {
+        return fetch(`${this.baseUrl}/auth/google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+        });
+    }
 }
 
 export const authApi = new AuthApi();

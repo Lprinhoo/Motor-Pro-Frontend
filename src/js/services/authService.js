@@ -30,11 +30,18 @@ export class AuthService {
      */
     async login(username, password, remember) {
         const response = await this.authApi.login(username, password);
-        if (!response.ok) return { ok: false, response };
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Credenciais inválidas');
+            }
+            throw new Error('Erro ao fazer login');
+        }
 
         const data = await response.json();
         const { accessToken, refreshToken } = data;
-        if (!accessToken) return { ok: false, response, missingToken: true };
+        if (!accessToken) {
+            throw new Error('Token de acesso não recebido na resposta do servidor.');
+        }
 
         this.tokenStorage.setAuthTokens({ accessToken, refreshToken }, remember);
         return { ok: true, accessToken, response };
@@ -42,7 +49,30 @@ export class AuthService {
 
     async register(username, email, password) {
         const response = await this.authApi.register(username, email, password);
-        return { ok: response.ok, response };
+        if (!response.ok) {
+            if (response.status === 409) { // Conflict
+                throw new Error('Usuário já existe');
+            }
+            throw new Error('Erro ao criar conta');
+        }
+        return { ok: true, response };
+    }
+
+    async googleAuth(idToken) {
+        const response = await this.authApi.googleAuth(idToken);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'Erro desconhecido no backend ao autenticar com Google.');
+        }
+
+        const data = await response.json();
+        const { accessToken, refreshToken } = data;
+        if (!accessToken) {
+            throw new Error('Token de acesso não recebido na resposta do servidor.');
+        }
+
+        this.tokenStorage.setAuthTokens({ accessToken, refreshToken }, false); // Google login doesn't use "remember me" checkbox
+        return { ok: true, accessToken, response };
     }
 
     logout() {

@@ -37,7 +37,16 @@ export class PopupService {
 
         this.title.innerText = title;
         this.message.innerHTML = message;
-        this.title.style.color = isError ? '#FF5252' : '#00E676';
+
+        // Remove classes de estado anteriores
+        this.card.classList.remove('popup-card--success', 'popup-card--error');
+
+        // Adiciona a classe de estado correta
+        if (isError) {
+            this.card.classList.add('popup-card--error');
+        } else {
+            this.card.classList.add('popup-card--success');
+        }
 
         this.card.classList.toggle('popup-is-form', isForm);
 
@@ -45,21 +54,16 @@ export class PopupService {
             this.closeBtn.style.display = 'none';
         } else {
             this.closeBtn.style.display = '';
-            this.closeBtn.style.background = isError ? '#FF5252' : 'linear-gradient(135deg, #00E676 0%, #00C853 100%)';
-            this.closeBtn.style.color = isError ? '#fff' : '#0A0A0C';
         }
 
         if (this.icon) {
-            const iconColor = isError ? '#FF5252' : '#00E676';
-            this.icon.style.background = isError ? 'rgba(255,82,82,0.15)' : 'rgba(0,230,118,0.15)';
-            this.icon.style.border = isError ? '1px solid rgba(255,82,82,0.25)' : '1px solid rgba(0,230,118,0.25)';
-
+            // As cores do ícone agora são definidas via CSS pelas classes popup-card--success/error
             if (isForm && !isError) {
-                this.icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+                this.icon.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
             } else {
                 this.icon.innerHTML = isError
-                    ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
-                    : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
+                    ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+                    : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>`;
             }
         }
 
@@ -70,7 +74,9 @@ export class PopupService {
         if (!this.overlay) return;
         this.overlay.classList.add('hidden');
         if (this.closeBtn) this.closeBtn.style.display = '';
-        if (this.card) this.card.classList.remove('popup-is-form');
+        if (this.card) {
+            this.card.classList.remove('popup-is-form', 'popup-card--success', 'popup-card--error');
+        }
     }
 }
 

@@ -21,3 +21,7 @@
 @import url('../components/_custom-select-icons.css');
 @import url('../components/_popup-form.css');
 @import url('../components/_service-details-popup.css');
+
+.metric-card--placeholder {
+    opacity: 0.6;
+}

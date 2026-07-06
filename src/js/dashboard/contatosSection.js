@@ -52,6 +52,9 @@ export class ContatosSection {
         const container = document.getElementById('contatosListContainer');
         if (!oficinaId || !container) return;
 
+        // Adiciona estado de loading
+        container.innerHTML = '<div class="empty-state empty-state--loading">Carregando contatos...</div>';
+
         try {
             const response = await this.oficinaApi.listarContatos(oficinaId);
             if (response.ok) {

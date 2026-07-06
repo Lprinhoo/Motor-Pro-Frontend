@@ -25,3 +25,29 @@
 @import url('../pages/_login.css');
 
 @import url('../layout/_responsive.css');
+
+/* Password Strength Indicator */
+.password-strength {
+    height: 6px;
+    background-color: var(--text-faint);
+    border-radius: 3px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    background-color: transparent;
+    border-radius: 3px;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.password-strength-label {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: var(--text-mute);
+    text-align: right;
+    min-height: 1.2em; /* Para evitar "jump" no layout */
+}

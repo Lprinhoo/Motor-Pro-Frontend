@@ -15,6 +15,7 @@ export class ServicosSection {
     /** @param {import('../api/servicoApi.js').ServicoApi} servicoApi */
     constructor(servicoApi) {
         this.servicoApi = servicoApi;
+        this._servicosCache = []; // Cache para a busca client-side
     }
 
     render(dbContent) {
@@ -29,7 +30,7 @@ export class ServicosSection {
                 <div class="top-bar-actions">
                     <div class="search-box">
                         <i class="ti ti-search"></i>
-                        <input type="text" placeholder="Buscar serviço...">
+                        <input type="text" id="serviceSearchInput" placeholder="Buscar serviço...">
                     </div>
                 </div>
             </header>
@@ -57,34 +58,64 @@ export class ServicosSection {
         document.getElementById('addServiceBtn')?.addEventListener('click', () => this.handleAddService());
         this.metricServicosEl = document.getElementById('metricServicos');
         this.carregarDados();
+
+        // Adiciona listener de busca
+        const searchInput = document.getElementById('serviceSearchInput');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const searchTerm = e.target.value.trim();
+                searchTimeout = setTimeout(() => {
+                    this._filterAndRenderServices(searchTerm);
+                }, 250); // Debounce de 250ms
+            });
+        }
     }
 
     async carregarDados() {
+        const el = document.getElementById('servicePanelsContainer');
+        if (el) {
+            el.innerHTML = '<div class="empty-state empty-state--loading">Carregando serviços...</div>';
+        }
+
         try {
             const response = await this.servicoApi.listar();
 
             if (response.ok) {
                 const servicos = await response.json();
-                this._renderizarPaineis(Array.isArray(servicos) ? servicos : []);
-                if (this.metricServicosEl) this.metricServicosEl.innerText = String(Array.isArray(servicos) ? servicos.length : 0);
+                this._servicosCache = Array.isArray(servicos) ? servicos : []; // Armazena no cache
+                this._renderizarPaineis(this._servicosCache);
+                if (this.metricServicosEl) this.metricServicosEl.innerText = String(this._servicosCache.length);
             } else if (response.status === 204) {
-                this._renderizarPaineis([]);
+                this._servicosCache = [];
+                this._renderizarPaineis(this._servicosCache);
                 if (this.metricServicosEl) this.metricServicosEl.innerText = '0';
             } else {
-                showPopup('Erro', escapeHtml(await parseApiError(response, 'Erro ao carregar serviços. Tente novamente.')), true);
-                this._renderizarPaineis([]);
+                const { generalMessage } = await parseApiError(response, 'Erro ao carregar serviços. Tente novamente.');
+                showPopup('Erro', escapeHtml(generalMessage), true);
+                this._servicosCache = [];
+                this._renderizarPaineis(this._servicosCache);
                 if (this.metricServicosEl) this.metricServicosEl.innerText = '0';
             }
         } catch (error) {
             if (error.message !== 'Refresh Token inválido ou expirado') {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
             }
-            this._renderizarPaineis([]);
+            this._servicosCache = [];
+            this._renderizarPaineis(this._servicosCache);
             if (this.metricServicosEl) this.metricServicosEl.innerText = '0';
         }
     }
 
-    _renderizarPaineis(servicos) {
+    _filterAndRenderServices(searchTerm) {
+        const filteredServices = this._servicosCache.filter(service =>
+            service.nome.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        this._renderizarPaineis(filteredServices, searchTerm);
+    }
+
+    _renderizarPaineis(servicos, searchTerm = '') {
         const el = document.getElementById('servicePanelsContainer');
         if (!el) return;
 
@@ -94,7 +125,11 @@ export class ServicosSection {
             return;
         }
         if (!servicos.length) {
-            el.innerHTML = '<div class="empty-state">Nenhum serviço cadastrado para exibir.</div>';
+            if (searchTerm) {
+                el.innerHTML = `<div class="empty-state">Nenhum serviço encontrado para "${escapeHtml(searchTerm)}".</div>`;
+            } else {
+                el.innerHTML = '<div class="empty-state">Nenhum serviço cadastrado para exibir.</div>';
+            }
             return;
         }
 
@@ -390,9 +425,10 @@ export class ServicosSection {
                 if (response.ok) {
                     hidePopup();
                     showPopup('Sucesso', isEdit ? 'Serviço atualizado com sucesso!' : 'Serviço adicionado com sucesso!');
-                    this.carregarDados();
+                    this.carregarDados(); // Recarrega os dados para atualizar o cache e a exibição
                 } else {
-                    showPopup('Erro de Validação', escapeHtml(await parseApiError(response, isEdit ? 'Erro ao atualizar serviço.' : 'Erro ao adicionar serviço.')), true);
+                    const { generalMessage } = await parseApiError(response, isEdit ? 'Erro ao atualizar serviço.' : 'Erro ao adicionar serviço.');
+                    showPopup('Erro de Validação', escapeHtml(generalMessage), true);
                 }
             } catch {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
@@ -423,9 +459,10 @@ export class ServicosSection {
                 if (response.ok || response.status === 204) {
                     hidePopup();
                     showPopup('Sucesso', 'Serviço excluído com sucesso!');
-                    this.carregarDados();
+                    this.carregarDados(); // Recarrega os dados para atualizar o cache e a exibição
                 } else {
-                    showPopup('Erro', escapeHtml(await parseApiError(response, 'Erro ao excluir serviço.')), true);
+                    const { generalMessage } = await parseApiError(response, 'Erro ao excluir serviço.');
+                    showPopup('Erro', escapeHtml(generalMessage), true);
                 }
             } catch {
                 showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor.', true);

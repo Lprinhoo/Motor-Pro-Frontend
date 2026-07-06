@@ -51,7 +51,8 @@ export class HttpClient {
         let response = await fetch(url, requestOptions);
 
         const isAuthFailure = response.status === 401 || response.status === 403;
-        const isRefreshCall = url === `${this.baseUrl}/auth/refresh`;
+        // Ajuste: Adiciona /auth/google à lista de chamadas que não devem disparar o refresh
+        const isRefreshCall = url === `${this.baseUrl}/auth/refresh` || url === `${this.baseUrl}/auth/google`;
 
         if (isAuthFailure && refreshToken && !isRefreshCall) {
             return this._handleAuthFailure(url, options);

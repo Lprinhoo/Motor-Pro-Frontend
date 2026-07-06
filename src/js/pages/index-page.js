@@ -1,6 +1,7 @@
-import { showPopup, hidePopup } from './utils.js';
-import { authFetch, API_BASE_URL, setAuthData, isRemembered, getStoredValue, clearAuthData } from './script.js';
+import { authService, tokenStorage, oficinaApi } from '../app/container.js';
+import { showPopup } from '../components/popup.js'; // hidePopup removido, pois não é usado diretamente aqui
 import { bootDone } from './boot.js';
+// API_BASE_URL removido, pois não é mais usado diretamente após a migração para authService/AuthApi
 
 let autoLoginTimeout;
 
@@ -18,12 +19,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleLoginBtn     = document.querySelector('.btn-google');
     const autoLoginStatus    = document.getElementById('auto-login-status');
     const switchAccountBtn   = document.getElementById('switch-account-btn');
-    // Adicionado: Referência para o novo botão de trocar conta Google
     const googleSwitchAccountBtn = document.getElementById('google-switch-account-btn');
+
+    // Password strength elements
+    const passwordRegisterField = document.getElementById('password-register');
+    const passwordStrengthBar = document.querySelector('#register-form .password-strength-bar');
+    const passwordStrengthLabel = document.querySelector('#register-form .password-strength-label');
 
     // ─── Login automático: se "Lembrar-me" estava marcado e há um token salvo,
     // mostra a tela de auto-login com opção de trocar de conta.
-    if (isRemembered() && getStoredValue('jwtToken')) {
+    if (tokenStorage.isRemembered() && tokenStorage.get('jwtToken')) {
         if (flipper) flipper.style.display = 'none';
         if (autoLoginStatus) autoLoginStatus.style.display = 'block';
 
@@ -38,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (switchAccountBtn) {
             switchAccountBtn.addEventListener('click', () => {
                 clearTimeout(autoLoginTimeout); // Cancela o redirecionamento automático
-                clearAuthData(); // Limpa os dados de autenticação
+                tokenStorage.clearAuth(); // Limpa os dados de autenticação
                 localStorage.removeItem('googleRefreshToken'); // Garante que o refresh token do Google seja limpo
                 if (autoLoginStatus) autoLoginStatus.style.display = 'none';
                 if (flipper) flipper.style.display = 'block';
@@ -117,18 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Busca oficina do usuário após login ──────────────────
     async function buscarOficinaDoUsuario() {
         try {
-            const response = await authFetch(`${API_BASE_URL}/oficinas/minha`);
+            const response = await oficinaApi.minha();
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {
-                    localStorage.setItem('oficinaId',   oficina.id);
-                    localStorage.setItem('oficinaNome', oficina.nome || '');
+                    tokenStorage.setItem('oficinaId',   oficina.id);
+                    tokenStorage.setItem('oficinaNome', oficina.nome || '');
                     return true;
                 }
             } else if (response.status === 204) {
                 return false;
             }
-        } catch (error) {
+        } catch { // 'error' removido, pois não é usado
             // Erro silencioso — será tratado pelo redirecionamento
         }
         return false;
@@ -152,39 +157,93 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.pointerEvents = 'none';
 
             try {
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
+                const remember = cbRemember?.classList.contains('checked') ?? false;
+                await authService.login(username, password, remember);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const accessToken  = data.accessToken;
-                    const refreshToken = data.refreshToken;
-
-                    if (!accessToken) {
-                        showPopup('Erro de Login', 'Token de acesso não recebido na resposta do servidor.', true);
-                        return;
-                    }
-
-                    const remember = cbRemember?.classList.contains('checked') ?? false;
-                    setAuthData({ accessToken, refreshToken }, remember);
-
-                    const temOficina = await buscarOficinaDoUsuario();
-                    setTimeout(() => {
-                        window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                    }, 400);
-                } else {
-                    showLoginError('Usuário ou senha incorretos.');
-                }
+                const temOficina = await buscarOficinaDoUsuario();
+                setTimeout(() => {
+                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                }, 400);
             } catch (error) {
-                showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
+                if (error.message === 'Credenciais inválidas') {
+                    showLoginError('Usuário ou senha incorretos.');
+                } else {
+                    showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
+                }
             } finally {
                 btn.style.opacity = '';
                 btn.style.pointerEvents = '';
             }
         });
+    }
+
+    // ─── Indicador de Força de Senha ──────────────────────────
+    function checkPasswordStrength() {
+        const password = passwordRegisterField.value;
+        let score = 0;
+        const messages = [];
+        const bar = passwordStrengthBar;
+        const label = passwordStrengthLabel;
+
+        // Critérios de força
+        if (password.length >= 8) {
+            score++;
+            messages.push('Pelo menos 8 caracteres');
+        } else {
+            messages.push('Mínimo de 8 caracteres');
+        }
+        if (/[0-9]/.test(password)) {
+            score++;
+            messages.push('Contém números');
+        }
+        if (/[A-Z]/.test(password)) {
+            score++;
+            messages.push('Contém letras maiúsculas');
+        }
+        if (/[^A-Za-z0-9]/.test(password)) {
+            score++;
+            messages.push('Contém caracteres especiais');
+        }
+
+        // Atualiza a barra e o label
+        let strengthText = '';
+        let barWidth = 0;
+        let barColor = '';
+
+        if (password.length === 0) {
+            strengthText = '';
+            barWidth = 0;
+            barColor = '';
+        } else if (score <= 1) {
+            strengthText = 'Fraca';
+            barWidth = 25;
+            barColor = 'var(--danger)';
+        } else if (score === 2) {
+            strengthText = 'Média';
+            barWidth = 50;
+            barColor = 'var(--warning)';
+        } else if (score === 3) {
+            strengthText = 'Boa';
+            barWidth = 75;
+            barColor = 'orange'; // Usar uma cor intermediária ou variável CSS
+        } else { // score === 4
+            strengthText = 'Forte';
+            barWidth = 100;
+            barColor = 'var(--success)';
+        }
+
+        if (bar) {
+            bar.style.width = `${barWidth}%`;
+            bar.style.backgroundColor = barColor;
+        }
+        if (label) {
+            label.textContent = strengthText;
+            label.style.color = barColor;
+        }
+    }
+
+    if (passwordRegisterField) {
+        passwordRegisterField.addEventListener('input', checkPasswordStrength);
     }
 
     // ─── Cadastro ─────────────────────────────────────────────
@@ -193,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const username        = document.getElementById('username-register').value.trim();
             const email           = document.getElementById('email-register').value.trim();
-            const password        = document.getElementById('password-register').value;
+            const password        = passwordRegisterField.value; // Usar a referência já existente
             const confirmPassword = document.getElementById('confirm-password-register').value;
 
             if (!username || !email || !password || !confirmPassword) {
@@ -215,59 +274,22 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.pointerEvents = 'none';
 
             try {
-                const regResponse = await fetch(`${API_BASE_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password }),
-                });
+                await authService.register(username, email, password);
+                await authService.login(username, password, false); // Login automático após cadastro
 
-                if (!regResponse.ok) {
-                    let errorMessage = 'Erro ao criar conta. Tente novamente.';
-                    try {
-                        const errorText = await regResponse.text();
-                        const errorData = JSON.parse(errorText);
-                        errorMessage = errorData.message || errorText || errorMessage;
-                    } catch { /* mantém padrão */ }
-                    showPopup('Erro no cadastro', errorMessage, true);
-                    return;
-                }
-
-                // Login automático após cadastro
-                const loginResponse = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                if (loginResponse.ok) {
-                    const data = await loginResponse.json();
-                    const accessToken  = data.accessToken;
-                    const refreshToken = data.refreshToken;
-
-                    if (!accessToken) {
-                        showPopup('Erro no Cadastro', 'Token de acesso não recebido após cadastro.', true);
-                        return;
-                    }
-
-                    // Cadastro recém-feito: mantém o login ativo nesta sessão por padrão
-                    setAuthData({ accessToken, refreshToken }, false);
-
-                    const temOficina = await buscarOficinaDoUsuario();
-                    setTimeout(() => {
-                        window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                    }, 400);
-                } else {
-                    let errorMessage = 'Erro ao fazer login automático após cadastro.';
-                    try {
-                        const errorText = await loginResponse.text();
-                        const errorData = JSON.parse(errorText);
-                        errorMessage = errorData.message || errorText || errorMessage;
-                    } catch { /* mantém padrão */ }
-                    showPopup('Erro no login automático', errorMessage, true);
-                    flipTo(false);
-                }
+                const temOficina = await buscarOficinaDoUsuario();
+                setTimeout(() => {
+                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                }, 400);
             } catch (error) {
-                showPopup('Erro de Conexão', 'Não foi possível conectar ao servidor ou erro inesperado.', true);
+                let errorMessage = 'Erro ao criar conta. Tente novamente.';
+                if (error.message === 'Usuário já existe') {
+                    errorMessage = 'Nome de usuário ou e-mail já cadastrado.';
+                } else if (error.message === 'Erro de rede') {
+                    errorMessage = 'Não foi possível conectar ao servidor.';
+                }
+                showPopup('Erro no cadastro', errorMessage, true);
+                flipTo(false);
             } finally {
                 btn.style.opacity = '';
                 btn.style.pointerEvents = '';
@@ -282,47 +304,26 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 let savedRefreshToken = null;
                 if (!forceNewLogin) {
-                    savedRefreshToken = localStorage.getItem('googleRefreshToken');
+                    savedRefreshToken = tokenStorage.get('googleRefreshToken');
                 }
 
-                // A função `googleLogin` em preload.js precisará ser atualizada para aceitar `forceNewLogin`
                 const { idToken, refreshToken } = await window.api.googleLogin(savedRefreshToken, forceNewLogin);
 
                 // Salva o refresh_token para próximas vezes
                 if (refreshToken) {
-                    localStorage.setItem('googleRefreshToken', refreshToken);
+                    tokenStorage.setItem('googleRefreshToken', refreshToken);
                 }
 
-                const response = await fetch(`${API_BASE_URL}/auth/google`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idToken }),
-                });
+                await authService.googleAuth(idToken);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const accessToken  = data.accessToken;
-                    const refreshToken = data.refreshToken;
-
-                    if (!accessToken) {
-                        showPopup('Erro de Login', 'Token de acesso não recebido.', true);
-                        return;
-                    }
-
-                    setAuthData({ accessToken, refreshToken }, false);
-
-                    const temOficina = await buscarOficinaDoUsuario();
-                    setTimeout(() => {
-                        window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
-                    }, 400);
-                } else {
-                    const errorData = await response.json().catch(() => ({}));
-                    showPopup('Erro no Login com Google', errorData.message || 'Erro desconhecido no backend.', true);
-                }
+                const temOficina = await buscarOficinaDoUsuario();
+                setTimeout(() => {
+                    window.location.href = temOficina ? 'dashboard.html' : 'register-oficina.html';
+                }, 400);
             } catch (error) {
                 if (error.message === 'Login cancelado pelo usuário') return;
                 console.error('Erro no login com Google:', error);
-                showPopup('Erro no Login com Google', 'Não foi possível iniciar o login com Google.', true);
+                showPopup('Erro no Login com Google', error.message || 'Não foi possível iniciar o login com Google.', true);
             }
         }
 

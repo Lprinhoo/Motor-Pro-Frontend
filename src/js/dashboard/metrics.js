@@ -6,20 +6,20 @@
 export function getMetricsHTML() {
     return `
         <div class="metrics-grid">
-            <div class="metric-card">
+            <div class="metric-card metric-card--placeholder">
                 <div class="metric-label">OS Abertas</div>
-                <div class="metric-value"></div>
-                <div class="metric-delta"></div>
+                <div class="metric-value">—</div>
+                <div class="metric-delta">Em breve</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card metric-card--placeholder">
                 <div class="metric-label">Faturamento do Mês</div>
-                <div class="metric-value"></div>
-                <div class="metric-delta"></div>
+                <div class="metric-value">—</div>
+                <div class="metric-delta">Em breve</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card metric-card--placeholder">
                 <div class="metric-label">Clientes Ativos</div>
-                <div class="metric-value"></div>
-                <div class="metric-delta"></div>
+                <div class="metric-value">—</div>
+                <div class="metric-delta">Em breve</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Serviços no Catálogo</div>

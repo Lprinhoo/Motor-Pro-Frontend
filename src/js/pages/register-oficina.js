@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showPopup('Sucesso', `Oficina "${data.nome}" cadastrada! Redirecionando...`);
                 setTimeout(() => { hidePopup(); window.location.href = 'dashboard.html'; }, 1500);
             } else {
-                showPopup('Erro', await parseApiError(response, 'Erro ao cadastrar oficina. Tente novamente.'), true);
+                const { generalMessage } = await parseApiError(response, 'Erro ao cadastrar oficina. Tente novamente.');
+                showPopup('Erro', generalMessage, true);
             }
         } catch (error) {
             console.error('Erro ao cadastrar oficina:', error);
