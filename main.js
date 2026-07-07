@@ -43,7 +43,7 @@ async function refreshGoogleToken(refreshToken) {
 async function fullGoogleLogin() {
   return new Promise((resolve, reject) => {
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     const redirectUri = 'http://127.0.0.1:8989';
 
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +

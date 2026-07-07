@@ -1,9 +1,28 @@
-/* ── Empty state ────────────────────────────────────────── */
+/* ── Empty State ────────────────────────────────────────────────────────── */
 .empty-state {
-    font-size: 13px;
-    color: var(--text-faint);
+    padding: 3rem 1.5rem;
     text-align: center;
-    padding: 3rem 0;
-    grid-column: 1 / -1;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    line-height: 1.5;
+    background-color: var(--bg-panel);
+    border-radius: var(--border-radius);
+    border: 1px dashed var(--border-color);
+    margin-top: 1.5rem;
+
+    /* Adicionado para centralizar o conteúdo */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+.empty-state--loading {
+    opacity: 0.8;
+    animation: pulseLoading 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseLoading {
+    0%, 70%, 100% { opacity: 0.4; }
+    35%            { opacity: 1;   }
+}

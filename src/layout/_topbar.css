@@ -11,6 +11,20 @@
     min-width: 0;
 }
 
+/* #dbContentInner é o "miolo" que troca a cada aba (metricsContainer fica
+   fora, fixo). Precisa repassar o mesmo comportamento flex que o
+   .db-content tinha antes, senão elementos internos com flex:1
+   (ex: .panel) perdem a referência de container flex e não esticam
+   mais para preencher a altura restante. */
+#dbContentInner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    min-height: 0;
+    min-width: 0;
+}
+
 /* ── Top Bar ────────────────────────────────────────────── */
 .top-bar {
     display: flex;

@@ -2,6 +2,7 @@ import { showPopup, hidePopup } from '../components/popup.js';
 import { parseApiError } from '../services/apiErrorParser.js';
 import { escapeHtml, getContactIcon, validateContactValue, configureContactValueField } from '../components/serviceHelpers.js';
 import * as masks from '../components/masks.js';
+import { renderPageHeader, renderPanelShell } from '../components/pageLayout.js';
 
 /**
  * Módulo de Contatos. Recebe OficinaApi e o id da oficina ativa por injeção
@@ -17,30 +18,18 @@ export class ContatosSection {
     render(dbContent) {
         if (!dbContent) return;
         dbContent.innerHTML = `
-            <header class="top-bar">
-                <div>
-                    <div class="page-eyebrow">CANAIS</div>
-                    <h2 class="page-title">Contatos</h2>
-                    <div class="page-subtitle">Formas de contato divulgadas para seus clientes.</div>
-                </div>
-                <div class="top-bar-actions">
-                    <button class="btn-action primary" id="addContatoBtn">
-                        <i class="ti ti-plus"></i> Novo Contato
-                    </button>
-                </div>
-            </header>
-
-            <section class="panel">
-                <div class="panel-title-group">
-                    <div>
-                        <div class="panel-title">CONTATOS CADASTRADOS</div>
-                        <div class="panel-hint">Telefone, WhatsApp, e-mail e redes sociais da oficina.</div>
-                    </div>
-                </div>
-                <div id="contatosListContainer" class="service-panels-grid">
-                    <!-- Renderizado pelo ContatosSection -->
-                </div>
-            </section>
+            ${renderPageHeader({
+                eyebrow: 'CANAIS',
+                title: 'Contatos',
+                subtitle: 'Formas de contato divulgadas para seus clientes.',
+                primaryActionId: 'addContatoBtn',
+                primaryActionLabel: 'Novo Contato',
+            })}
+            ${renderPanelShell({
+                title: 'CONTATOS CADASTRADOS',
+                hint: 'Telefone, WhatsApp, e-mail e redes sociais da oficina.',
+                bodyId: 'contatosListContainer',
+            })}
         `;
 
         document.getElementById('addContatoBtn')?.addEventListener('click', () => this.handleAddContato());

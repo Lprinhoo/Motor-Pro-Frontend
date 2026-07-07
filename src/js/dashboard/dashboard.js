@@ -2,10 +2,12 @@ import { authService, oficinaApi, servicoApi, tokenStorage } from '../app/contai
 import { bootDone } from '../pages/boot.js';
 import { ServicosSection } from './servicosSection.js';
 import { ContatosSection } from './contatosSection.js';
+import { getMetricsHTML } from './metrics.js';   // <-- novo import
 
 document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn  = document.getElementById('logoutBtn');
-    const dbContent  = document.querySelector('.db-content');
+    const dbContent  = document.getElementById('dbContentInner'); // apenas a área que troca por aba
+    const metricsContainer = document.getElementById('metricsContainer'); // <-- fica fixo, fora do dbContent
 
     const token     = tokenStorage.get('jwtToken');
     const oficinaId = tokenStorage.get('oficinaId');
@@ -26,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nomeEl) nomeEl.innerText = oficinaNome;
 
     const getOficinaId = () => tokenStorage.get('oficinaId');
+
+    // Renderiza a barra de métricas uma única vez, fora da troca de abas
+    if (metricsContainer) metricsContainer.innerHTML = getMetricsHTML();
 
     // ─── Registro de seções (OCP) ───────────────────────────────────────────
     // Cada chave corresponde ao `data-page` usado no HTML. Para habilitar uma

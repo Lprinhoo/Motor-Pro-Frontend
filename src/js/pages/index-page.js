@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ─── Busca oficina do usuário após login ──────────────────
     async function buscarOficinaDoUsuario() {
         try {
-            const response = await oficinaApi.minha();
+            const response = await oficinaApi.buscarMinhaOficina();
             if (response.ok) {
                 const oficina = await response.json();
                 if (oficina && oficina.id) {
@@ -133,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (response.status === 204) {
                 return false;
             }
-        } catch { // 'error' removido, pois não é usado
+        } catch (error) {
+            console.error('Erro ao buscar oficina do usuário:', error);
             // Erro silencioso — será tratado pelo redirecionamento
         }
         return false;

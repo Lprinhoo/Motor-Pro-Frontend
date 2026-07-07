@@ -2,7 +2,8 @@ import { showPopup, hidePopup } from '../components/popup.js';
 import { parseApiError } from '../services/apiErrorParser.js';
 import { formatarTempo, escapeHtml, extrairValorServico, extrairTempoServico } from '../components/serviceHelpers.js';
 import { applyCurrencyMask, parseCurrencyInput } from '../components/masks.js';
-import { getMetricsHTML } from './metrics.js';
+import { renderPageHeader, renderPanelShell } from '../components/pageLayout.js';
+// import { getMetricsHTML } from './metrics.js'; // Removido, pois as métricas são renderizadas globalmente
 
 const DESCRICAO_MIN = 10;
 const DESCRICAO_MAX = 500;
@@ -21,38 +22,20 @@ export class ServicosSection {
     render(dbContent) {
         if (!dbContent) return;
         dbContent.innerHTML = `
-            <header class="top-bar">
-                <div>
-                    <div class="page-eyebrow">VISÃO GERAL</div>
-                    <h2 class="page-title">Serviços</h2>
-                    <div class="page-subtitle">Resumo de atividades e serviços da oficina.</div>
-                </div>
-                <div class="top-bar-actions">
-                    <div class="search-box">
-                        <i class="ti ti-search"></i>
-                        <input type="text" id="serviceSearchInput" placeholder="Buscar serviço...">
-                    </div>
-                </div>
-            </header>
-
-            ${getMetricsHTML()}
-
-            <section class="panel">
-                <div class="panel-title-group">
-                    <div>
-                        <div class="panel-title">SERVIÇOS DISPONÍVEIS</div>
-                        <div class="panel-hint">Catálogo de serviços que sua oficina oferece.</div>
-                    </div>
-                    <div class="panel-actions">
-                        <button class="btn-action primary" id="addServiceBtn">
-                            <i class="ti ti-plus"></i> Novo Serviço
-                        </button>
-                    </div>
-                </div>
-                <div id="servicePanelsContainer" class="service-panels-grid">
-                    <!-- Renderizado pelo ServicosSection -->
-                </div>
-            </section>
+            ${renderPageHeader({
+                eyebrow: 'VISÃO GERAL',
+                title: 'Serviços',
+                subtitle: 'Resumo de atividades e serviços da oficina.',
+                searchInputId: 'serviceSearchInput',
+                searchPlaceholder: 'Buscar serviço...',
+                primaryActionId: 'addServiceBtn',
+                primaryActionLabel: 'Novo Serviço',
+            })}
+            ${renderPanelShell({
+                title: 'SERVIÇOS DISPONÍVEIS',
+                hint: 'Catálogo de serviços que sua oficina oferece.',
+                bodyId: 'servicePanelsContainer',
+            })}
         `;
 
         document.getElementById('addServiceBtn')?.addEventListener('click', () => this.handleAddService());
