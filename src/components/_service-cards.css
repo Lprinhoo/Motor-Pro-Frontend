@@ -9,6 +9,20 @@
     flex: 1;
 }
 
+/* Quando o único conteúdo é uma mensagem de estado vazio, centraliza
+   ela no espaço todo do painel (em vez de ficar presa no topo/esquerda). */
+.service-panels-grid:has(> .empty-state) {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.service-panels-grid:has(> .empty-state) .empty-state {
+    transform: translateY(-60px);
+    opacity: 0.4;
+    font-weight: 700;
+}
+
 /* ── Card de serviço ────────────────────────────────────── */
 .service-panel {
     background: var(--surface-2);
